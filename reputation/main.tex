@@ -4,13 +4,20 @@
 
 \subsection{Skill hierarchy}
 
-The organisational hierarchy of a colony is described in section \ref{sec:domains}. In addition to this organisational hierarchy (which is unique to each colony), the Colony Network also maintains a hierarchy of skills, which is available for all colonies to use. A user's good or bad activity associated with either of these hierarchies will earn or lose them the corresponding reputation.
+The existence of domains that form the organisational hierarchy of a colony was described in section \ref{sec:domains}. In addition to this organisational hierarchy (which is unique to each colony), the Colony Network also maintains a hierarchy of skills, which is available for all colonies to use. A user's good or bad activity associated with either of these hierarchies will earn or lose them the corresponding reputation, though only in a single colony.\footnote{It is hopefully clear that allowing users to earn reputation in one colony and then use it to influence decisions in another would be ripe for abuse.}
 
 For example, when a task is created, as well as being placed in a particular domain in the colony, it is also tagged with a skill from the skill hierarchy. If the worker completes the task successfully, they will earn reputation in the relevant domain and skill. Conversely, if their work is found inadequate, they will lose the corresponding reputation.
 
 When a task is completed successfully and paid out, if the payout is denominated in the colony's own token, the user also receives reputation. 
 
+\subsection{Earning reputation}
+The only way that reputation is created in a colony is when it is 
 
 \subsection{Bootstrapping reputation}
+
+When a colony is new, no-one has done any work in it and so any objections raised would be pointless, as no-one would be able to vote on them. Therefore, when a colony is created, the creator can nominate addresses to have reputation assigned to them to begin with and to allow the colony to bootstrap itself. There will be a global limit on the rep that can be assigned in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without associated work being done.
+
+A similar bootstrapping problem presents itself whenever a domain is created - if the domain has had no work done in it, then who has the authority to make decisions? We do not wish to create new reputation here, as this would devalue reputation already earned in the colony by users completing work. Instead, we simply accept the fact the new domain has no reputation in it. Any objections can be escalated to a parental domain if necessary. This is not necessarily required in the event of a disagreement, however --- users will still be able to vote based on their reputation in relevant skills during a dispute, even if there is no reputation in the domain to contribute to the decision.
+
 \subsection{Reputation mining}\label{sec:reputationmining}
 
