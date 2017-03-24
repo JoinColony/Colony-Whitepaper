@@ -17,9 +17,9 @@ All tokens and currencies are administered by the colony contract; it is respons
 \textbf{Each domain and each task in a colony has an associated \emph{pot}.} To each pot, the colony contract may associate any number of unassigned tokens it holds. Depending on context, the funds in a pot may be referred to as the bounty, the budget, the salary or woking capital.\\
 \textbf{Funds are transferred between pots through \emph{funding proposals}.}
 \begin{description}
- \item A Funding Proposal consinsts of the following data
+ \item A Funding Proposal consists of the following data
  \begin{itemize}
-  \item \textbf{creator}	--	The person that created the proposal.
+  \item \textbf{Creator}	--	The person that created the proposal.
   \item \textbf{From}	--	Pot funds are coming from
   \item \textbf{To}	--	Pot funds are going to
   \item \textbf{TokenType}	--	The token contract address (0x0 for ether)
@@ -54,7 +54,7 @@ When a funding proposal is elligible to accrue funds (see below QUEUE REFREFFERE
 Note: TotalPaid in only ever increased up to TotalRequested and when this happens, the LastUpdated value is set to the earliest time at which this could have occured.
 
 \subsubsection{The Funding Queue}
-Active Funding Proposals are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
+Active Funding Proposals that share the same `From' pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
 
 
 
@@ -107,22 +107,33 @@ When the RFP enters the `completed' state, for a period of three days anyone can
 \subsubsection{Mandated Funding Proposals}
 A mandated funding proposal (\textbf{MFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. MFPs begin in the `inactive' state and can only become active via an explicit vote. The vote is based on reutation in the domain that is the most recent common ancestor of the two pots that money is being transferred between.
 
+\subsubsection*{Use-cases for MFPs}
+We imagine MFPs may be used to
+\begin{itemize}
+ \item reclaim funds from child domains
+ \item reclaim funds from cancelled tasks
+ \item fund projects across domains (joint ventures)
+ \item set aside funds designated as a person's salary
+ \item MORE? INSERT OTHERS HERE!!!
+\end{itemize}
+
+
 \subsubsection*{MFPs and the Funding Queue}
 
+Active Mandated Funding Proposals take priority over regular proposals and so they are placed at the top of the funding queue. The are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus MFPs that are higher in the domain hierarchy come before those lower down.
 
------------------------------------------
+Just like with RFPs, any user can `ping' an active MFP at the top of the queue to cause the contract to update the funds available to the recipient pot. TotalPaid, LastUpdated and CurrentState are updated as required.
 
-If a proposal is made for Department 1 to fund Task 1, then members of Department 1 vote on it. As this is allowed by a regular funding proposal, the implication here is that there is something unusual about the funding request.
-If a proposal is made for Department 1 to fund Parent Department (i.e. the Parent Department is reclaiming some funds), then members of Parent Department vote on it.
-If a proposal is made for Department 1 to fund Task 3 (yes, this is odd, but I don’t see why it shouldn’t be possible), then members of Parent department vote on it.
+\subsubsection*{The 24h waiting period for MFP updates}
+Mandated Funding Proposals take precedence over Regular Funding Proposals. To avoid the situation in which long running MFPs block the RFP process entirely, a limit is placed on how often and MFP can be updated (`pinged'). Thus we have the following
+\begin{description}
+ \item[Rule:] An MFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its LastUpdated time is at least 24 hours old.
+\end{description}
 
-If the proposal fails, the proposal is not funded. Otherwise, the mandated funding proposal is placed into the ‘active’ state. As a mandated funding proposal, it is forced to the top of the funding queue, and is not constrained by the funding rate limits that are placed on regular funding proposals (this is allowable because the rate was defined explicitly when the proposal was created, and then the relevant department voted on it).
+The result of this rule is that fast payments are still possible - in this case the MFP's rate is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate MFPs that do not block the entire RFP process.
 
-Placing the proposal at the top of the funding queue means that if the mandated funding proposal is one that reclaims money from the department, the department cannot make funding proposals that would drain the money trying to be reclaimed elsewhere. If multiple mandated funding proposals exist in a department at once, they are ordered by the total amount of reputation that was eligible to vote on them. For example, if two mandated funding proposals existed in Department 1 above, one of which was created by Department 1 and another of which was created by Parent Department, then the one created in Parent Department would take priority.
+\subsubsection*{When is a Funding Proposal eligible to receive funding?}
+A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the LastUpdated time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
+A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago.\\
 
-Once a mandated funding proposal is active, any user can make a transaction to cause the contract to update the funds available to the recipient pot at any time. We refer to this as ‘pinging’ the funding proposal. If the Amount Paid In for a proposal is not yet equal to the Allowed Amount, and the proposal is top of the approved mandated funding proposal queue, funds in the parent pot are allocated to this proposal. Any funds then available in this proposal are moved into the recipient pot based on the last update time of the funding proposal, the rate, and the current time.
-
-At any time, a dispute can be raised about a funding proposal to change its properties - perhaps to increase the allowed amount, or to flag it as cancelled. In the event of the latter, if the department wishes to reclaim any funds that have already passed through the funding proposal and now reside in the target pot, a new mandated funding proposal in the reverse direction must be made.
-
-To prevent mandated funding proposals from blocking normal funding proposals from being funded, they are only required to be updated every 24 hours. In the case where mandated funding proposals represent a controlled rate of payment to be made
-
+When an MFP is updated, and there are no lower-priority MFPs in the queue (i.e. the next item in the queue is the topmost RFP), then 
