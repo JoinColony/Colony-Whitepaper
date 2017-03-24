@@ -19,15 +19,15 @@ All tokens and currencies are administered by the colony contract; it is respons
 \begin{description}
  \item A Funding Proposal consists of the following data
  \begin{itemize}
-  \item \textbf{Creator}	--	The person that created the proposal.
-  \item \textbf{From}	--	Pot funds are coming from
-  \item \textbf{To}	--	Pot funds are going to
-  \item \textbf{TokenType}	--	The token contract address (0x0 for ether)
-  \item \textbf{CurrentState}	--	The state of the proposal ( e.g. inactive, active, completed, cancelled )
-  \item \textbf{TotalPaid}	--	How much has been transferred along this funding proposal so far
-  \item \textbf{TotalRequested}	--	The maximum amount to transfer after which this funding porposal is considered 'completed'
-  \item \textbf{LastUpdated}	--	The time when the funding proposal was last updated
-  \item \textbf{Rate}	--	Rate of funding
+  \item \ascode{\textbf{Creator}}	--	The person that created the proposal.
+  \item \ascode{\textbf{From}}	--	Pot funds are coming from
+  \item \ascode{\textbf{To}}	--	Pot funds are going to
+  \item \ascode{\textbf{TokenType}}	--	The token contract address (0x0 for ether)
+  \item \ascode{\textbf{CurrentState}}	--	The state of the proposal ( e.g. inactive, active, completed, cancelled )
+  \item \ascode{\textbf{TotalPaid}}	--	How much has been transferred along this funding proposal so far
+  \item \ascode{\textbf{TotalRequested}}	--	The maximum amount to transfer after which this funding porposal is considered 'completed'
+  \item \ascode{\textbf{LastUpdated}}	--	The time when the funding proposal was last updated
+  \item \ascode{\textbf{Rate}}	--	Rate of funding
  \end{itemize}
 
 \end{description}
@@ -40,18 +40,18 @@ In either case, the assignment to pots associated with departments or tasks is p
 Any member of the colony may create a funding proposal, however, the user in question must stake 0.01\%\footnote{this value may change before release} of the relevant reputation, where the reputation in question is that of the domain that is the most recent common ancestor of the source and target pots. They must also stake the same fraction of the colony's tokens i.e. the amount of reputation being staked is as a fraction of reputation in the whole colony domain, an the user must stake that fraction of all of the colony's local tokens in existence. This small stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. 
 
 \subsubsection*{From, To and TokenType}
-The purpose of a funding proposal is to move tokens of \textbf{TokenType} from a pot \textbf{From} to a pot \textbf{To}. \\
-The TokenType may be any ERC20 token whitelisted by the network, ether, Global Colony Token or Local Colony Token. The `From' and `To' addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
+The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}. \\
+The TokenType may be any ERC20 token whitelisted by the network, ether, Global Colony Token or Local Colony Token. The \ascode{From} and \ascode{To} addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
 
 \subsubsection*{CurrentState}
-The state of a funding proposal is either `inactive', `active', `completed' or `cancelled'. Only an active funding proposal is in line to receive any funds. A regular funding proposal begins in active state while a mandated one begins inactive (i.e. it must be activated by a dispute / vote). A funding proposal is completed when it's `TotalPaid' reaches `TotalRequested'. Any other state changes must be made through the dispute mechanism.
+The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to receive any funds. A regular funding proposal begins in active state while a mandated one begins inactive (i.e. it must be activated by a dispute / vote). A funding proposal is completed when it's \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism.
 
 \subsubsection*{TotalPaid and TotalRequested}
-The total number of funds that a funding proposal wiches to reallocate is called its `TotalRequested' amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its TotalRequested amount. The total number of tokens accrued to date are stored in its `TotalPaid' amount. 
+The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount. 
 
 \subsubsection*{Rate and LastUpdated}
 When a funding proposal is elligible to accrue funds (see below QUEUE REFREFFERERENCE) it does so at a specific Rate. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- the user requests and update. Upon being pinged, the time since LastUpdated is multiplied by the Rate to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to TotalPaid and the current time is recorded as LastUpdated.\\
-Note: TotalPaid in only ever increased up to TotalRequested and when this happens, the LastUpdated value is set to the earliest time at which this could have occured.
+Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens, the \ascode{LastUpdated} value is set to the earliest time at which this could have occured.
 
 \subsubsection{The Funding Queue}
 Active Funding Proposals that share the same `From' pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
@@ -89,17 +89,17 @@ When a user backs a proposal, both the user and their reputation at the time is 
 
 
 \subsubsection*{Completing an RFP}
-If an update finds that a proposal is funded (i.e. TotalPaid = TotalRequested), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
+If an update finds that a proposal is funded (i.e. \ascode{TotalPaid = TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
 \begin{itemize}
  \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated
- \item[\textbf{2.}] TotalPaid is set to TotalRequested
- \item[\textbf{3.}] The State is set to `Completed'
+ \item[\textbf{2.}] TotalPaid is set to \ascode{TotalRequested}
+ \item[\textbf{3.}] The \ascode{CurrentState} is set to \ascode{Completed}
  \item[\textbf{4.}] The RFP is removed from the queue
- \item[\textbf{5.}] The next RFP in the queue is promoted to the top of the queue, and its LastUpdated time is set as the time calculated in \textbf{1.}
+ \item[\textbf{5.}] The next RFP in the queue is promoted to the top of the queue, and its \ascode{LastUpdated} time is set as the time calculated in \textbf{1.}
 \end{itemize}
 
 
-When the RFP enters the `completed' state, for a period of three days anyone can make a proposal that the creator should be punished (i.e. lose their stake). If no such proposal is made, or the proposal fails to pass, then the creator can reclaim their stake.
+When the RFP enters the \ascode{completed} state, for a period of three days anyone can make a proposal that the creator should be punished (i.e. lose their stake). If no such proposal is made, or the proposal fails to pass, then the creator can reclaim their stake.
 
 
 
@@ -122,18 +122,20 @@ We imagine MFPs may be used to
 
 Active Mandated Funding Proposals take priority over regular proposals and so they are placed at the top of the funding queue. The are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus MFPs that are higher in the domain hierarchy come before those lower down.
 
-Just like with RFPs, any user can `ping' an active MFP at the top of the queue to cause the contract to update the funds available to the recipient pot. TotalPaid, LastUpdated and CurrentState are updated as required.
+Just like with RFPs, any user can `ping' an active MFP at the top of the queue to cause the contract to update the funds available to the recipient pot. \ascode{TotalPaid}, \ascode{LastUpdated} and \ascode{CurrentState} are updated as required.
 
 \subsubsection*{The 24h waiting period for MFP updates}
 Mandated Funding Proposals take precedence over Regular Funding Proposals. To avoid the situation in which long running MFPs block the RFP process entirely, a limit is placed on how often and MFP can be updated (`pinged'). Thus we have the following
 \begin{description}
- \item[Rule:] An MFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its LastUpdated time is at least 24 hours old.
+ \item[Rule:] An MFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its \ascode{LastUpdated} time is at least 24 hours old.
 \end{description}
 
 The result of this rule is that fast payments are still possible - in this case the MFP's rate is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate MFPs that do not block the entire RFP process.
 
 \subsubsection*{When is a Funding Proposal eligible to receive funding?}
-A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the LastUpdated time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
-A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago.\\
+A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the \ascode{LastUpdated} time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
+A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain to orderings for the MFPs, one by priority and one by \ascode{LastUpdated}.}.\\
 
-When an MFP is updated, and there are no lower-priority MFPs in the queue (i.e. the next item in the queue is the topmost RFP), then 
+\subsubsection{Cancelling Tasks and Funding Proposals}
+As with any other non standard state-change, task and FP cancellation use the dispute mechanism. A dispute is raised ``this task's \ascode{State} should be set to \ascode{Cancelled}'', a vote is triggered and, if it passes, the state change is made.\\
+When a task is cancelled, and funding proposals that have that task's pot as their target (\ascode{To}) also enter the \ascode{Cancelled} their \ascode\CurrentState} when they are next pinged. However, the funds that had already been transferred are not automatically returned; it will require a special MFP to return the funds `upstream'\footnote{It is conceivable that such return-funds-from-cancelled-tasks MFPs have lower hurdles of activation.}.
