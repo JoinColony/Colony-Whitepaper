@@ -37,11 +37,11 @@ Mandated funding proposal should be used: when funds need to be directed somewhe
 In either case, the assignment to pots associated with departments or tasks is purely a bookkeeping mechanism; from the perspective of the blockchain, ether and tokens are held by the colony contract until paid out when a task is completed. 
 
 \subsubsection*{Creating a Funding Proposal}
-Any member of the colony may create a funding proposal, however, the user in question must stake 0.01\%\footnote{this value may change before release} of the relevant reputation, where the reputation in question is that of the domain that is the most recent common ancestor of the source and target pots. They must also stake the same fraction of the colony's tokens i.e. the amount of reputation being staked is as a fraction of reputation in the whole colony domain, an the user must stake that fraction of all of the colony's local tokens in existence. This small stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. 
+Any member of the colony may create a funding proposal, however, the user in question must stake 0.01\%\footnote{this value may change before release} of the relevant reputation, where the reputation in question is that of the domain that is the most recent common ancestor of the source and target pots. They must also stake the same fraction of the colony's tokens i.e. the fraction is the amount of reputation being staked as a fraction of reputation in the whole colony domain, and the user must stake a number of the colony's local tokens that constitute this fraction of all of the colony's local tokens in existence. This small stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. 
 
 \subsubsection*{From, To and TokenType}
 The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}. \\
-The TokenType may be any ERC20 token whitelisted by the network, ether, Global Colony Token or Local Colony Token. The \ascode{From} and \ascode{To} addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
+The \ascode{TokenType} may be any ERC20 token whitelisted by the network, ether, Global Colony Token or Local Colony Token. The \ascode{From} and \ascode{To} addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
 
 \subsubsection*{CurrentState}
 The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to receive any funds. A regular funding proposal begins in active state while a mandated one begins inactive (i.e. it must be activated by a dispute / vote). A funding proposal is completed when it's \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism.
@@ -50,11 +50,11 @@ The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \a
 The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount. 
 
 \subsubsection*{Rate and LastUpdated}
-When a funding proposal is elligible to accrue funds (see below QUEUE REFREFFERERENCE) it does so at a specific Rate. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- the user requests and update. Upon being pinged, the time since LastUpdated is multiplied by the Rate to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to TotalPaid and the current time is recorded as LastUpdated.\\
-Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens, the \ascode{LastUpdated} value is set to the earliest time at which this could have occured.
+When a funding proposal is elligible to accrue funds (see below QUEUE REFREFFERERENCE) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- i.e. the user manually requests and update. Upon being pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.\\
+Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occured.
 
 \subsubsection{The Funding Queue}
-Active Funding Proposals that share the same `From' pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
+Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
 
 
 
@@ -68,16 +68,16 @@ Insert schematic picture here of funding proposals in a queue.\\[2cm]
 
 
 \subsubsection{Regular Funding Proposals}
-A regular funding proposal (\textbf{RFP}) is a funding proposal from some domain's pot to one of it's children's. It starts out in the active state and is thus immediately elligible for funding. It may be cancelled at any time by the creator, or through the dispute mechanism.
+A regular funding proposal (\textbf{RFP}) is a funding proposal from some domain's pot to one of it's children's. It starts out in the \ascode{active} state and is thus immediately elligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism.
 
 \subsubsection*{Ordering of RFPs}
 Regular funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by `amount of reputation backing the proposal'.\\
-When created, a regular funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of an RFP is the domain of the pot that the funding proposal is `From'.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them `staking their reputation', it merely helps the proposal achieve funding.
+When created, a regular funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of an RFP is the domain of the pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them `staking their reputation', it merely helps the proposal achieve funding.
 
 The more reputation backs a proposal, the higher up the queue it is placed. Every transaction that adds backing to a proposal (or otherwise updates the backing level) inserts the proposal in the correct place in the queue. Only the funding proposal at the top of the queue accrues funds.\\
 
 \subsubsection*{The Rate of funding for RFPs}
-The more reputation backs a proposal, the faster it is funded; the rate scales linearly, and at the limit, if 100\% of the reputation in the source domain backs a regular funding proposal, then that funding proposal will be funded at a rate of 10\%\footnote{This number may change before release} of the domain's holdings (of the TokenType) per day. This ensures that, in the event of the queue being empty, the opportunistic user is unable to claim the entirety of the domain's funds instantaneously.
+The more reputation backs a proposal, the faster it is funded; the rate scales linearly, and at the limit, if 100\% of the reputation in the source domain backs a regular funding proposal, then that funding proposal will be funded at a rate of 10\%\footnote{This number may change before release.} of the domain's holdings (of the \ascode{TokenType}) per day. This ensures that, in the event of the queue being empty, the opportunistic user is unable to claim the entirety of the domain's funds instantaneously. The goal is a steady and predictable allocation of resources directed collectively by the domain's reputation weighted priorities.
 
 When a user backs a proposal, both the user and their reputation at the time is recorded. Consequently the user is able to update their backing at a later date. However, we note that such an update is not automatic and even if a user loses reputation due to bad behaviour, their backing level remains unchanged. To rectify this, we will allow users to update another user's backing to reflect their updated reputation scores, but we don't expect this functionality to be used often. Indeed we would only anticipate it being used if a user lost a lot of reputation due to some very bad behaviour, and other users wanted to prevent a bad funding proposal backed by the same user from being completed before it could be cancelled by other means (see REFREFFERERENCE). %Of course, this only applies to existing backings - users cannot force another user to back a proposal.
 
@@ -91,9 +91,9 @@ When a user backs a proposal, both the user and their reputation at the time is 
 \subsubsection*{Completing an RFP}
 If an update finds that a proposal is funded (i.e. \ascode{TotalPaid = TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
 \begin{itemize}
- \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated
- \item[\textbf{2.}] TotalPaid is set to \ascode{TotalRequested}
- \item[\textbf{3.}] The \ascode{CurrentState} is set to \ascode{Completed}
+ \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated% (and is recorded as \ascode{LastUpdated})
+ \item[\textbf{2.}] \ascode{TotalPaid} is set to \ascode{TotalRequested}
+ \item[\textbf{3.}] The \ascode{CurrentState} is set to \ascode{completed}
  \item[\textbf{4.}] The RFP is removed from the queue
  \item[\textbf{5.}] The next RFP in the queue is promoted to the top of the queue, and its \ascode{LastUpdated} time is set as the time calculated in \textbf{1.}
 \end{itemize}
@@ -105,7 +105,7 @@ When the RFP enters the \ascode{completed} state, for a period of three days any
 
 
 \subsubsection{Mandated Funding Proposals}
-A mandated funding proposal (\textbf{MFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. MFPs begin in the `inactive' state and can only become active via an explicit vote. The vote is based on reutation in the domain that is the most recent common ancestor of the two pots that money is being transferred between.
+A mandated funding proposal (\textbf{MFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. MFPs begin in the \ascode{inactive} state and can only become \ascode{active} via an explicit vote. The vote is based on reputation in the domain that is the most recent common ancestor of the two pots that money is being transferred between.
 
 \subsubsection*{Use-cases for MFPs}
 We imagine MFPs may be used to
@@ -120,7 +120,7 @@ We imagine MFPs may be used to
 
 \subsubsection*{MFPs and the Funding Queue}
 
-Active Mandated Funding Proposals take priority over regular proposals and so they are placed at the top of the funding queue. The are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus MFPs that are higher in the domain hierarchy come before those lower down.
+Active Mandated Funding Proposals take priority over regular proposals and so they are placed at the top of the funding queue. They are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus MFPs that are higher in the domain hierarchy come before those lower down.
 
 Just like with RFPs, any user can `ping' an active MFP at the top of the queue to cause the contract to update the funds available to the recipient pot. \ascode{TotalPaid}, \ascode{LastUpdated} and \ascode{CurrentState} are updated as required.
 
@@ -130,12 +130,13 @@ Mandated Funding Proposals take precedence over Regular Funding Proposals. To av
  \item[Rule:] An MFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its \ascode{LastUpdated} time is at least 24 hours old.
 \end{description}
 
-The result of this rule is that fast payments are still possible - in this case the MFP's rate is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate MFPs that do not block the entire RFP process.
+The result of this rule is that fast payments are still possible - in this case the MFP's \ascode{rate} is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate MFPs that do not block the entire RFP process.
 
 \subsubsection*{When is a Funding Proposal eligible to receive funding?}
 A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the \ascode{LastUpdated} time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
-A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain to orderings for the MFPs, one by priority and one by \ascode{LastUpdated}.}.\\
+A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain two orderings for the MFPs, one by priority and one by \ascode{LastUpdated}. }.\\
 
 \subsubsection{Cancelling Tasks and Funding Proposals}
+The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to \ascode{cancelled}. Similarly the creator of a task may cancel the task if it has not yet been assigend a worked (see section REFREFREF). Beyond this it must be possible to cancel any funding proposal at any time:\\
 As with any other non standard state-change, task and FP cancellation use the dispute mechanism. A dispute is raised ``this task's \ascode{State} should be set to \ascode{Cancelled}'', a vote is triggered and, if it passes, the state change is made.\\
 When a task is cancelled, and funding proposals that have that task's pot as their target (\ascode{To}) also enter the \ascode{Cancelled} their \ascode{CurrentState} when they are next pinged. However, the funds that had already been transferred are not automatically returned; it will require a special MFP to return the funds `upstream'\footnote{It is conceivable that such return-funds-from-cancelled-tasks MFPs have lower hurdles of activation.}.
