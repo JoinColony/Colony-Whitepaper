@@ -52,11 +52,11 @@ When the owner of a contract with an associated EternalStorage wishes to upgrade
 \begin{enumerate}
 \item The new version of the contract is deployed - let's assume to the address \code{0xcafe}.
 \item The owner of the existing \code{EternalStorage} is set to \code{0xcafe}.
-\item Destroy the old contract.
+\item The old contract is destroyed.
 \end{enumerate}
 
 All of the data is now available to the new contract, as well as the ability to amend existing data or write new data to the store, and the new contract has all of the assets of the original. This is only possible because no storage variables were used in the original colony contract. A naive implementation would copy across the data from an old contract to the new one, but this can get arbitrarily expensive.
 
-In the case of a colony being upgraded, we must also account for any token balances the colony has. For a colony with balances in a large number of tokens, sending each of these balances this could conceivably result in the upgrade process being unable to complete in a single transaction. Our intention is therefore to have a contract that can be associated with the colony to handle tokens on behalf of the colony that will exist alongside the colony for its lifetime.
+When a colony is being upgraded, we must also account for any token balances the colony has. If the colony has balances in a large number of tokens, sending each and every one of these token balances could conceivably result in the gas limit preventing the upgrade process being completed in a single transaction. Our intention is therefore to have a separate contract that can be associated with the colony which handles tokens on behalf of the colony, and will continue to exist alongside the colony for its entire lifetime.
 
 An important point for us to stress is that, in the case of a colony, the choice of upgrading will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
