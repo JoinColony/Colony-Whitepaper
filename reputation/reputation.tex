@@ -95,7 +95,7 @@ All reputations held by all users in all colonies are ordered in a list. The ele
  \node at (3,-5) (r3) {$R_3$};
  \node at (4.5,-5) (r4) {$R_4$};
  \node at (6,-5) (rdots) {$\cdots$};
- \node at (8,-5) (rn) {$R_n$};
+ \node at (8,-5) (rn) {$R_N$};
  %
  \node at (0,-4) (r1hash) {$\mathcal{H}(R_1)$}
   edge[-] (r1);
@@ -105,7 +105,7 @@ All reputations held by all users in all colonies are ordered in a list. The ele
   edge[-] (r3);
  \node at (4.5,-4) (r4hash) {$\mathcal{H}(R_4)$}
   edge[-] (r4);
- \node at (8,-4) (rnhash) {$\mathcal{H}(R_n)$}
+ \node at (8,-4) (rnhash) {$\mathcal{H}(R_N)$}
   edge[-] (rn);
  %
  \node at (1,-2.5) (r12) {$\mathcal{H}_{1,2}$}
@@ -114,7 +114,7 @@ All reputations held by all users in all colonies are ordered in a list. The ele
  \node at (3.75,-2.5) (r34) {$\mathcal{H}_{3,4}$}
   edge[-] (r3hash)
   edge[-] (r4hash);  
- \node at (7,-2.5) (rnn) {$\mathcal{H}_{n,n-1}$}
+ \node at (7,-2.5) (rnn) {$\mathcal{H}_{N,N-1}$}
   edge[-] (rnhash)
   edge[dashed] (6.5,-4);
  %
@@ -123,6 +123,8 @@ All reputations held by all users in all colonies are ordered in a list. The ele
   edge[-] (r34);
  %
  \node[draw, fill=gray!5] at (4,0) (root) {\texttt{ReputationRootHash}};
+ \node[right = 2mm of root] (rh) {$\mathcal{RH}$} 
+   edge[-] (root);
  \node[below = 1mm of root] (dummy) {\phantom{a}}
   (dummy.north west) edge[dashed] (r14)
   (dummy.north east) edge[dashed] (rnn);
@@ -134,12 +136,12 @@ All reputations held by all users in all colonies are ordered in a list. The ele
 
 In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself.
 
-The \ascode{ReputationRootHash} is the data we record on the blockchain. It represents an integrity check for the entire reputation system and whenever a user wishes to make use of their reputation, the can submit a merkle proof starting at the reputation they wish to make use of and ending at the \ascode{ReputationRootHash}.
+The \ascode{ReputationRootHash} is the data we record on the blockchain. It represents an integrity check for the entire reputation system and whenever a user wishes to make use of their reputation, the can submit a merkle proof starting at the reputation $\mathcal{R}_i$ they wish to make use of and ending at $\mathcal{RH}$.
 
 \subsection{Calculating the new root hash}
 The \rcth takes the last reputation state, and decays all reputation held by all users in all colonies, in the order of the leaves in the tree. They then take the set of reputation gains or losses due to good or bad behaviour that were not in the last state submitted, and are to be included in the next state. They apply the reputation updates to each user, in each colony, as is appropriate, to end up with a new list of reputations for all users and colonies. These new reputations are then hashed and assembled into a new merkle tree yielding an updated \ascode{ReputationRootHash}.
 
-While the calculation is to large to be done on-chain due to technical (gas limit) and economic (gas cost) limitations, it is expected that this calculation can easily be performaed by any consumer grade laptop computer.
+While the calculation is too large to be done on-chain due to technical (gas limit) and economic (gas cost) limitations, it is expected that this calculation can easily be performaed by any consumer grade laptop computer.
 
 \subsection{Submission of a new root hash}
 %
@@ -151,7 +153,8 @@ Since any user can calculate the correct root hash locally, it would be possible
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some \rcths to submit results to begin with. To participate in the mining process, \rcths must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash, ... )} is sufficiently small.  At the beginning of the submission window, the target is set to 0 and slowly increases such that after 150 blocks all submissions are accepted\footnote{Some minimal \rct holding requirements may apply to ward off a denial of service attack with thousands of false submissions.}. Here N is some number greater than 0 and less than the number of tokens the \rcth address has staked, meaning that users with a large stake have a higher chance of qualifying to submit a hash than smaller stake holders.
 %
 \subsubsection*{Verifying a submission}
-If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made.  If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge protocol can establish which state is incorrect (see Section \ref{sec:challengeresponse})
+If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurance.\\
+If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challengeresponse})
 
 \subsubsection*{Mining Rewards}
 
@@ -186,13 +189,89 @@ Note also that the array of \ascode{l}'s and \ascode{r}'s nothing more than a bi
 \subsubsection{The Challenge-Response Protocol}
 We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one \rcth out of all miners is required to make a submission, and there is an incentive for them to do so (\rc reputation). Thus our task is not to validate the correct hash but to invalidate the false ones.
 
+We must prove all but one submission incorrect by having each submission navigate a series of challenges. These \emph{challenges} refer to events that happened in the colony network within the last update cycle that have a reputation effect while the \emph{responses} to the challenges are merkle proofs that the corersponding reputation update was properly handled.
 
+\subsubsection*{1. The Justification Tree}
+ The first step is for both parties to upload a second merkle root. This is the root of a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}. The right-most leaf ($\mathcal{RH}_n$) is the hash they originally submitted, the left-most leaf ($\mathcal{RH}_0$) is the final accepted reputation state from the last update, and the intermediate leaves ($\mathcal{RH}_i$) represent the evolution of the reputation state after the reputation updates are applied one-at-a-time. 
+ %
+ \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
+ %
+\begin{center}
+\begin{tikzpicture}
+ \node at (0,-4) (rh0) {$\mathcal{RH}_0$};
+ \node at (1.5,-4) (rh1) {$\mathcal{RH}_1$};
+ \node at (3,-4) (rh2) {$\mathcal{RH}_2$};
+ \node at (4.5,-4) (rh3) {$\mathcal{RH}_3$};
+ \node at (6,-4) (rh4) {$\mathcal{RH}_4$};
+ \node at (7.5,-4) (rdots) {$\cdots$};
+ \node at (9.5,-4) (rhn) {$\mathcal{RH}_n$};
+ %
+ \node at (0.75,-2.5) (rh01) {$j_{01}$}
+  edge[-] (rh0)
+  edge[-] (rh1);
+ %
+ \node at (2.25,-2.5) (rh12) {$j_{12}$}
+  edge[-] (rh1)
+  edge[-] (rh2);
+ %
+ \node at (3.75,-2.5) (rh23) {$j_{23}$}
+  edge[-] (rh2)
+  edge[-] (rh3);  
+ %
+ \node at (5.25,-2.5) (rh34) {$j_{34}$}
+  edge[-] (rh3)
+  edge[-] (rh4);  
+ %
+ \node at (8.5,-2.5) (rhnn) {$j_{n,n-1}$}
+  edge[-] (rhn)
+  edge[dashed] (8,-4);
+ %
+ \node at (1.75,-1) (rh02) {$j_{02}$}
+  edge[-] (rh01)
+  edge[-] (rh12);
+ %
+ \node at (4.5,-1) (rh24) {$j_{24}$}
+  edge[-] (rh23)
+  edge[-] (rh34);
+ %
+ \node at (3.7,0) (dummy14) {$j_{04}$}
+  edge[dashed] (rh02)
+  edge[dashed] (rh24);
+ %
+ \node[draw, fill=gray!5] at (5,1) (root) {\texttt{JustificationRootHash}};
+ \node[right = 2mm of root] (jrh) {$\jrh$} 
+   edge[-] (root);
+ \node[below = 1mm of root] (dummy) {\phantom{a}}
+  (dummy.north west) edge[dashed] (dummy14)
+  (dummy.north east) edge[dashed] (rhnn);
+ %
+ %
+ \node at (4,-5) (label) {\textnormal{The Justification Tree}};
+\end{tikzpicture}
+\end{center}
+Note that in the first stage of the tree, every pair of leaves is hashed, and so any pair has a shared merkle proof to the root.\\
+Any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$. Somewhere there is a transition  ($\mathcal{RH}_i$ to $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update, the calculation of which is able to be done on-chain. \\
+First, however, we must establish where the two overall calculations submitted differ.
 
+\subsubsection*{2. Searching for the discrepancy}
+The contract requires both parties to submit merkle proofs that specific reputation updates were handled correctly. It begins by pseudorandomly picking a reputation updating transaction from the first half of the log (REFREFERENCE) (say the $i^{th}$ update for some $i<\frac{n}{2}$) and requires both parties to provide:\\
+\begin{itemize}
+ \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{i-1}$)
+ \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_i$)
+ \item[(iii)] A merkle proof showing that the pair ($\mathcal{RH}_{i-1}, \mathcal{RH}_i$) is correctly included in the justification tree
+ \item[(iv)] A merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update trasaction.
+\end{itemize}
+Note: in point (iv), the \emph{exact same} merkle proof that proves the inclusion of $R_j$ (before the reputation update) in the root $\mathcal{RH}_{i-1}$ also proves the inclusion of $R_j$ (after the reputation update) in the root $\mathcal{RH}_i$. This is because the trees $\mathcal{RH}_{i-1}$ and $\mathcal{RH}_i$ differ in only a single leaf.\\
 
+The contract then repeats this process using a binary search algorithm. If the merkle proof (iii) for both submissions had the same sibling values almost all the way up, but differing only in the the final sibling, then the discrepancy must occur later (i.e. the two sumbissions differ at some $i^\prime > \frac{n}{2}$) whereas if the merkle proofs already differ at an earlier sibling, then the submissions must also differ in an update before $\frac{n}{2}$.
 
+The contract pseudorandomly selects a reputation update from within the subtree in which the first discrepancy is known to lie. Each newly submitted proof further reduces the size of the subtree by a factor of two\footnote{ By examing precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it’s likely it’s more gas efficient to just do the ‘naive’ binary search.}.
 
+Ultimately, the location of the first discrepancy in the series of state transitions is found. This transition is then calculated on-chain to determine which is the correct answer. The submission that has been proved to be incorrect is rejected. If at any point in the above process, a submission does not respond to the challenge requested, in a timely fashion they forfeit, and are assumed to be incorrect.
 
+In the event of more than two submissions, this process is conducted in parallel between multiple pairs of submitted hashes, and then repeated, until only one submission remains.
 
+\subsubsection*{3. Implementation Details}
 
 
 
