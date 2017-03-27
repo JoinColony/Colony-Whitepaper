@@ -134,7 +134,7 @@ The result of this rule is that fast payments are still possible - in this case 
 
 \subsubsection*{When is a Funding Proposal eligible to receive funding?}
 A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the \ascode{LastUpdated} time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
-A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain two orderings for the MFPs, one by priority and one by \ascode{LastUpdated}. }.\\
+A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain two orderings for the MFPs, one by priority and one by \ascode{LastUpdated}. }.
 
 \subsubsection{Cancelling Tasks and Funding Proposals}
 The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to \ascode{cancelled}. Similarly the creator of a task may cancel the task if it has not yet been assigend a worked (see section REFREFREF). Beyond this it must be possible to cancel any funding proposal at any time:\\
