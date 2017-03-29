@@ -1,0 +1,30 @@
+\section{Revenue \& Rewards}\label{sec:revenue}
+
+This section is a work in progress -- aron.
+
+
+When a colony earns back some of its own tokens as revenue, they are added the the main colony domain's pot and become part of the general fund allocation system of regular and mandated funding proposals (Section \ref{sec:pots-and-fp}). However, when a colony receives Ether, or any other token on the network's whitelist, they are not immediately made available to the colony domain. There is some expectation that some fraction of any Ether or other valuable tokens earned by the colony are paid out to their token holding members as rewards. In order to be passed on to the main colony domain's pot, a user makes a special transaction that takes any revenue that has accumulated since the last such transaction, and makes 90\% available to the colony while the remaining 10\% is used to pay out users that hold both colony tokens and reputation in the colony. This split can be altered based on a colony-wide vote. 
+
+The one exception to this is when a colony receives its own token. These are not paid out to users who hold both tokens and reputation in the colony, but instead all incoming tokens are available in the colony's fund as soon as they are received.
+
+Triggering the payout to users is a special type of proposal that can be made at any time by any user, proposing that all users should receive a payout based on the colony's holdings in a particular token. While it is of course up to the members of each individual colony to decide, it is advisable that these proposals should only be accepted sporadically to keep the gas costs low for the users claiming their payouts, as well as simply to not be a nuisance to the users continually finding their tokens locked.
+
+This proposal includes the currency that should be paid out. In the event that the proposal is approved by vote of reputation, then all user's tokens are locked until they claim their payout. This is done by incrementing the colony's `most recent payout' counter.
+
+A locking mechanism is used in our currency contract to ensure that a user cannot move tokens while they have votes to reveal; we use the same mechanism here to ensure that users cannot move tokens after a payout is approved by the members of the colony. The colony has a counter for each user that is incremented whenever they claim a payout; they can also waive their claim to a payout that will increment this counter. 
+
+We need to have a similar behaviour to `lock' the reputation of the users for the payout. When a payout is activated, the current state of the reputation tree - calculated by the RCTHs - is recorded in the payout itself. Users are paid out according to their reputation in this state, rather than the most recent state, to ensure all users get an appropriate payout and to avoid gaming the system (e.g. “if I wait until this task I've done is approved, I'll have more reputation and be able to claim more reward”).
+
+The amount that each user $u_i$ of a colony $\mathcal{C}$ is entitled to claim ($p_i$) is a function of their colony token holdings ( $t_i$ ) and their total reputation in the colony ($r_i$).
+
+\begin{equation}\label{eq:reward-claim}
+ p_i = \frac{\sqrt{t_i r_i}}{\sum\limits_{u_j\in \mathcal{C}} t_j \times \sum\limits_{u_j\in \mathcal{C}} r_j}
+\end{equation}
+
+
+
+Note that this is very unlikely to payout all the tokens set aside for a payout - the only way it would do so is if everyone had the same proportion of reputation in the colony as they did proportion of tokens in the colony. However, the geometric average is the natural way to capture influence of two variables, and ensures that large token holders must earn large amounts of reputation to get the most from the payouts. The total tokens issued, total reputation and user reputation in the colony are all provable on-chain at claim time via a merkle proof that the root supplied by the RCTH mining contains some values claimed by the user; the user's balance of colony tokens is trivial to lookup.
+
+After some sufficiently long period of time (500000 blocks), all unclaimed tokens can be reclaimed by the colony and the payout closed. Any users that have not claimed their payout by that point will still have their tokens locked, and they will remain locked until they issue a transaction waiving their claim to the payout (indeed, they already passively did this by not claiming it in a timely fashion).
+
+Unclaimed tokens are returned to the reward pot and become part of the next reward cycle.
