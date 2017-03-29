@@ -1,47 +1,53 @@
 \section{Reputation}
 \subsection{What is Reputation?}
-blabla text here ... score associated to an account... cannot be transferred... used as voting weight... hoepfully leading to meritocratic decision making.
-FIXME FIXME
+In the context of colony, a reputation is a score, a number tied to an account. Unlike tokens, reputation cannot be transferred between accounts, it cannot be bought or sold; it represents an appraisal of the account holder by the colony collective.\\
+Since it is not a tradable asset, reputation must be \emph{earned}. The primary method of earning reputation is by completing tasks in a colony and earning the colony's tokens; as soon as you successfully complete your first task in a colony and claim a reward of the colony's tokens, you will also earn \emph{reputation} in that colony. The amount of reputation earned will be based on a combination of the performance of the user completing the task, and the payout associated with the task itself. Aside from tasks, there are administrative and managerial duties that allow users to earn reputaion as well. (Section \ref{sec:earning-rep}).
 
-There are many reputation scores per user ... local to domains or skills.... not one global score. Also Reputation decays with time.
+Any reputation earned remembers the \emph{context} in which it was earned. Thus we keep track of the domain in which reputation was earned and the skills associated with it. As an example, reputation earned for the completion of a task in the `development' domain, tagged with the `solidity-dev' skill tag will be recorded as colony reputation as well as development reputation and solidity-dev reputation. (See Sections \ref{sec:rep-by-domain} and \ref{sec:rep-by-skill} for details).
 
+Reputation can also be lost. Any account engaged in bad behaviour will lose reputation as punishment. Furthermore \textbf{all reputation decays with time}. %Reputation has a half life of 3 months\footnote{The exact decay rate may change before release.}. 
+In order to maintain a high reputation score, an account must continue to contribute to the colony. (Section \ref{sec:losing-rep}).\\
 
+\textbf{The Colony Governance System aims to be broadly meritocratic. For this reason, the majority of day-to-day decisions in a colony are weighted by the relevant reputation.}\\ %Thus for example. any dispute in the development team will be resolved by a vote weighted by development reputation.
 
-Reputation earned in Colony will primarily be earned from completing tasks, and the amount of reputation earned will be based on a combination of the performance of the user completing the task, and the payout associated with the task itself.
+We note that since reputation is conferred along with token payments, this creates a problem we have affectionately taken to calling the `Palo Alto Problem', whereby users who are paid more for the same work - such as those living in Palo Alto may be compared to those in South America - earn more influence in the colony. While we would like to solve this problem, we have been unable to do so to date; any possible solution either seems to introduce a great deal of complexity to the system or provide the ability for a bad actor to accrue undue influence in the colony.\\
+%
 
-We note this creates a problem we have affectionately taken to calling the ‘Palo Alto Problem’, whereby users who are paid more for the same work - such as those living in Palo Alto may be compared to those in South America - earn more influence in the colony. While we would like to solve this problem, we have been unable to do so to date; any possible solution either seems to introduce a great deal of complexity to the system or provide the ability for a bad actor to accrue undue influence in the colony.
-\subsubsection{Reputation per Domain}
-Users have reputation local to any domain. Earning rep in a domain earns you rep in any parent domain. Losing rep also affects all children.
-Top Level reputation ...
+Reputations held in one colony have no bearing on reputations held by the same account in another colony.
+%
+%
+\subsubsection{Reputation per Domain}\label{sec:rep-by-domain}
+The existence of domains that form the organisational hierarchy of a colony was described in section \ref{sec:domains}. The reputation system reflects this hierarchy as well. As such, users have reputation local to any domain.
 
-beyond this we also want skill tags:
+Suppose for example, a colony has a `development' domain which contains a `backend' domain and a `frontend' domain. Any time a member of the colony earns reputation for work completed in the backend domain, it will count towards backend-reputation as well as development-reputation and colony-reputation, while reputation earned in the development domain will only increase the development and colony reputation scores of the user. Conversely, when reputation is lost, it is lost in all parent domains and all child domains. Losing reputation in development means losing frontend and backend reputation also. 
 
-\subsubsection{Skill hierarchy}
+We envision domains to be an organisational hierarchy within the colony. To have an even more fine-grained account of the \emph{type} of work that a user completed to earn their reputation, we also include a skill hierarchy:
 
-The existence of domains that form the organisational hierarchy of a colony was described in section \ref{sec:domains}. In addition to this organisational hierarchy (which is unique to each colony), the Colony Network also maintains a hierarchy of skill domains (or just `skills'), which is available for all colonies to use. A user's good or bad activity associated with either of these hierarchies will earn or lose them the corresponding reputation, though only in a single colony.\footnote{It is hopefully clear that allowing users to earn reputation in one colony and then use it to influence decisions in another would be ripe for abuse.}
+\subsubsection{Skill hierarchy}\label{sec:rep-by-skill}
 
-For example, when a task is created, as well as being placed in a particular domain in the colony, it is also tagged with a skill from the skill hierarchy. When the worker earns reputation for succesfully completing the task, they will earn reputation in all the relevant domains and skills. Conversely, if they are to lose reputation because their work is found inadequate, they will do so in all the relevant domains ad skills.
+c In addition to this organisational hierarchy (which is unique to each colony), the Colony Network also maintains a hierarchy of skill domains (or just `skills'), which is available for all colonies to use. A user's good or bad activity associated with either of these hierarchies will earn or lose them the corresponding reputation, though only in a single colony.\footnote{It is hopefully clear that allowing users to earn reputation in one colony and then use it to influence decisions in another would be ripe for abuse.}
 
-\subsection{Earning reputation}
-The only way that reputation is created in a colony is when it is FIXME
+For example, when a task is created, as well as being placed in a particular domain in the colony, it is also tagged with a skill from the skill hierarchy. When the worker earns reputation for succesfully completing the task, they will earn reputation in all the relevant domains and skills. Conversely, if they are to lose reputation because their work is found inadequate, they will do so in all the relevant domains and skills.
 
-\subsubsection{Bootstrapping reputation}
+\subsection{Earning reputation}\label{sec:earning-rep}
+Morally, reputation is awarded for good behaviour, for submitting good work, for being a good citizen of the colony. Technically, it is earned by performing specific actions in a colony. Primarily, reputation is earned by an account whenever the account earns a bounty denominated in the colony's own token. This includes working on a task, as well as administrating or evaluating a task (Section \ref{sec:earning-rep-from-task}). Second, reputation can also be earned in the dispute process (Section \ref{sec:earning-rep-in-disputes}). Finally, reputation can be `earned' when the colony is first created (Section \ref{sec:bootstrapping-rep}).
 
+\subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 Since a large portion of a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies.
 When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently,no dospites could be resolved as no-one would be able to vote on them. \\
 Therefore, when a colony is created, the creator can nominate addresses to have initial reputation assigned to them to allow the colony to bootstrap itself. There will be a global limit on the reputation that can be assigned in this manner in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. \textbf{This is the only time that reputation can be created without associated work being done.}
 
 At first glance it may appear as if the same bootstrapping problem presents itself whenever a domain is created - if the domain has had no work done in it, then who has the authority to make decisions? We do not wish to allow the creation new reputation here, as this would devalue reputation already earned in the colony by users completing work. Luckily we can proceed without any new reputation: we simply accept the fact the new domain has no reputation in it. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the domain to contribute to the decision, users will still be able to vote based on their reputation in relevant skills.
 
-\subsubsection{Earning Reputation by contributing to a task}
+\subsubsection{Earning Reputation by contributing to a task}\label{sec:earning-rep-from-task}
 admin, worker, evaluator.... FIXME
 
-\subsubsection{Earning Reputation as a result of Disputes}
+\subsubsection{Earning Reputation as a result of Disputes}\label{sec:earning-rep-in-disputes}
 see title.
 
 
 
-\subsection{Losing Reputation}
+\subsection{Losing Reputation}\label{sec:losing-rep}
 
 \subsubsection{Reputation Decay}
 All reputation decays over time.\\
