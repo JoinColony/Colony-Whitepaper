@@ -50,7 +50,7 @@ The performance of the user who has completed the work is established when the w
 In the case of the evaluator, a rating of 0-2 stars counts as them rejecting the work, and a score of 3-5 stars counts as accepting the work. Beyond that, we suggest the following guidelines for ratings:
 \begin{itemize}
  \item[0 stars] - user submitted no meaningful work 
- \item[1 star] - user showed little activity relevant to the task, and remains far from completion on due date.
+ \item[1 star\phantom{s}] - user showed little activity relevant to the task, and remains far from completion on due date.
  \item[2 stars] - user was unable to complete the task, but put in a reasonable amount of effort
  \item[3 stars] - user completed the task spec but there were issues during the work.
  \item[4 stars] - user completed the task acceptably and there were no complaints.
@@ -62,7 +62,7 @@ The actual number of reputation points $r$ earned by the worker for the completi
  r = t \times \frac{2s - 5}{3} 
 \end{equation}
  
-Reputation lost or gained as a function of the star rating therefore varies linearly between $\frac{-5}{3}$ and $\frac{5}{3}$ for zero and five stars respectively, and a rating of four stars earns the user exactly $t$. It is also possible that we should allow half-stars or even more granular ratings.
+Reputation lost or gained as a function of the star rating therefore varies linearly between $\frac{-5t}{3}$ and $\frac{5t}{3}$ for zero and five stars respectively, and a rating of four stars earns the user exactly $t$. It is also possible that we should allow half-stars or even more granular ratings.
 
 Similarly, the evaluator gets an amount of reputation based on their grading by the worker, but on a scale that only varies between $-t_{ev}$ and $t_{ev}$ (where $t_{ev}$ is the evaluator’s notional token payout for the task). They only earn this reputation in the current (and all parent) domains, not the skill reputation as they have not actually done the task. While it is likely some knowledge is required to perform the evaluation, this is not always the case; we believe that skill reputation should exclusively demonstrate ability to perform tasks.
 
