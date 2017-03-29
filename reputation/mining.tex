@@ -23,7 +23,7 @@ R =
 \end{cases}
 $$
 All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a merkle tree of all individual reputations in a colony and the cumulative totals. (Note: with the \ascode{user} is set to zero, the corresponding amount is taken to represent the total of all such reputation held by users in this colony.)\\
-All reputations held by all users in all colonies are ordered in a list. The elements of this list are hashes pairwise, to end up with a shorter list of hashes. This process is repeated until only one hash remains: the \ascode{ReputationRootHash}, $\mathcal{H}$.
+All reputations held by all users in all colonies are ordered in a list. The elements of this list are hashes pairwise, to end up with a shorter list of hashes. This process is repeated until only one hash remains: the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{center}
 \begin{tikzpicture}
  \node at (0,-5) (r1) {$R_1$};
@@ -257,7 +257,7 @@ It is only by recording the number of parent reputations (\ascode{generation}) a
 
 When the discrepant state transition is found, the users supply the index of the update on-chain that corresponds to that reputation update. This means that the contract does not have to iterate over the whole list expensively, but the contract can easily check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. In the event that the discrepant transaction is a decay transaction, which is easily determined by the merkle path corresponding to an index smaller than the number of leaves in the tree at the end of the last successful update, they must also supply a merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle.
 
-Recording the number of leaves in the tree is required to allow the binary search to occur and accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decays (see next section). There is a decay calculation for every leaf in the previously accepted tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
+Recording the number of leaves in the tree is required to allow the binary search to occur and accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decays (see next section REFREFREF). There is a decay calculation for every leaf in the previously accepted tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
 
 When a user earns reputation in a new skill, at least one new leaf is added to the tree - if they have not earned reputation before in some of the parents, then they will also cause further new leaves to be added. New leaves will also be added if they are the first user in a colony to earn those particular skills, making the total reputation for that skill in the colony non-zero. During a dispute, when the user proves that they have included the update in the tree, it is not possible to check (efficiently) on-chain that they should not have added it to an existing leaf instead. However, because during a dispute we are always playing two submissions off against the other, one of two things will be true:
 
@@ -266,7 +266,7 @@ The other submission adds the new reputation to an existing leaf (the correctnes
 
 
 
-\subsubsection{Transfers of reputation between accounts}
+\subsubsection{Transfers of reputation between accounts}\label{sec:reptransfer}
 
 blabla reputation cannot be transferred blabla.... but we have a mechanism where A loses and B gains... this has to be modelled as a transfer because....
 
@@ -277,5 +277,5 @@ To achieve this, all the transactions that correspond to updating the reputation
 Then, when calculating the reputation deduction to be applied to the losing user, the reputation that defined the context should be done last i.e. all the children (and parents) should be considered first, as it is the amount of the reputation that defined the context that will determine the fraction lost of each of the children reputation. If any of these calculation need to be proved correct during the resolution protocol, 
 
 
-\subsubsection{The Reputation Decay Process}
+\subsubsection{The Reputation Decay Process}\label{sec:repdecay}
 ...
