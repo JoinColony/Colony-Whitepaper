@@ -40,10 +40,33 @@ Therefore, when a colony is created, the creator can nominate addresses to have 
 At first glance it may appear as if the same bootstrapping problem presents itself whenever a domain is created - if the domain has had no work done in it, then who has the authority to make decisions? We do not wish to allow the creation new reputation here, as this would devalue reputation already earned in the colony by users completing work. Luckily we can proceed without any new reputation: we simply accept the fact the new domain has no reputation in it. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the domain to contribute to the decision, users will still be able to vote based on their reputation in relevant skills.
 
 \subsubsection{Earning Reputation by contributing to a task}\label{sec:earning-rep-from-task}
-admin, worker, evaluator.... FIXME
+Each task defines three roles: the administrator, the worker and the evaluator (Section \ref{sec:tasks}). Each of these roles are eligible to earn reputation when the task is completed as long as their work was well received and they earn a bounty denominated in the colony's token. 
+
+The performance of the user who has completed the work is established when the work is submitted and then evaluated. At this point, both the evaluator and the worker grade each other\footnote{These scores should be submitted using a pre-commit and reveal scheme to ensure secrecy during the rating process.} out of five stars.
+
+In the case of the evaluator, a rating of 0-2 stars counts as them rejecting the work, and a score of 3-5 stars counts as accepting the work. Beyond that, we suggest the following guidelines for ratings:
+\begin{itemize}
+ \item[0 stars] - user submitted no meaningful work 
+ \item[1 star] - user showed little activity relevant to the task, and remains far from completion on due date.
+ \item[2 stars] - user was unable to complete the task, but put in a reasonable amount of effort
+ \item[3 stars] - user completed the task spec but there were issues during the work.
+ \item[4 stars] - user completed the task acceptably and there were no complaints.
+ \item[5 stars] - user completed the task to a higher standard than requested.
+\end{itemize}
+
+The actual number of reputation points $r$ earned by the worker for the completion of the task is then a function of this rating $s$ and the token payout $t$:
+\begin{equation}\label{eq:stars-to-rep}
+ r = t \times \frac{2s - 5}{3} 
+\end{equation}
+ 
+Reputation lost or gained as a function of the star rating therefore varies linearly between $\frac{-5}{3}$ and $\frac{5}{3}$ for zero and five stars respectively, and a rating of four stars earns the user exactly $t$. It is also possible that we should allow half-stars or even more granular ratings.
+
+Similarly, the evaluator gets an amount of reputation based on their grading by the worker, but on a scale that only varies between $-t_{ev}$ and $t_{ev}$ (where $t_{ev}$ is the evaluator’s notional token payout for the task). They only earn this reputation in the current (and all parent) domains, not the skill reputation as they have not actually done the task. While it is likely some knowledge is required to perform the evaluation, this is not always the case; we believe that skill reputation should exclusively demonstrate ability to perform tasks.
+
+Reputation updates are only made and payout are only made available after the objection window (section REFREFERENCE) has closed at the end of the task; the reputation updates and payouts are based on the final state of the task, after all objections have been resolved.
 
 \subsubsection{Earning Reputation as a result of Disputes}\label{sec:earning-rep-in-disputes}
-see title.
+see title. FIXME
 
 
 
@@ -54,11 +77,11 @@ All reputation decays over time.\\
 Every 600000 blocks, a user’s reputation in any domain or skill decays by a factor of 2. This decay occurs continuously, rather than being a step change every three months to ensure there are as few incentives to earn reputation at any particular time.
 
 \subsubsection{Losing Reputation due to a Negative Evaluation}
-working on a task. bad review. lose rep....
+As described above in section \ref{sec:earning-rep-from-task}, a worker receives an evaluation at the end of a task. If this evaluation is less than 3 stars, the work was \emph{rejected} be the evaluator. If this rating is not overturned in the dispute process, the worker will lose reputation as per equation \eqref{eq:stars-to-rep}.
 
 
 \subsubsection{Losing Reputation due to Bad Behaviour}
-disputes and how they affect rep....
+disputes and how they affect rep.... FIXME
 
 
 Whenever a user stakes tokens, they are also risking their reputation. If the tokens are lost, then they also lose reputation. Reputation is not staked, and so while at risk it can still be used by users to vote on decisions where that reputation is relevant - they only lose the voting power associated with the reputation once it is lost. However, it should be noted that the same is not true of colony tokens - once staked, their voting power is lost. However, we expect that users will only ever stake a small proportion of their tokens - only small amounts of tokens are staked in the Colony Network to ensure a tangible financial punishment to the staking user can be made if they are a badly behaving actor.
