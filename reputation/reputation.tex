@@ -1,7 +1,9 @@
 \section{Reputation}
 \subsection{What is Reputation?}
-blabla text here ... score associated to an account... cannot be transferred... used as voting weight... hoepfully leading to meritocratic decision making.
-FIXME FIXME
+
+Reputation is a score associated with each account in a colony that quantifies the contribution that account has made to the colony in recent history. Reputation will be used primarily for two things within a colony --- weighing votes of users, and determining rewards that should be allocated to users. The more reputation that a user has, the larger a fraction of the rewards payout they receive, and the more weight their vote has when making a decision. We believe that because reputation is awarded to users by peer approval of their actions, the consequences of this will be that influence in the colony will effectively be assigned in meritocratic way.
+
+Of course, users will be unable to transfer reputation between each other. Once assigned to an address, the only way that a user's reputation can change is through their behaviour (or lack thereof) within the colony. 
 
 There are many reputation scores per user ... local to domains or skills.... not one global score. Also Reputation decays with time.
 
@@ -9,7 +11,8 @@ There are many reputation scores per user ... local to domains or skills.... not
 
 Reputation earned in Colony will primarily be earned from completing tasks, and the amount of reputation earned will be based on a combination of the performance of the user completing the task, and the payout associated with the task itself.
 
-We note this creates a problem we have affectionately taken to calling the ‘Palo Alto Problem’, whereby users who are paid more for the same work - such as those living in Palo Alto may be compared to those in South America - earn more influence in the colony. While we would like to solve this problem, we have been unable to do so to date; any possible solution either seems to introduce a great deal of complexity to the system or provide the ability for a bad actor to accrue undue influence in the colony.
+We note this creates a problem we have affectionately taken to calling the `Palo Alto Problem', whereby users who are paid more for the same work --- such as those living in Palo Alto may be compared to those in South America --- earn more influence in the colony. While we would like to solve this problem, we have been unable to do so to date; any possible solution either seems to introduce a great deal of complexity to the system or provide the ability for a bad actor to easily accrue undue influence in the colony.
+
 \subsubsection{Reputation per Domain}
 Users have reputation local to any domain. Earning rep in a domain earns you rep in any parent domain. Losing rep also affects all children.
 Top Level reputation ...
@@ -20,7 +23,7 @@ beyond this we also want skill tags:
 
 The existence of domains that form the organisational hierarchy of a colony was described in section \ref{sec:domains}. In addition to this organisational hierarchy (which is unique to each colony), the Colony Network also maintains a hierarchy of skill domains (or just `skills'), which is available for all colonies to use. A user's good or bad activity associated with either of these hierarchies will earn or lose them the corresponding reputation, though only in a single colony.\footnote{It is hopefully clear that allowing users to earn reputation in one colony and then use it to influence decisions in another would be ripe for abuse.}
 
-For example, when a task is created, as well as being placed in a particular domain in the colony, it is also tagged with a skill from the skill hierarchy. When the worker earns reputation for succesfully completing the task, they will earn reputation in all the relevant domains and skills. Conversely, if they are to lose reputation because their work is found inadequate, they will do so in all the relevant domains ad skills.
+For example, when a task is created, as well as being placed in a particular domain in the colony, it is also tagged with a skill from the skill hierarchy. When the worker earns reputation for successfully completing the task, they will earn reputation in all the relevant domains and skills. Conversely, if they are to lose reputation because their work is found inadequate, they will do so in all the relevant domains ad skills.
 
 \subsection{Earning reputation}
 The only way that reputation is created in a colony is when it is FIXME
