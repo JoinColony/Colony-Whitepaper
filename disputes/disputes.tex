@@ -1,1 +1,67 @@
 \section{Disputes and Arbitration}\label{sec:disputes}
+
+The what and why of the dispute system: permissive by default, dispute forces votes... FIXME.
+
+\subsection{What are Disputes?}
+
+
+Mechanics and Implementations of objections
+A user can raise an objection - by doing so, they are fundamentally proposing that a variable, or more than one variable - stored in the EternalStorage contract should be changed to another value. The user raising the objection determines which one or two reputations (one from the organisational hierarchy, and optionally one from the skill hierarchy) they want to weigh the voting by, and then has to prove that those skills should be allowed to change that variable. For example, most people would agree that the design team shouldn’t be able to vote among themselves and change something that was happening in the development team.\footnote{However, they are of course be able to propose such a decision, and escalate it to a high enough level in the colony that they are able to influence the decision, though not be the only members of the electorate.}
+
+All variables in the EternalStorage contract are prefixed with what they relate to. For example, all variables to do with a task begin with \code{task\_}. For each type of variable, the governance system is programmed to know whether a permissions check is required. It seems likely it'll always be required, to me… can anyone come up with a variable that any group should be able to change on a whim?
+
+When a change is proposed, assuming that skill permission checks are required, we need to ensure that the reputation they are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the skills when they are created, which includes pointers to at least the direct parent of the skill (see the skill tree section of the reputation document). When a user creates a dispute, to specify the skill that they are escalating to they provide the lookups to be used from the skill(s) associated with the variable to be change, rather than directly specifying the skill they are escalating to. This ensures that the skill(s) they escalate to are direct parents of the skill associated with the variable.
+
+\subsection{Costs and Rewards}
+\subsubsection{Cost of starting a dispute}
+The cost of creating a proposal is a number of tokens equal to 1\% of the context. If they do not currently have the required number of tokens or reputation, they can still raise such a proposal by staking as little as 10\% of the reputation and tokens required. This minimum amount required to even propose a change prevents users from spamming objections - even those that won’t ever be voted on - to large numbers of people, which would impede the smooth running of the colony.
+
+\subsubsection{Cost of defending against a raised dispute}
+While this staking is occurring on the ‘change’ side, simultaneously users are able to stake to oppose the change. If, three days after the ‘change’ side have enough tokens staked, the opposing side does not have enough tokens staked, then it is assumed that the change is acceptable and it occurs. If the opposing side has enough tokens staked, but the ‘change’ side does not, it never goes to a vote and is rejected. In either of these cases, the losing side loses their tokens and reputation staked by the mechanisms described below, with the calculations assuming that a close vote took place.
+
+As staking occurs, metadata is saved to the blockchain along with each stake, to allow a gas-efficient method of inspecting a specific reputation transfer (required in the event of there being a dispute in the reputation state) . There is a rough implementation in Python for those who wish to see how exactly it happens, but broadly speaking by keeping running totals for both sides staking as stakes are made and noting any partial matches that get made (e.g. first person stakes 100 on one side, the next person stakes 50 on the other, the first person has their stake partially unmatched), this allows for an arbitrary transfer to able to be referenced by index and not have to compute all previous transfers at that time (essentially, some of the calculation is done when the stake is made).  The number of reputation updates that need to be made (excluding the children and parent reputations) in such a situation will be equal to twice the number of stakers; some updates are ‘null’ updates with no transfer to ensure this figure is always correct.
+
+If neither side have enough staked after three days, all parties may claim their stakes back but no change is made to the variable in question. If both sides stake the required number of tokens and reputation within the three days, then the proposal goes to a vote.
+
+The exact mechanisms of the vote are described elsewhere and are not repeated here. The weight of a user’s vote is the sum of their reputations in the skills chosen by the user who originally proposed the vote.
+
+A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, no changes are made and all participants get their staked tokens returned. We define quorum to be more than 10\% of the reputation eligible to vote has done so.
+
+If quorum has been reached, if the proposing side won then the variable in question is changed, assuming that the reputation that voted for this outcome is more than previous vote on the same variable (see below). If the opposing side won, then the variable is not changed. In either case, the rest of the consequences are the same.
+
+Alongside the variable that may or may not have been changed, the fraction of total rep in the colony that voted for the winning side is noted. This is the threshold that must be exceeded in a future vote in order to change the variable. This is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
+
+5\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision\footnote{\code{https://www.economicsnetwork.ac.uk/sites/default/files/Ashley/6\%20References\%20for\%20KBC.pdf}}. Any tokens assigned to users that do not vote in a poll are returned to the colony pot.
+
+At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens and the complementary percentage of the reputation they put at risk is lost. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
+
+The number of people that voted in a decision
+The fraction of the reputation in the colony that voted
+How close the vote ultimately was
+
+At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side’s vote weight () reaches a landslide threshold  of the total vote weight, then they receive 0\% of their staked tokens back.  varies based on the fraction of total reputation in the colony that was allowed to vote, :
+
+\[
+L = 1 - \frac{R}{3}
+\]
+
+So for a small vote with little reputation in the colony being allowed to vote, the decision has to be close to unanimous for the losing side to be punished harshly. For a vote of the whole colony, the  reduces to 67\% of the votes - i.e. the reputation of the colony overall was split 2-to-1 on the decision.
+
+Between these extremes of a landslide loss and a very slim loss, the loss of tokens and reputation suffered by the losing side ($\Delta$) varies linearly:
+
+\[
+ \Delta = 0.9 x min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace
+\]
+
+
+Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).
+
+
+
+Proposing an arbitrary transaction by the Colony contract
+This is no different from a normal proposal - the proposal is to set the value of a special variable to the value of the transaction data of the proposed transaction. Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as the actions of the contract as a whole should be available for all to vote on. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to empty if successful (to prevent it being called multiple times).
+
+Token-weighted, reputation-weighted and hybrid voting
+The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn’t be available for some decisions, nor a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to be leveraged. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
+
+The primary use of a token weighted vote is related to the management of the colony tokens itself; it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
