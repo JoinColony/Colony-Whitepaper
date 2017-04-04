@@ -6,17 +6,53 @@ The assumption is that well aligned teams tend to be in agreement on most day-to
 The \textbf{Dispute System} is there to resolve disagreements within the group and to punish bad behaviour and fraud. In short, the dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
 
 
-\subsection{What are Disputes?}
+\subsubsection*{What are Objections?}
+When a member of a colony feels that something is amiss, some task is overpriced, some evaluation incorrect, some funding proposal unjustified; they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable - stored in the \ascode{EternalStorage} contract should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
+
+The user raising the objection must also put up a stake to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding uneccessary voting, the objection will pass automatically \emph{unless} someone else stakes on the counterside and thereby elevates the objection to a \emph{dispute}.
+
+\subsubsection*{What are Disputes?}
+We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting. 
+
+\subsection{Objections and Disputes}\label{sec:objections-and-disputes}
+
+The user raising an objection submits the following data:
+\begin{itemize}
+ \item the data that should be changed
+ \item the reputation(s) that should vote on this issue (max. one each from organisational and skill hierarchy)
+ \item proof that these reputations should be allowed to make the change in question. 
+\end{itemize}
+
+The first point is obvious - it is the subject of the objection. The second and third points concern \emph{escalation}. 
+
+\begin{center}
+ \textbf{In Colony you cannot escalate a decision to higher management, you can only escalate to bigger groups of your peers.}
+\end{center}
+
+For example, suppose that the objection concerns a task in the domain `development of our website'. The objection could chose to have all `development' reputation vote on it -- we say the decision was `escalated to the development domain'. In this example, the third point would be a proof that the domain `development of our website' was indeed a subdomain of `development'.
+
+The highest domain any decision can be escalated to is the entire colony.
 
 
-Mechanics and Implementations of objections
-A user can raise an objection - by doing so, they are fundamentally proposing that a variable, or more than one variable - stored in the EternalStorage contract should be changed to another value. The user raising the objection determines which one or two reputations (one from the organisational hierarchy, and optionally one from the skill hierarchy) they want to weigh the voting by, and then has to prove that those skills should be allowed to change that variable. For example, most people would agree that the design team shouldn't be able to vote among themselves and change something that was happening in the development team.\footnote{However, they are of course be able to propose such a decision, and escalate it to a high enough level in the colony that they are able to influence the decision, though not be the only members of the electorate.}
 
-All variables in the EternalStorage contract are prefixed with what they relate to. For example, all variables to do with a task begin with \code{task\_}. For each type of variable, the governance system is programmed to know whether a permissions check is required. It seems likely it'll always be required, to me... can anyone come up with a variable that any group should be able to change on a whim?
+
+
+
+
+
+
+
+
+
+
+% 
+% For example, most people would agree that the design team shouldn't be able to vote among themselves and change something that was happening in the development team.\footnote{However, they are of course be able to propose such a decision, and escalate it to a high enough level in the colony that they are able to influence the decision, though not be the only members of the electorate.}
+% 
+% All variables in the EternalStorage contract are prefixed with what they relate to. For example, all variables to do with a task begin with \ascode{task\_}. For each type of variable, the governance system is programmed to know whether a permissions check is required. It seems likely it'll always be required, to me... can anyone come up with a variable that any group should be able to change on a whim?
 
 When a change is proposed, assuming that skill permission checks are required, we need to ensure that the reputation they are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the skills when they are created, which includes pointers to at least the direct parent of the skill (see the skill tree section of the reputation document). When a user creates a dispute, to specify the skill that they are escalating to they provide the lookups to be used from the skill(s) associated with the variable to be change, rather than directly specifying the skill they are escalating to. This ensures that the skill(s) they escalate to are direct parents of the skill associated with the variable.
 
-\subsection{Costs and Rewards}
+\subsection{Costs and Rewards}\label{sec:costs-of-disputes}
 \subsubsection{Cost of starting a dispute}
 The cost of creating a proposal is a number of tokens equal to 1\% of the context. If they do not currently have the required number of tokens or reputation, they can still raise such a proposal by staking as little as 10\% of the reputation and tokens required. This minimum amount required to even propose a change prevents users from spamming objections - even those that won’t ever be voted on - to large numbers of people, which would impede the smooth running of the colony.
 
