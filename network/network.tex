@@ -55,7 +55,7 @@ When the owner of a contract with an associated EternalStorage wishes to upgrade
 \item The old contract is destroyed.
 \end{enumerate}
 
-All of the data is now available to the new contract, as well as the ability to amend existing data or write new data to the store, and the new contract has all of the assets of the original. This is only possible because no storage variables were used in the original colony contract. A naive implementation would copy across the data from an old contract to the new one, but this can get arbitrarily expensive.
+All of the data is now available to the new contract, as well as the ability to amend existing data or write new data to the store, and the new contract has all of the assets of the original. This is only possible because no storage variables were used in the original colony contract. A na{\"i}ve implementation would copy across the data from an old contract to the new one, but this can get arbitrarily expensive.
 
 When a colony is being upgraded, we must also account for any token balances the colony has. If the colony has balances in a large number of tokens, sending each and every one of these token balances could conceivably result in the gas limit preventing the upgrade process being completed in a single transaction. Our intention is therefore to have a separate contract that can be associated with the colony which handles tokens on behalf of the colony, and will continue to exist alongside the colony for its entire lifetime.
 

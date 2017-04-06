@@ -84,6 +84,7 @@ captionpos=b
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{soul}
 \usepackage[breakable, theorems, skins]{tcolorbox}
+\usepackage{booktabs}
 \tcbset{enhanced}
 \definecolor{light-gray}{gray}{0.92}
 \sethlcolor{light-gray}
@@ -116,7 +117,7 @@ captionpos=b
 \usepackage{tikz}
 \usetikzlibrary{arrows,positioning}
 
-
+\usepackage{tablefootnote}
 \begin{document}
 
 \maketitle
@@ -132,5 +133,6 @@ captionpos=b
 \input{./tokens/tokens.tex}
 \input{./finance/finance.tex}
 \input{./finance/revenue.tex}
-
+\appendix
+\input{./appendixa/appendixa.tex}
 \end{document}
