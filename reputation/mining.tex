@@ -268,27 +268,30 @@ The other submission adds the new reputation to an existing leaf (the correctnes
 
 \subsubsection{Transfers of reputation between accounts}\label{sec:reptransfer}
 
-blabla reputation cannot be transferred blabla.... but we have a mechanism where A loses and B gains... this has to be modelled as a transfer because....
+The most important quality of reputation that distinguishes it from a token is that it is tied to an account and cannot be trasnferred. However, in the event of disputes (Section \ref{sec:disputes}) it can happen that one party to a dispute loses reputation while the other gains. This process has to be modelled as a `reputation transfer' to ensure that reputation is never created in this process (i.e. the reputation lost by the loser is at least as much as the reputation gained by the winner).
 
-If the entry in the reputation update log indicates that the reputation has come from another user, then this entry represents updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
+If an entry in the reputation update log indicates that the reputation has come from another user, then this entry represents updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
 
 To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user’s reputation, prior to them losing it in this update, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
 
 Then, when calculating the reputation deduction to be applied to the losing user, the reputation that defined the context should be done last i.e. all the children (and parents) should be considered first, as it is the amount of the reputation that defined the context that will determine the fraction lost of each of the children reputation. If any of these calculation need to be proved correct during the resolution protocol, 
 
+For further details about reputation transfers and disputes, see Appendix \ref{appendix:rep-transfer}.
 
 \subsubsection{The Reputation Decay Process}\label{sec:repdecay}
-...
+... FIXME ... there is a longish section in the gogole doc about approximating an exponential decay. Shall we keep that section or is it not really necessary @alex?
 
 
 \subsection{Possible Attacks}
 \subsubsection*{Many false submissions}
-If we cannot figure out what the correct submission is within the given timeframe, then the rep update process stalls... that's about it though. Very expensive attack and only effect is to delay one update.
+FIXME\\ If we cannot figure out what the correct submission is within the given timeframe, then the reputation update process stalls... that's about it though. Very expensive attack and only effect is to delay one update.
 
 
 
 \subsection{Costs and Rewards of Mining}
+FIXME\\
+Notes:\\
 -token holders must stake in order to be miners\\
 -reputational reward comes from tokens earned just like task payout
--how much rep exactly you get (siilar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
--how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much rep.
+-how much rep exactly you get (similar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
+-how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much reputation.
