@@ -1,6 +1,6 @@
-\section{Gas-efficient reputation penalty in dispute resolution}
+\section{Gas-efficient reputation penalty in dispute resolution}\label{appendix:rep-transfer}
 
-Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation if they have it to lose. If those users lose reputation, some of those on the winning side will therefore gain reputation. If there is a dispute in the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, whether a specific user was able to lose reputation or not at that time. All of the reputation losses that each user who was involved in the dispute is only represented by a single entry in the `reputation update log`, and so it is necessary to expand upon the process used to do this.
+Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation if they have it to lose. If those users lose reputation, some of those on the winning side will therefore gain reputation. If there is a dispute in the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, whether a specific user was able to lose reputation or not at that time. All of the reputation losses that each user who was involved in the dispute is only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
 
 Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. We must therefore not have any (on-chain) loops in this implementation.
 
@@ -47,7 +47,7 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 \end{tabular}
 \end{table}
 
-When staking, the user supplies the 'Match From' and 'Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes. Then, when a \rcth is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list.
+When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes. Then, when a \rcth is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list.
 
 \subsection{Exact matching}\label{sec:exactMatching}
 
@@ -117,4 +117,4 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 
 \end{table}
 
-So for example, in table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the 'positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. (what remains of) the stake from user B.
+So for example, in table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. (what remains of) the stake from user B.
