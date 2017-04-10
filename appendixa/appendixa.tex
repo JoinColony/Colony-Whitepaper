@@ -1,6 +1,6 @@
 \section{Gas-efficient reputation penalty in dispute resolution}\label{appendix:rep-transfer}
 
-Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation if they have it to lose. If those users lose reputation, some of those on the winning side will therefore gain reputation. If there is a dispute in the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, whether a specific user was able to lose reputation or not at that time. All of the reputation losses that each user who was involved in the dispute is only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
+Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. All of the reputation changes that each user who was involved in the dispute is only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
 
 Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. We must therefore not have any (on-chain) loops in this implementation.
 
@@ -33,7 +33,7 @@ Let's also assume that all users have the appropriate amount reputation to lose.
 
 Indeed, in a group of $m$ people where some owe the others a debt, the maximum possible of transfers required to make everyone whole is equal to $m-1$. If the reputation being lost has $p$ parents and $c$ children, then there are $2 + 2p + c$ reputation updates that must occur at each of these steps. There are therefore $\left(m-1\right)\times\left(2+2p+c\right)$ reputation updates in total. In the event of a disagreement regarding the reputation state, we must be able to access the $n$th update directly when calculating an update on-chain. This is made possible by additional logging of data when stakes are made.
 
-When a user stakes and opposes some existing stake that does not yet have a counterparty, we record the stakes that it is matching against as well as any remainder.
+When a user stakes and opposes some existing stake that does not yet have a counterpart, we record the stakes that it is matching against as well as any remainder.
 
 \begin{table}[ht]
 \centering
@@ -47,7 +47,7 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 \end{tabular}
 \end{table}
 
-When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes. Then, when a \rcth is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list.
+When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes, and the remainder from the previous match. Then, when a \rcth is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list. The user's client is required to do this iteration locally to find the row, but this does not require any gas expenditure.
 
 \subsection{Exact matching}\label{sec:exactMatching}
 
@@ -81,11 +81,11 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To \\ \hline
 \end{tabular}
 \end{table}
 
-These dummy insertions occur whenever the remainder is 0 --- i.e. the stake has matched  the first unmatched stake exactly (or its remainder). This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
+These dummy insertions occur whenever the remainder is 0 --- i.e. when the new stake has matched only the first unmatched stake (or its remainder) and has done so exactly. This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
 
 \subsection{Generalisation}
 
-This procedure can also be extended to account for stakes being made in aribtrary orders (i.e. not all of one side followed by all of the other). This can be achieved by making the indices in the `Match From' and `Match To' columns only refer to stakes on one side or the other, and keeping matching lists that map those indices onto the stakes. Altering our first example slightly, we might end up with the stakes in table \ref{appa:modifiedexample} and the log entries in table \ref{appa:modifiedexamplelog}. The list of positive stakes would be [1, 3, 4] and the list of negative stakes would be [2, 5]. The `Match From' and `Match To' indices then refer to the list corresponding to the opposite sign of the stake currently being considered.
+This procedure can also be extended to account for stakes being made in arbitrary orders (i.e. not all of one side followed by all of the other). This can be achieved by making the indices in the `Match From' and `Match To' columns only refer to stakes on one side or the other, and keeping matching lists that map those indices onto the stakes. Altering our first example slightly, we might end up with the stakes in table \ref{appa:modifiedexample} and the log entries in table \ref{appa:modifiedexamplelog}. The list of positive stakes would be [1, 3, 4] and the list of negative stakes would be [2, 5]. The `Match From' and `Match To' indices then refer to the list corresponding to the opposite sign of the stake currently being considered.
 
 \begin{table}[ht]
 \centering
