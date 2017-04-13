@@ -61,5 +61,5 @@ When a colony is being upgraded, we must also account for any token balances the
 
 An important point for us to stress is that, in the case of a colony, the choice of upgrading will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
 
-\section{The future}
+\subsection{The future}
 It is entirely possible that in the future, during the development of the Colony Network, the functionality that will have been developed will be unable to be contained in a single \code{Colony} contract. The growth of the contract can be mitigated by the use of libraries, but even then it seems likely that at some point in the future the contract will become impossible to deploy in a single transaction. In that case, the contract would be partitioned into multiple contracts that dealt with different elements under the control of a single colony contract. In this scenario, the client would have to perform some convenience functions behind the scenes to maintain ease of use (directing requests to the appropriate contracts), but this should still be achievable.

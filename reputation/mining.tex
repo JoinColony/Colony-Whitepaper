@@ -274,7 +274,7 @@ Then, when calculating the reputation deduction to be applied to the losing user
 For further details about reputation transfers and disputes, see Appendix \ref{appendix:rep-transfer}.
 
 \subsubsection{The Reputation Decay Process}\label{sec:repdecay}
-... FIXME ... there is a longish section in the gogole doc about approximating an exponential decay. Shall we keep that section or is it not really necessary @alex?
+The reputation decay process was describe above as being continuous. To have a user's reputation continuously decay, and end up with half of the starting amount after three months, an exponential decay makes most sense. However, such a calculation is not possible on-chain, so we must use an approximation. The details of the approximation we use, and a proof that this approximation is accurate and will not affect the running of (active) colonies can be found in appendix \ref{appendix:rep-decay}.
 
 
 \subsection{Possible Attacks}

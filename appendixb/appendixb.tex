@@ -1,0 +1,46 @@
+\clearpage
+\section{Reputation decay calculation details}\label{appendix:rep-decay}
+
+Reputation in any skill decays by a factor of two every 300000 blocks (roughly every three months). At each update (i.e. after every 300 blocks), the new decayed value ($u_{\rm new}$) is calculated by
+
+$$u_{\rm new} = u_{\rm old} \times \exp\left(-\frac{\ln 2}{1000}\right) = u_{\rm old} \times \exp\left(-k\right).$$
+
+
+This calculation is applied separately to each user's skill, as well as the number that represents the total of all of those skills in the colony. Due to rounding error with the integer representation on the blockchain, these numbers will drift away from each other. However, we can show the accumulated error will be negligible. The amount of reputation that will be incorrectly missing after the first iteration will be, on average $0.5N$ reputation wei, where $N$ is the number of users that have this skill.\footnote{This ignores the reputation lost by the rounding error on the sum of the users' reputation, but as there is only one total and many more users, this does not change our conclusions. We also note that there is an implicit assumption here that all users have the same amount of reputation; this is a worst-case assumption, as if it is not true then once some users have lost all their reputation the reputation incorrectly lost on each cycle will drop below $0.5N$.} The 0.5 is the average fractional part lost during each calculation.
+
+After the second iteration, the amount of reputation that is incorrectly missing is
+
+$$0.5N\exp\left(-k\right) + 0.5N.$$
+
+
+The second term here is the incorrectly lost reputation from this second set of calculations. The factor of $\exp\left(-k\right)$ has been introduced to the term representing the incorrectly lost reputation from the first set of calculations because some of that incorrectly lost reputation should have decayed away anyway by this point, and so it shouldn't be considered incorrectly lost.
+
+It is apparent that this is a geometric series, and after $b$ cycles of reputation update have passed, the amount of reputation incorrectly missing ($R_{\rm m}$) is
+$$R_{\rm m} = \frac{N}{2} \left(\frac{1-\exp\left(-bk\right)}{1-\exp\left(-k\right)}\right)$$
+
+\noindent where we have used the standard result for the sum of a geometric series. If we started with $R_0$ reputation, then the ratio of the incorrectly missing reputation to the total the colony believes exists is
+
+$$\frac{R_{\rm m}}{R_0\exp\left(-bk\right)}.$$
+
+
+This ratio becomes 1 when
+$$ b = \frac{1}{k}\ln\left(\frac{2R_{\rm 0}}{N}\left(1-\exp\left(-k\right)\right) +1   \right)$$
+
+
+\noindent which, for conservative values of $R_0 = 200\times10^{18}$ and $N=1000000$ occurs after 38011 iterations, or over 5 years for 15 second blocks. At this point, even though the colony believes some amount of reputation exists, no users have it, and no users can make decisions related to this type of reputation.
+
+This is the end-of-life for an inactive colony; if no activity takes place in it for five years that is worthy of earning reputation, then the colony will be irrecoverable --- no-one will be able to create tasks to earn further reputation. This seems like a reasonable failure mode for an inactive colony, and it would be longer for smaller colonies. 
+
+We now consider the case of an active colony. If the colony is active and creates $A$ new reputation at every update cycle, how does the ratio between the figure taken to be the total reputation and the incorrectly missing reputation change over time?
+
+$R_{\rm m}$ remains the same in this situation, but the total the colony believes exists increases by $A$ each cycle. After $b$ iterations, we can show that the total reputation the colony believes exists is
+
+$$R_{\rm 0}\exp\left(-bk\right) + A\frac{1-\exp\left(-bk\right)}{1-\exp\left(-k\right)}.$$
+
+
+As $k$ tends to infinity --- which represents the regime of a colony in a steady state --- the ratio between this and $R_{\rm m}$ tends to 
+$$\frac{N}{2A}$$
+
+i.e. for the discrepancy to be small between what the colony thinks the total reputation inside it is and the sum of all users' reputations, the reputation earned in each cycle should, on average, be much larger than the number of users. Given that reputation will be expressed in terms of numbers on the order of $10^{18}$, this seems assured.
+
+For calculating the exponential decay, we will use the first-order Taylor expansion of the exponential decay i.e. we approximate $\exp\left(-k\right)$ as $1-k$. Given that $k$ is small, this will be a good approximation --- the second order term is on the order of $10^{-7}$. This error will cause all reputations to decay slightly faster than an exponential, but will not cause the sum of the users' reputation to drift away from the notional sum of the users' reputations in the colony.
