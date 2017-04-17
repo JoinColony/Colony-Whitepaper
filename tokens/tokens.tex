@@ -1,23 +1,23 @@
 \section{CLNY Tokens, the Colony Network and the Common Colony}
 
 \subsection{Creation of CLNY Tokens}
-CLNY are generated during the Colony crowdsale period. While ideally the crowdsale would be run from within the colony network, it seems unlikely that we will have the network deployed at that time. As a result, we will run the crowdsale using a widely-available crowdsale contract, which will be standalone.
+CLNY are generated during the Colony crowdsale period. Since the Colony Network will not yet be deployed at that time and thus not able to conduct a token sale internally; we will run the crowdsale using a widely-available crowdsale contract, which will be standalone.
 
-After the Colony Network Contract is deployed, the first colony created will be the \rc. Tokens in this Colony will be \rct (CLNY). At this point, users will be able to `burn' the tokens purchased during the crowdsale 1:1 for tokens that are tokens in the \rc. In short, \rct are the same as CLNY.
+After the Colony Network Contract is deployed, the first colony created will be the \rc. Tokens in this Colony will be CLNY. At this point, users will be able to `burn' the tokens purchased during the crowdsale 1:1 for tokens that are tokens in the \rc. In short, \rcts are the same as CLNY.
 
 \subsection{Role of CLNY Holders}
 CLNY holders, in the case of the fully realised Colony Network, have two primary roles. The first is management of the Colony Network itself. Holders vote on parameters that affect the network as a whole - for example, the fee charged by the network when a payment is made upon completion of a task (Section \ref{sec:tasks}). There will be permissioned functions on the Network Contract to allow these parameters to be set. 
 
-In order for these permissioned functions to be called by the colony contract, a vote must be taken where all CLNY holders and reputation holders are allowed to vote. Indeed, this restriction applies to all votes where the colony is making an arbitrary transaction - because the transaction comes from the colony contract, everyone who is involved in the colony should be allowed to have a say. See also Section \ref{sec:arbitrary-transaction}.
+In order for these permissioned \rc functions to be called by the colony contract, a vote must be taken where all CLNY holders and reputation holders are allowed to vote. Indeed, this restriction applies to all votes where the colony is making an arbitrary transaction (Section \ref{sec:arbitrary-transaction}).
 
 Management of the Colony network also includes making updates to Colony contracts available to colonies. CLNY holders are not responsible for coding these updates, but the updates are only able to be deployed to the Colony Network with the assent of their assent, so they are responsible for at least doing due diligence to avoid introducing a security hole or other undesirable behaviour to the network. It is anticipated that actual work of this nature would take place within the \rc itself as a series of tasks.
 
-The second primary role for the CLNY holders is the process we have termed `Reputation Mining', described in section \ref{sec:reputationmining}.
+The second primary role for the CLNY holders is the process we have termed `Reputation Mining' (Section \ref{sec:reputationmining}).
 
 \subsection{Role of the \rc}
 As alluded to above, the CLNY token is the token of the \rc. Like any other colony, the \rc has both tokens and reputation and its decision making is affected by both.\\
-As a colony, the \rc is responsible for the development of the Colony Network i.e. the family of smart contract that underpin the governance of and interaction between all colonies. In return, the \rc is the beneficiary of the network fee (Section \ref{sec:networkrevenue}).\\
-Reputation in the \rc can be earned by earning tokens on tasks and administrative duties just as in any other colony (Section \ref{sec:earning-rep}). Furthermore, reputation in the \rc can be earned by participating in the reputation mining process (Section \ref{subsec:mining-costs-and-rewards}).
+As a colony, the \rc is responsible for the development of the Colony Network i.e. the family of smart contracts that underpin the governance of and interaction between all colonies. In return, the \rc is the beneficiary of the network fee (Section \ref{sec:networkrevenue}).\\
+Reputation in the \rc can be earned by earning CLNY tokens on tasks and administrative duties just as in any other colony (Section \ref{sec:earning-rep}). Furthermore, reputation in the \rc can be earned by participating in the reputation mining process (Section \ref{subsec:mining-costs-and-rewards}).
 
 \subsection{Handing off decision-making power to the \rc}\label{subsec:ceding-control-to-rc}
 While CLNY holders are responsible from the start for Reputation Mining, to begin with, decisions about the functioning of the network, will be made by holders of a multisig key, owned by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will be released to the \rc, and the token holders within it.
@@ -26,10 +26,10 @@ While CLNY holders are responsible from the start for Reputation Mining, to begi
 Initially, the Network Contract's functions for making these changes will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
 
 \subsubsection*{Stage 2: Foundation Mutisig approval required}
-At a later date, an intermediate contract will be set up, which will have these permissions given to it instead. This contract will be set up to allow the \rc (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the \rc Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc will be able to propose changes, but the foundation must sign off on them.
+At a later date, an intermediate contract will be set up, which will have these permissions given to it instead. This contract will be set up to allow the \rc (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Root Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc will be able to propose changes, but the foundation must sign off on them.
 
 \subsubsection*{Stage 3: Foundation Multisig retains veto}
-The next stage will be a second intermediate contract which will operate very similarly to the first, but after a timeout - with no interaction from the Colony Foundation's address - the change will automatically be made to the Colony Root Contract. The Colony Foundation's role will be to block changes if necessary. The proposal to move to this contract will, of course, have to come from the \rc itself.  Thus at this stage the root colony will be able to make changes autonomously, but the foundation retains a veto.
+The next stage will be a second intermediate contract which will operate very similarly to the first, but after a timeout - with no interaction from the Colony Foundation's address - the change will automatically be made to the Colony Root Contract. The Colony Foundation's role will be to block changes if necessary. The proposal to move to this contract will, of course, have to come from the \rc itself.  Thus at this stage the \rc will be able to make changes autonomously, but the foundation retains a veto.
 
 \subsubsection*{Stage 4: \rc fuly in charge of the network}
 Finally, the intermediate contract will be removed, and the \rc will have control over the Colony Root Contract with no direct control imbued to the Colony Foundation other than that provided by any \rct (CLNY) held by the Foundation. 
@@ -40,9 +40,10 @@ While it is extremely hard to make a contract with no flaws, it is slightly less
 At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access a function that directly allows the state of the contract to be edited - in practise, this probably corresponds to access to the functions in the StorageContract to allow editing of variables. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. We require multiple whitelisted addresses to approve the removal from recovery mode to ensure that a whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode, making an edit to the contract state that would be difficult to otherwise detect.
 
 In general, the contract may enter `recovery mode' due to:
+\begin{itemize}
+ \item A flag being raised by an appropriately permissioned user.
+ \item Something that should always be true of the colony not being true - for example, amount of funds promised to tasks and not yet paid out should always be less than the balance of the colony.
+ \item Some other trigger - perhaps too many tokens have been paid out in a short amount of time.
+\end{itemize}
 
-A flag being raised by an appropriately permissioned user
-Something that should always be true of the colony not being true - for example, amount of funds promised to tasks and not yet paid out should always be less than the balance of the colony.
-Some other trigger - perhaps too many tokens have been paid out in a short amount of time.
-
-The Colony Foundation can be added as one of these whitelisted addresses as a `trusted party'. Note that if a Colony is able to be put into recovery mode, edited and taken out of recovery mode by the same user, this represents a security risk.
+The Colony Foundation can be added as one of these whitelisted addresses as a `trusted party'. Note that if a Colony is able to be put into recovery mode, edited and taken out of recovery mode by the same user, this represents a security risk. It should be easier to enter recovery mode than to leave it.

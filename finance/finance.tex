@@ -7,7 +7,7 @@ For revenue earned by a colony see section \ref{sec:revenue}.
 
 \subsection{Tokens and Ether}
 Every colony has its own ERC20-compatible token, the `local colony token'. These tokens are under the control of the colony contract and may be used to pay for work done in the colony. Tokens only leave the control of the colony upon being paid out for completed tasks.\\
-In addition to local tokens, a colony may also use Ether, Global Colony Tokens and several other ERC20 tokens that have been explicitly whitelisted by the Colony Network.
+In addition to local tokens, a colony may also use Ether, CLNY and several other ERC20 tokens that have been explicitly whitelisted by the Colony Network.
 
 
 \subsection{Pots and Funding Proposals}\label{sec:pots-and-fp}
@@ -23,50 +23,50 @@ All tokens and currencies are administered by the colony contract; it is respons
   \item \ascode{\textbf{TokenType}}	--	The token contract address (0x0 for ether)
   \item \ascode{\textbf{CurrentState}}	--	The state of the proposal ( e.g. inactive, active, completed, cancelled )
   \item \ascode{\textbf{TotalPaid}}	--	How much has been transferred along this funding proposal so far
-  \item \ascode{\textbf{TotalRequested}}	--	The maximum amount to transfer after which this funding porposal is considered 'completed'
+  \item \ascode{\textbf{TotalRequested}}	--	The maximum amount to transfer after which this funding porposal is considered `completed'
   \item \ascode{\textbf{LastUpdated}}	--	The time when the funding proposal was last updated
   \item \ascode{\textbf{Rate}}	--	Rate of funding
  \end{itemize}
 
 \end{description}
-We distinguish between two types of funding proposals; one intended for normal use, and one intended to be used when atypical circumstances present themselves (a \emph{mandated funding proposal}). The funding proposal intended for normal use may start funding the target straight away, whereas a mandated funding proposal must be explicitly voted on before it starts directing funds. Furthermore, in a normal funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a mandated funding proposal has not such restrictions.\\
+We distinguish between two types of funding proposals; one intended for normal use (Regular Funding Proposals, RFP) , and one intended to be used when atypical circumstances present themselves (Mandate Funding Proposals, MFP). The regular funding proposal may start funding the target straight away, whereas a mandated funding proposal must be explicitly voted on before it starts directing funds. Furthermore, in a normal funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a mandated funding proposal has not such restrictions.\\
 Mandated funding proposal should be used: when funds need to be directed somewhere that is not a direct descendant of the source or when the funding rate needs to be very high (fast/immediate payment), or when the funding rate should be otherwise controlled (eg. salary).\\
 
-In either case, the assignment to pots associated with departments or tasks is purely a bookkeeping mechanism; from the perspective of the blockchain, ether and tokens are held by the colony contract until paid out when a task is completed. 
+In either case, the assignment to pots associated with domains or tasks is purely a bookkeeping mechanism; from the perspective of the blockchain, ether and tokens are held by the colony contract until paid out when a task is completed. 
 
 \subsubsection*{Creating a Funding Proposal}
-Any member of the colony may create a funding proposal, however, the user in question must stake 0.01\%\footnote{this value may change before release} of the relevant reputation, where the reputation in question is that of the domain that is the most recent common ancestor of the source and target pots. They must also stake the same fraction of the colony's tokens i.e. the fraction is the amount of reputation being staked as a fraction of reputation in the whole colony domain, and the user must stake a number of the colony's local tokens that constitute this fraction of all of the colony's local tokens in existence. This small stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. 
+Any member of the colony may create a funding proposal, however, the user in question must stake 0.01\%\footnote{this value may change before release} of the relevant reputation, where the reputation in question is that of the domain that is the most recent common ancestor of the source and target pots. They must also stake the same fraction of the colony's tokens i.e. the fraction is the amount of reputation being staked as a fraction of reputation in the whole colony, and the user must stake a number of the colony's tokens that constitute this fraction of all of the colony's tokens in existence. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. 
 
 \subsubsection*{From, To and TokenType}
 The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}. \\
-The \ascode{TokenType} may be any ERC20 token whitelisted by the network, ether, Global Colony Token or Local Colony Token. The \ascode{From} and \ascode{To} addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
+The \ascode{TokenType} may be any ERC20 token whitelisted by the network, Ether, CLNY or the Colony's own Token. The \ascode{From} and \ascode{To} addresses must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a regular funding proposal is often sufficient. To move funds between any other pots or at a higher priority / rate, a mandated funding proposal is needed.
 
 \subsubsection*{CurrentState}
-The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to receive any funds. A regular funding proposal begins in active state while a mandated one begins inactive (i.e. it must be activated by a dispute / vote). A funding proposal is completed when it's \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism.
+The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to receive any funds. A regular funding proposal begins in active state while a mandated one begins inactive (i.e. it must be activated by a dispute / vote). A funding proposal is completed when it's \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism (Section \ref{sec:objections-and-disputes}).
 
 \subsubsection*{TotalPaid and TotalRequested}
 The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount. 
 
 \subsubsection*{Rate and LastUpdated}
-When a funding proposal is elligible to accrue funds (see below QUEUE REFREFFERERENCE) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- i.e. the user manually requests and update. Upon being pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.\\
+When a funding proposal is elligible to accrue funds (see Section \ref{subsec:funding-queue}) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- i.e. the user manually requests and update. Upon being pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.\\
 Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occured.
 
-\subsubsection{The Funding Queue}
-Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below REFREFFERERENCE.\\
+\subsubsection{The Funding Queue}\label{subsec:funding-queue}
+Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the mandated funding proposals, followed by the regular funding proposals. MFPs are ordered by the total reputation in their domain\footnote{The domain of an MFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while regular funding proposals are ordered by `backing'.  The details of this procedure are outlined below.\\
 
 
 
-Insert schematic picture here of funding proposals in a queue.\\[2cm]
-
-
-
-
+%Insert schematic picture here of funding proposals in a queue.\\[2cm]
 
 
 
 
-\subsubsection{Regular Funding Proposals}
-A regular funding proposal (\textbf{RFP}) is a funding proposal from some domain's pot to one of it's children's. It starts out in the \ascode{active} state and is thus immediately elligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism.
+
+
+
+
+\subsubsection{Regular Funding Proposals}\label{subsubsec:RFPs}
+A regular funding proposal (\textbf{RFP}) is a funding proposal from some domain's pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately elligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism.
 
 \subsubsection*{Ordering of RFPs}
 Regular funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by `amount of reputation backing the proposal'.\\
@@ -75,9 +75,10 @@ When created, a regular funding proposal gets placed at the bottom of the queue.
 The more reputation backs a proposal, the higher up the queue it is placed. Every transaction that adds backing to a proposal (or otherwise updates the backing level) inserts the proposal in the correct place in the queue. Only the funding proposal at the top of the queue accrues funds.\\
 
 \subsubsection*{The Rate of funding for RFPs}
-The more reputation backs a proposal, the faster it is funded; the rate scales linearly, and at the limit, if 100\% of the reputation in the source domain backs a regular funding proposal, then that funding proposal will be funded at a rate of 10\%\footnote{This number may change before release.} of the domain's holdings (of the \ascode{TokenType}) per day. This ensures that, in the event of the queue being empty, the opportunistic user is unable to claim the entirety of the domain's funds instantaneously. The goal is a steady and predictable allocation of resources directed collectively by the domain's reputation weighted priorities.
+The more reputation backs a proposal, the faster it is funded; the rate scales linearly, and at the limit, if 100\% of the reputation in the source domain backs a regular funding proposal, then that funding proposal will be funded at a rate of 10\%\footnote{This number may change before release.} of the domain's holdings (of the \ascode{TokenType}) per day.%This ensures that, in the event of the queue being empty, the opportunistic user is unable to claim the entirety of the domain's funds instantaneously. 
+The goal is a steady and predictable allocation of resources directed collectively by the domain's reputation weighted priorities.
 
-When a user backs a proposal, both the user and their reputation at the time is recorded. Consequently the user is able to update their backing at a later date. However, we note that such an update is not automatic and even if a user loses reputation due to bad behaviour, their backing level remains unchanged. To rectify this, we will allow users to update another user's backing to reflect their updated reputation scores, but we don't expect this functionality to be used often. Indeed we would only anticipate it being used if a user lost a lot of reputation due to some very bad behaviour, and other users wanted to prevent a bad funding proposal backed by the same user from being completed before it could be cancelled by other means (see REFREFFERERENCE). %Of course, this only applies to existing backings - users cannot force another user to back a proposal.
+When a user backs a proposal, both the user and their reputation at the time are recorded. Consequently the user is able to update their backing at a later date. However, we note that such an update is not automatic and even if a user loses reputation due to bad behaviour, their backing level remains unchanged. To rectify this, we will allow users to update another user's backing to reflect their updated reputation scores, but we don't expect this functionality to be used often. Indeed we would only anticipate it being used if a user lost a lot of reputation due to some very bad behaviour, and other users wanted to prevent a bad funding proposal backed by the same user from being completed before it could be cancelled by other means (Section \ref{sec:objections-and-disputes}). %Of course, this only applies to existing backings - users cannot force another user to back a proposal.
 
 %We emphasised that a user could back a proposal with their reputation at the time of backing because the reputation backing a proposal will not change when that user's reputation does so. If a user backs a funding proposal, when their reputation updates (which it will due to reputation decay if nothing else), the amount of reputation that they backed the task with does not update. We don’t anticipate this being an issue for the working of a colony, and simply a quirk of the platform. If the reputation recorded as backing a funding proposal ends up higher than 100\% of the total of that reputation in the colony, then the funding occurs no quicker than it would at 100%.
 
@@ -97,8 +98,9 @@ If an update finds that a proposal is funded (i.e. \ascode{TotalPaid = TotalRequ
 \end{itemize}
 
 
-When the RFP enters the \ascode{completed} state, for a period of three days anyone can make a proposal that the creator should be punished (i.e. lose their stake). If no such proposal is made, or the proposal fails to pass, then the creator can reclaim their stake.
+When the RFP enters the \ascode{completed} state, for a period of three days anyone can make a proposal that the creator should be punished (i.e. lose their stake). This proposal takes the form of an Objection (Section \ref{sec:objections-and-disputes}). If no such proposal is made, or the proposal fails to pass, then the creator can reclaim their stake.
 
+%Details: what is the variable that we are changing here?
 
 
 
@@ -112,8 +114,7 @@ We imagine MFPs may be used to
  \item reclaim funds from cancelled tasks
  \item fund projects across domains (joint ventures)
  \item set aside funds designated as a person's salary
- \item MORE? INSERT OTHERS HERE!!!
-\end{itemize}
+ \end{itemize}
 
 
 \subsubsection*{MFPs and the Funding Queue}
@@ -131,7 +132,7 @@ Mandated Funding Proposals take precedence over Regular Funding Proposals. To av
 The result of this rule is that fast payments are still possible - in this case the MFP's \ascode{rate} is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate MFPs that do not block the entire RFP process.
 
 \subsubsection*{When is a Funding Proposal eligible to receive funding?}
-A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the \ascode{LastUpdated} time of the MFPs at the top and bottom of the MFP queue are less than 24 hours old.\\
+A Regular Funding Proposal may receive funds when pinged if it is active and at the top of the RFP funding queue and when the \ascode{LastUpdated} time of the MFPs are less than 24 hours old.\\
 A Mandated Funding Proposal may receive funds when pinged if it is active and all MFP ahead of it in the funding queue have been updated less than 24 hours ago\footnote{In order to avoid hitting the gas limit due to unbounded loops, it may be necessary to maintain two orderings for the MFPs, one by priority and one by \ascode{LastUpdated}. }.
 
 \subsubsection{Cancelling Tasks and Funding Proposals}
@@ -142,8 +143,8 @@ When a task is cancelled, and funding proposals that have that task's pot as the
 \subsection{Paying out a task bounty}\label{sec:claiming-bounty}
 Ultimately, via the mechanism described above, some tokens have found their way into a pot associated with a task. Upon completion of the specified work and approval by the evaluator, the worker has earned the contents of the pot. However, even once the work has been approved, there remains a period of time before the funds can be requested to be paid out by the receiving address. This is enforced to allow a period where a user of the colony can object to the payout, accusing it of fraudulence or similar.
 
-If a user objects to the payout, they can raise a dispute to void the task payout. The dispute is raised to a parent domain of the task in question - or even the colony domain itself. The choice of domain lies with the user making the objection. Users vote to resolve the dispute with votes weighted by their reputation in the domain the objection was raised to. In the event that their dispute is upheld, the funds can be returned to the domain that contained the task. If the voters approve of the payout, no changes are made and the user will be able to claim their payout after all.
+If a user objects to the payout, they can raise an objection to void the task payout. The objection may be raised to a parent domain of the task in question - or even escalated to the colony domain itself. The choice of domain lies with the user making the objection. Users vote to resolve any resulting disputes with votes weighted by their reputation in the domain the objection was raised to. In the event that their dispute is upheld, the funds can be returned to the domain that contained the task. If the voters approve of the payout, no changes are made and the user will be able to claim their payout after all.
 
 While a payout is under dispute, the timeout period continues to run. After the end of the dispute period, no more objections are able to be raised, but any existing objections are resolved before payout is allowed.  This is to prevent users being able to continually raise disputes to prevent payout.
 
-Once the tokens have been paid out, they are under the control of the user - there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here. While in principle we could add a feature to the colony tokens to allow them to be reclaimed by the colony, this would cause colony tokens to behave differently to Ether or other ERC20 tokens, which might prove confusing to users and likely severely reduce confidence in the tokens being issued. We therefore do not intend to add any such feature to the colony token contracts.
+Once the tokens have been paid out, they are under the control of the user - there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here. %While in principle we could add a feature to the colony tokens to allow them to be reclaimed by the colony, this would cause colony tokens to behave differently to Ether or other ERC20 tokens, which might prove confusing to users and likely severely reduce confidence in the tokens being issued. We therefore do not intend to add any such feature to the colony token contracts.
