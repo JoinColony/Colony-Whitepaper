@@ -1,10 +1,10 @@
-\section{Structure and Hierarchy}
-
+\section{Structure and Hierarchy within a Colony}
+The purpose of colonies is to facilitate coordination among its members; to direct collective effort towards some goal(s). In light of this, one of the most central functions of a colony is to manage work assignments.\\
 Work in a colony is divided up into well-defined jobs called `tasks', which can then be organised within a colony into `domains'. In this section, we describe each of these in detail and how we anticipate each to be used.
 
 \subsection{Tasks}\label{sec:tasks}
 
-The fundamental unit of structure in a colony is the `task'. A task has three roles associated with it:
+The smallest structural unit in a colony is the `task'. A task represents a small unit of work that requires no further subdivision and delegation. A task has three roles associated with it:
 \begin{itemize}
 \item An administrator - someone responsible for defining the task
 \item A worker - someone responsible for executing the task
@@ -17,21 +17,21 @@ The administrator (the creator of the task) is responsible for selecting the eva
 
 \begin{itemize}
 \item A due date (represented by a block number)
-\item Payouts for each of the administrator, the worker and the evaluator. We anticipate that the worker should be the role to get the bulk of each payout, as they are actually doing the work. 
+\item Payouts for each of the administrator, the worker and the evaluator. We anticipate that the worker should be the role to get the bulk of each payout, as they are actually doing most of the work. 
 \item A specification or brief for the task, to be used by the worker to guide the work, and by the evaluator for deciding if the work has been completed.
 \end{itemize}
 
 In order to create a task, the administrator must stake 0.01\% of the Colony Tokens in existence. This small stake is used to help discourage spamming of nonsense tasks, and provide a mechanism whereby the administrator can be punished upon bad behaviour. 
 
-Defining what the payouts for each role should be, of course, does not provide the funds - this must be done through the funding mechanisms in Colony (see section \ref{sec:finance}). While the administrator is not the only person who is able to make the funding proposal - which can be made by anyone - they are the natural person to do so.
+Defining what the payouts for each role should be, of course, does not provide the funds - this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). While the administrator is not the only person who is able to make the funding proposal - which can be made by anyone - they are the natural person to do so.
 
-Formally defining the worker is irreversible, and can only occur after the funds to satisfy the proposed payout has been received by the task, and both the administrator and proposed worker have accepted they are happy with the assignment. After that point, the worker and payout cannot be changed, though other variables associated with the task can be.
+Assigning the worker account can only occur after the funds to satisfy the proposed payout has been received by the task, and both the administrator and proposed worker have accepted they are happy with the assignment. After that point, the worker account and payout cannot be changed, though other variables associated with the task can be.
 
 Once all these elements have been set and funding is secured, the worker is able to --- at any point --- make a `final submission', which includes some proof that the work has been completed. This is a generic field that can be use for any proof that the work has been completed, but most likely should be an IPFS or Swarm hash referring to a longer file rather than a large proof that would be expensive to store on-chain.
 
-Once the due date has passed or the worker has made their submission, the evaluator is able to grade the work. Regardless of whether the grading is positive or not, the task then enters a state where objections or `disputes' (see section \ref{sec:disputes}) can be made over the final state of the task but no other changes can be made. Once three days have passed, no more disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
+Once the due date has passed or the worker has made their submission, the evaluator is able to grade the work. Regardless of whether the grading is positive or not, the task then enters a state where objections or `disputes' (see Section \ref{sec:disputes}) can be made over the final state of the task but no other changes can be made. Once three days have passed, no more disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
 
-If the evaluator's grading for the work is changed as a result of a dispute, they get a reduced payout based on the discrepancy between their original score and the score that their peers determined to be more appropriate. If a dispute has determined the administrator should be punished, they lose their stake, otherwise the stake is returned. The worker is paid based on the final score awarded to their work, taking into account the result of any disputes.
+If the evaluator's grading for the work is changed as a result of an objection (see Section \ref{sec:disputes}), they get a reduced payout based on the discrepancy between their original score and the score that their peers determined to be more appropriate. If an objection has determined the administrator should be punished, they lose their stake, otherwise the stake is returned. The worker is paid based on the final score awarded to their work, taking into account the result of any objections (or disputes).
 
 \subsection{Domains}\label{sec:domains}
 
@@ -42,3 +42,4 @@ This compartmentalisation of activity in a colony provides a tangible benefit to
 We also note that on some level, it is up to individual colonies to decide how they wish to use domains - some might only use them for coarse categorisations, whereas others may use them to very precisely group only the most similar tasks together, or even multiple tasks that other colonies would consider a single task. We aim to provide a general framework that colonies can use how they see fit, and to only be prescriptive in the service's use where necessary.
 
 
+%schematic example diagram goes here

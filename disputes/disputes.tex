@@ -1,25 +1,25 @@
-\section{Disputes and Arbitration}\label{sec:disputes}
+\section{Objections and Disputes}\label{sec:disputes}\label{sec:objections-and-disputes}
 %The what and why of the dispute system: permissive by default, dispute forces votes... FIXME.
-Bureaucracies are slow and voting is cumbersome and takes time. Colony aims to be usable, efficient and fluid. The emphasis should be on `getting stuff done' and not about `applying for permission'. For this reason, Colony is designed to be \emph{permissive}. Explicitly, this means that task creation does not need explicit approval (Section \ref{sec:tasks}), neither does the process of getting funding for a task using a regular funding proposal (Section \ref{sec:finance}) nor any number of administrative actions throughout the colony system.\\
+Bureaucracies are slow and voting is cumbersome and takes time. Colony aims to be usable, efficient and fluid. The emphasis should be on `getting stuff done' and not about `applying for permission'. For this reason, Colony is designed to be \emph{permissive}. Explicitly, this means that task creation does not need explicit approval (Section \ref{sec:tasks}), neither does the process of getting funding for a task using a regular funding proposal (Section \ref{sec:finance}) nor any number of administrative actions throughout the Colony system.\\
 The assumption is that well aligned teams tend to be in agreement on most day-to-day goings on in their group. It is expected that members keep an eye out on what their colleagues are doing, but seldom feel the need to intervene. 
 
 The \textbf{Dispute System} is there to resolve disagreements within the group and to punish bad behaviour and fraud. In short, the dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
 
 
 \subsubsection*{What are Objections?}
-When a member of a colony feels that something is amiss, some task is overpriced, some evaluation incorrect, some funding proposal unjustified; they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable - stored in the \ascode{EternalStorage} contract should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
+When a member of a colony feels that something is amiss, some task is overpriced, some evaluation incorrect, some funding proposal unjustified; they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable - stored in the \ascode{EternalStorage} contract - should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
 
 The user raising the objection must also put up a stake to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding uneccessary voting, the objection will pass automatically \emph{unless} someone else stakes on the counterside and thereby elevates the objection to a \emph{dispute}.
 
 \subsubsection*{What are Disputes?}
 We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting. 
 
-\subsection{Objections and Disputes}\label{sec:objections-and-disputes}
+\subsection{Raising Objections}\label{subsec:raising-objections}
 
 The user raising an objection submits the following data:
 \begin{itemize}
  \item the data that should be changed
- \item the reputation(s) that should vote on this issue (max. one each from organisational and skill hierarchy)
+ \item the reputation(s) that should vote on this issue (max. one each from domain and skill hierarchy)
  \item proof that these reputations should be allowed to make the change in question. 
 \end{itemize}
 
@@ -63,7 +63,7 @@ The exact mechanisms of the vote are described elsewhere (Section \ref{sec:votin
 
 
 \subsubsection{Time to vote and quorum requirements}
-The length of the voting period scales with the size of the reputation pool queried. A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, no changes are made and all participants get their staked tokens returned. We define quorum to be more than 10\% of the reputation eligible to vote has done so.
+The length of the voting period scales with the size of the reputation pool queried. A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, the change side is deemed to have lost. No changes are made and all participants get their remaining staked tokens returned\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}. We define quorum to be more than 10\% of the reputation eligible to vote has done so.
 
 \subsubsection{Consequences of the vote}
 If quorum has been reached, if the `change' side won then the variable in question is changed, assuming that the reputation that voted for this outcome is more than previous vote on the same variable (see \ref{sec:repeated-disputes} below). If the `keep' side won, then the variable is not changed. In either case, the rest of the consequences are the same.
@@ -78,7 +78,7 @@ At the conclusion of the poll, losing stakers receive 0-90\% of their staked tok
  \item How close the vote ultimately was
 \end{itemize}
 
-At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side's vote weight ($w$) reaches a landslide threshold ($L$) of the total vote weight, then they receive 0\% of their staked tokens back. $L$ varies based on the fraction of total reputation in the colony that was allowed to vote ($R$):
+At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side's vote weight ($w$) reaches a landslide threshold ($L$) of the total vote weight, then they receive 0\% of their staked tokens back. $L$ varies based on the fraction of total reputation in the colony that voted ($R$):
 
 \[
 L = 1 - \frac{R}{3}
@@ -92,10 +92,10 @@ Between these extremes of a landslide loss and a very slim loss, the loss of tok
  \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace
 \]
 
-
+\subsubsection*{What heppens to the tokens lost?}
 Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).
 
-The motivation behind this scheme is again one of efficiency. We aim to discourage spurious objections and disputes. We regard a close vote as a sign that the decision was indeed not a simple one and that forcing a vote on the issue may have been wise; on the other hand, if a vote ends in a landslide is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible long before the dispute process is invoked.
+The motivation behind this scheme is again one of efficiency. We aim to discourage spurious objections and disputes. We regard a close vote as a sign that the decision was indeed not a simple one and that forcing a vote on the issue may have been wise; on the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible long before the dispute process is invoked.
 
 \subsubsection*{Summary}
 If you staked on the losing side of a dispute
@@ -103,7 +103,7 @@ If you staked on the losing side of a dispute
  \item 10\% of your stake is used to compensate voters for voting (unclaimed funds go to colony)
  \item Of the remaining 90\%, $\Delta$ is split between the opposing stakers and the colony
  \item $(90-\Delta)\%$ of your tokens are returned to you.
- \item You lose $(100-\Delta)\%$ of your staked reputation, with half of it going to opposing stakers (Section \ref{appendix:rep-transfer}).
+ \item You lose $(100-\Delta)\%$ of your staked reputation, with half of it going to opposing stakers (Section \ref{sec:reptransfer} and Appendix \ref{appendix:rep-transfer}).
 \end{itemize}
 
 
@@ -115,10 +115,10 @@ In order to prevent repeated objections and disputes over the same variable, the
 \subsection{Special case: Proposing an arbitrary transaction by the Colony contract}\label{sec:arbitrary-transaction}
 It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurances with high threshhold requirements.
 
-Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from any other normal objection; the proposal is to set the value of a special variable to the value of the transaction data of the proposed transaction.\\
-Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as the actions of the contract as a whole should be available for all to vote on. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to empty if successful (to prevent it being called multiple times).
+Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction.\\
+Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.
 
 \subsection{Token-weighted, reputation-weighted and hybrid voting}
-The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, nor a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to be leveraged. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
+The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, nor a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to vote. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
 
 The primary use of a token weighted vote is related to the management of the colony tokens itself; it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.

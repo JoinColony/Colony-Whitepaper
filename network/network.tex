@@ -1,6 +1,8 @@
-\section{The Colony Network}
+\section{The Colony Network on Ethereum}
 
-Much thought has been put into making sure that the system deployed can be upgraded going forward; we want people to start using Colony as soon as possible, before all the functionality described in this document is fully realised. This has led directly to the Colony Network being a collection of contracts. The contracts that must be deployed to instantiate the Colony network are:
+Much thought has been put into making sure that the system deployed can be upgraded going forward; we want people to start using Colony as soon as possible, before all the functionality described in this document is fully realised.
+
+The Colony Network consists of a collection of contracts on the ethereum blockchain. The contracts that must be deployed to instantiate the Colony Network are:
 
 \begin{itemize}
 \item The \code{ColonyNetworkResolver}
@@ -43,7 +45,7 @@ When deployed, the \code{ColonyFactory} and the \code{ColonyNetwork} contracts e
 
 \noindent where \code{TYPE} is one of the six types. The functions to get and set the value in storage have the modifier \code{onlyOwner}; this ensures that values are able to be set only by the contract that this storage contract belongs to. The associated contract must define its own public getter if it wishes there to be one. There is also an associated changeOwner function, only callable by the current owner, to change the owner of the contract. This allows the data contained within the contract to be moved to a new (presumably upgraded) contract when necessary. 
 
-Contracts that are not intended to be upgraded do not have an \code{EternalStorage} contract deployed alongside them to use. We admit that there is a minor gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add some gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed. 
+Contracts that are not intended to be upgraded do not have an \code{EternalStorage} contract deployed alongside them to use. We admit that there is a minor gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add some gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed\footnote{\texttt{https://blog.colony.io/writing-upgradeable-contracts-in-solidity-6743f0eecc88}}. 
 
 \subsection{The upgrade process}
 
@@ -59,7 +61,9 @@ All of the data is now available to the new contract, as well as the ability to 
 
 When a colony is being upgraded, we must also account for any token balances the colony has. If the colony has balances in a large number of tokens, sending each and every one of these token balances could conceivably result in the gas limit preventing the upgrade process being completed in a single transaction. Our intention is therefore to have a separate contract that can be associated with the colony which handles tokens on behalf of the colony, and will continue to exist alongside the colony for its entire lifetime.
 
+\textbf{NOTE @alex: maybe write about an \ascode{EternalWallet} allongside \ascode{EternalStorage}? FIXME}
+
 An important point for us to stress is that, in the case of a colony, the choice of upgrading will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
 
-\subsection{The future}
-It is entirely possible that in the future, during the development of the Colony Network, the functionality that will have been developed will be unable to be contained in a single \code{Colony} contract. The growth of the contract can be mitigated by the use of libraries, but even then it seems likely that at some point in the future the contract will become impossible to deploy in a single transaction. In that case, the contract would be partitioned into multiple contracts that dealt with different elements under the control of a single colony contract. In this scenario, the client would have to perform some convenience functions behind the scenes to maintain ease of use (directing requests to the appropriate contracts), but this should still be achievable.
+% \subsection{The future}
+% It is entirely possible that in the future, during the development of the Colony Network, the functionality that will have been developed will be unable to be contained in a single \code{Colony} contract. The growth of the contract can be mitigated by the use of libraries, but even then it seems likely that at some point in the future the contract will become impossible to deploy in a single transaction. In that case, the contract would be partitioned into multiple contracts that dealt with different elements under the control of a single colony contract. In this scenario, the client would have to perform some convenience functions behind the scenes to maintain ease of use (directing requests to the appropriate contracts), but this should still be achievable.
