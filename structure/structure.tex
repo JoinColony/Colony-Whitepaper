@@ -1,17 +1,18 @@
 \section{Structure and Hierarchy within a Colony}
-The purpose of colonies is to facilitate coordination among its members; to direct collective effort towards some goal(s). In light of this, one of the most central functions of a colony is to manage work assignments.\\
+The purpose of colonies is to facilitate coordination among its members; to direct collective effort towards some goal(s). In light of this, one of the most central functions of a colony is to manage work assignments.
+
 Work in a colony is divided up into well-defined jobs called `tasks', which can then be organised within a colony into `domains'. In this section, we describe each of these in detail and how we anticipate each to be used.
 
 \subsection{Tasks}\label{sec:tasks}
 
-The smallest structural unit in a colony is the `task'. A task represents a small unit of work that requires no further subdivision and delegation. A task has three roles associated with it:
+The smallest structural unit in a colony is the `task'. A task represents a small unit of work that requires no further subdivision or delegation. A task has three roles associated with it:
 \begin{itemize}
-\item An administrator - someone responsible for defining the task
-\item A worker - someone responsible for executing the task
-\item An evaluator - someone responsible for checking the work has been completed
+\item An administrator --- someone responsible for defining the task
+\item A worker --- someone responsible for executing the task
+\item An evaluator --- someone responsible for checking the work has been completed
 \end{itemize}
 
-These roles are assigned to addresses. While we anticipate that tasks will be mainly be defined such that each of these roles is assigned to an individual in the first instance, there is nothing preventing these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation  earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
+These roles are assigned to addresses. While we anticipate that tasks will be mainly be defined such that each of these roles is assigned to an individual in the first instance, there is nothing preventing these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
 
 The administrator (the creator of the task) is responsible for selecting the evaluator and worker (by whatever means they deem appropriate) and setting additional metadata for the task:
 
@@ -23,7 +24,7 @@ The administrator (the creator of the task) is responsible for selecting the eva
 
 In order to create a task, the administrator must stake 0.01\% of the Colony Tokens in existence. This small stake is used to help discourage spamming of nonsense tasks, and provide a mechanism whereby the administrator can be punished upon bad behaviour. 
 
-Defining what the payouts for each role should be, of course, does not provide the funds - this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). While the administrator is not the only person who is able to make the funding proposal - which can be made by anyone - they are the natural person to do so.
+Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). While the administrator is not the only person who is able to make the funding proposal --- which can be made by anyone --- they are the natural person to do so.
 
 Assigning the worker account can only occur after the funds to satisfy the proposed payout has been received by the task, and both the administrator and proposed worker have accepted they are happy with the assignment. After that point, the worker account and payout cannot be changed, though other variables associated with the task can be.
 

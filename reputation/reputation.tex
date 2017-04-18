@@ -60,12 +60,12 @@ The performance of the user who has completed the work is established when the w
 
 In the case of the evaluator, a rating of 0-2 stars counts as them rejecting the work, and a score of 3-5 stars counts as accepting the work. Beyond that, we suggest the following guidelines for ratings:
 \begin{itemize}
- \item[0 stars] - user submitted no meaningful work 
- \item[1 star\phantom{s}] - user showed little activity relevant to the task, and remains far from completion on due date.
- \item[2 stars] - user was unable to complete the task, but put in a reasonable amount of effort
- \item[3 stars] - user completed the task spec but there were issues during the work.
- \item[4 stars] - user completed the task acceptably and there were no complaints.
- \item[5 stars] - user completed the task to a higher standard than requested.
+ \item[] 0 stars: user submitted no meaningful work 
+ \item[]1 star:\phantom{s} user showed little activity relevant to the task, and remains far from completion on due date.
+ \item[]2 stars: user was unable to complete the task, but put in a reasonable amount of effort
+ \item[]3 stars: user completed the task spec but there were issues during the work.
+ \item[]4 stars: user completed the task acceptably and there were no complaints.
+ \item[]5 stars: user completed the task to a higher standard than requested.
 \end{itemize}
 
 The actual number of reputation points $r$ earned by the worker for the completion of the task is then a function of this rating $s$ and the token payout $t$:
@@ -90,7 +90,7 @@ If a dispute occurs, causing a vote among some portion of the colony, each side 
 
 
 \subsubsection{Reputation Decay}
-All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs continuously, rather than being a step change every three months to ensure there are as few incentives to earn reputation at any particular time.
+All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are as few incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation
 
 
 
