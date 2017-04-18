@@ -112,6 +112,10 @@ captionpos=b
 \end{tcolorbox}
 }
 
+\usepackage[nottoc]{tocbibind} %https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
+\settocbibname{Bibliography and References}
+
+
 %until we agree on a name
 \newcommand{\rc}{Common Colony\ }
 \newcommand{\rct}{Common Colony token\ }
@@ -144,4 +148,9 @@ captionpos=b
 \appendix
 \input{./appendixa/appendixa.tex}
 \input{./appendixb/appendixb.tex}
+
+
+% {Bibliography}
+\input{bibliography/biblio.tex}
+
 \end{document}

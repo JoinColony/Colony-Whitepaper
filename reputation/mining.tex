@@ -20,7 +20,7 @@ R =
  amount & \textnormal{the numerical value of the reputation}.
 \end{cases}
 $$
-All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a merkle tree (\cite{MerkleTrees}) of all individual reputations in a colony and the cumulative totals. (Note: The tree also contains the totals of all types of reputation held by users in this colony; these are entries in which the \ascode{user} is set to zero.)\\
+All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a merkle tree (\cite{MerkleTrees}, \cite{MerkleInEthereum}) of all individual reputations in a colony and the cumulative totals. (Note: The tree also contains the totals of all types of reputation held by users in this colony; these are entries in which the \ascode{user} is set to zero.)\\
 All reputations held by all users in all colonies are ordered in a list. The elements of this list are hashes pairwise, to end up with a shorter list of hashes. This process is repeated until only one hash remains: the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{center}
 \begin{tikzpicture}
