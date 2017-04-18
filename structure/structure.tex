@@ -44,3 +44,24 @@ We also note that on some level, it is up to individual colonies to decide how t
 
 
 %schematic example diagram goes here
+
+
+
+\begin{center}
+ \begin{tikzpicture}
+   \node[ellipse,draw, dashed] at (0,0) (tld) {Colony Domain};
+   \node[ellipse,draw, dashed] at (-2,-2) (design) {Design};
+   \node[ellipse,draw, dashed] at (2,-2) (development) {Development};
+   \node[ellipse,draw, dashed] at (0.5,-4) (frontend) {Frontend};
+   \node[ellipse,draw, dashed] at (4,-4) (backend) {Backend};
+   \node[ellipse,draw, dashed] at (3,-6) (cpp) {C++};
+   \node[ellipse,draw, dashed] at (5,-6) (golang) {Go}
+    (tld.-120) edge[->, bend left=45, in=-120] (design.north)
+    (tld.-60) edge[->, bend left=45, out=-60, in=120] (development.north)
+    (development.-120) edge[->, bend left=45, in=-120] (frontend.north)
+    (development.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north)
+    (backend.-120) edge[->, bend left=45, in=-120] (cpp.north)
+    (backend.-60)  edge[->, bend left=45, out=-60, in=120] (golang.north);
+  \node at (-2,-5.5) {\begin{tabular}{l} Parts of a domain hierarchy\\for a web development colony.\end{tabular}};
+ \end{tikzpicture}
+\end{center}
