@@ -48,9 +48,12 @@ When deployed, the  \code{ColonyNetwork} contract has an \code{EternalStorage} c
 
 Contracts that are not intended to be upgraded do not have an \code{EternalStorage} contract deployed alongside them to use. We admit that there is a minor gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add some gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed (\cite{UpgradingContracts}). 
 
+\subsection{EternalWallet Contract}
+Each colony has an associated \code{EternalWallet} contract. The intention is to have this separate contract handling all tokens on behalf of the colony for the colony's entire lifetime. The \code{EternalWallet} handles the colony's Ether, CLNY and other tokens whitelisted by the network. 
+
 \subsection{The upgrade process}
 
-When the owner of a contract with an associated EternalStorage wishes to upgrade the contract, the following process occurs (in a single transaction):
+When the owner of a contract with an associated \code{EternalStorage} wishes to upgrade the contract, the following process occurs (in a single transaction):
 
 \begin{enumerate}
 \item The new version of the contract is deployed --- let's assume to the address \code{0xcafe}.
@@ -60,9 +63,7 @@ When the owner of a contract with an associated EternalStorage wishes to upgrade
 
 All of the data is now available to the new contract, as well as the ability to amend existing data or write new data to the store, and the new contract has all of the assets of the original. This is only possible because no storage variables were used in the original colony contract. A na{\"i}ve implementation would copy across the data from an old contract to the new one, but this can get arbitrarily expensive.
 
-When a colony is being upgraded, we must also account for any token balances the colony has. If the colony has balances in a large number of tokens, sending each and every one of these token balances could conceivably result in the gas limit preventing the upgrade process being completed in a single transaction. Our intention is therefore to have a separate contract that can be associated with the colony which handles tokens on behalf of the colony, and will continue to exist alongside the colony for its entire lifetime.
-
-\textbf{NOTE @alex: maybe write about an \ascode{EternalWallet} allongside \ascode{EternalStorage}? FIXME}
+When a colony is being upgraded, we must also account for any token balances the colony has. If the colony has balances in a large number of tokens, sending each and every one of these token balances could conceivably result in the gas limit preventing the upgrade process being completed in a single transaction. This is a major reason for the \code{EternalWallet}; the upgrade process is handled analgously to the \code{EternalStorage}.
 
 An important point for us to stress is that, in the case of a colony, the choice of upgrading will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
 
