@@ -188,7 +188,7 @@ Any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (the
 First, however, we must establish where the two overall calculations submitted differ.
 
 \subsubsection*{2. Searching for the discrepancy}
-The contract requires both parties to submit merkle proofs that specific reputation updates were handled correctly. It begins by pseudorandomly picking a reputation updating transaction from the first half of the log (\ref{subsec:reputation-event-log}) (say the $i^{th}$ update for some $i<\frac{n}{2}$) and requires both parties to provide:\\
+The contract requires both parties to submit merkle proofs that specific reputation updates were handled correctly. It begins by pseudorandomly picking a reputation updating transaction from the first half of the log (Appendix \ref{appendix:rep-transfer}) (say the $i^{th}$ update for some $i<\frac{n}{2}$) and requires both parties to provide:\\
 \begin{itemize}
  \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{i-1}$)
  \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_i$)
