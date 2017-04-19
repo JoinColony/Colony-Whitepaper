@@ -308,11 +308,16 @@ $$t \times \left\lceil\log_2\left(4500\right)\right\rceil\times \left\lceil\log_
 
 Long term, $N_{\rm updates}$ will be dominated by the decay transactions rather than by any updates that have occurred since the last reputation state was established. Even if the Colony Network were wildly successful, with 100000 colonies, each with 1000 users that had earned some reputation in 1000 different skills in each of the structural and skill hierarchies, the delay to the reputation updates would only be around $36$ hours.
 
-There would be little effect on the rest of the colony network in this time. Users would still be able to exercise their reputation from the previous reputation update, and continue to influence decisions with that reputation. Indeed, this shows what perhaps the main motivation for such an attack would be --- if a user knew that they had been `caught' behaving badly, and was due to lose all their reputation, they might try such an attack to eke out the last bits of influence they possibly could. However, decisions in the colony network do not resolve quickly, and in a well-developed colony we would not expect any one person to have a large amount of reputation when compared to the rest of the colony, so it seems unlikely they would be able to do much damage while conducting the attack.
+There would be little effect on the rest of the colony network in this time. Users would still be able to exercise their reputation from the previous reputation update, and continue to influence decisions with that reputation. Indeed, this shows what perhaps the main motivation for such an attack would be --- if a user knew that they had been `caught' behaving badly, and was due to lose all their reputation, they might try such an attack to eke out the last bits of influence they possibly could. However, decisions in the colony network do not resolve quickly, and in a well-developed colony we would not expect any one person to have a large amount of reputation when compared to the rest of the colony, so it seems unlikely they would be able to unduly influence decisions significantly while conducting the attack.
 
-Assuming this attack continued, then the reputation mining protocol would effectively only update every 36 hours. Users staking would become more susceptible to variance in terms of the rewards, but otherwise little would change in the day-to-day functioning of any individual colony. The attacker would lose all the \rct that they had staked in order to perform the attack.
+Assuming this attack continued, then the reputation mining protocol would effectively only update every 36 hours. Users staking would become more susceptible to variance in terms of the rewards, but otherwise little would change in the day-to-day functioning of any individual colony. 
+
+The attacker would lose all the \rct that they had staked (which would be around 4500 times the expected minimum stake) in order to perform the attack, and so would have to buy more to attack again.
 
 \subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
+In order to be involved in the reputation mining process, \rcths must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
+
+If they submit a correct reputation hash,
 FIXME\\
 Notes:\\
 -token holders must stake in order to be miners\\
