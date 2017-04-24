@@ -84,7 +84,9 @@ The final \ascode{ReputationRootHash} is submitted to the contract by the miner 
 %
 \subsubsection*{Who can submit a new root hash?}
 CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} \rcth to submit the hash to the contract.
-It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash, ... )} is sufficiently small (\ascode{< target}).  At the beginning of the submission window, the target is set to 0 and slowly increases such that after 150 blocks all submissions are accepted\footnote{Some minimal \rct holding requirements may apply to ward off a denial of service attack with thousands of false submissions.}. Here N is some number greater than 0 and less than the number of tokens the \rcth address has staked, meaning that users with a large stake have a higher chance of qualifying to submit a hash than smaller stake holders.
+It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is sufficiently small (\ascode{< target}). At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}\times10^{-3}$ after 150 blocks. The fact that the target is capped, rather than increasing to $2^{256}$ at the end of the submission period effectively creates a minimum number of tokens required to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see section \ref{}). This factor will be changeable by the \rc.
+
+The variable $N$ that goes into the hash is some number greater than 0 and less than the number of tokens the \rcth address has staked divided by $10^15$, meaning that users with a large stake have a higher chance of qualifying to submit a hash than smaller stake holders. The factor of $10^15$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client.
 %
 \subsubsection*{Verifying a submission}
 If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurrence.\\
@@ -317,10 +319,36 @@ The attacker would lose all the \rct that they had staked (which would be around
 \subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
 In order to be involved in the reputation mining process, \rcths must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
 
-If they submit a correct reputation hash,
+If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash.
+
+If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain root colony tokens and reputation. The total amount of reputation earned is controlled by the amount of reputation that exists in the colony, and tries to ensure that 25\% of the reputation in a colony comes from mining. If normal activity in a colony generates $A$ reputation per hour, the total reputation that exists $R$ is given by 
+
+$$\frac{A}{1-\exp\left(-k\right)}$$
+
+\noindent On where $k$ is the decay constant used in each update period (see appendix \ref{}). If we wish for 25\% of $R$ to come from mining, then the amount of reputation earned from mining in each update period should be 
+
+$$\frac{R}{4}\left(1-\exp\left(-k\right)\right).$$
+
+When a user makes their submission, their weighting for that hash is recorded, and the total weight submitted by all users for that hash is updated. A staker's weight is given by 
+
+\begin{equation}\label{eq:stakerweight}
+\left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
+\end{equation}
+
+where $B$ is the total number of tokens they have staked, $n$ is their position in the list, $S$ and $T$ are normalising constants, and $t$ is the number of blocks they have staked their tokens for. 
+
+The first factor in equation \ref{eq:stakerweight} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. We expect $T$ to represent around a month.
+
+The second factor in equation \ref{eq:stakerweight} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal. This factor also means that users are not incentivised to split up their holdings, as some of the split up tokens will have lower weightings. $S$ should be a number on the order of the number of people that are staking in each round to ensure the discrepancy between the rewards for being first and last are not huge; it should be under the control of the \rc.
+
+The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
+
+
 FIXME\\
 Notes:\\
 -token holders must stake in order to be miners\\
 -reputational reward comes from tokens earned just like task payout
 -how much rep exactly you get (similar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
 -how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much reputation.
+- $k$ should be multiplied by the number of hours since the last update to accommodate for attack
+- Merkle proof of current $R$ should be submitted with hash, otherwise not accessible on-chain?
