@@ -21,7 +21,7 @@ R =
 \end{cases}
 $$
 All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a merkle tree (\cite{MerkleTrees}, \cite{MerkleInEthereum}) of all individual reputations in a colony and the cumulative totals. (Note: The tree also contains the totals of all types of reputation held by users in this colony; these are entries in which the \ascode{user} is set to zero.)\\
-All reputations held by all users in all colonies are ordered in a list. The elements of this list are hashes pairwise, to end up with a shorter list of hashes. This process is repeated until only one hash remains: the \ascode{ReputationRootHash}, $\mathcal{RH}$.
+All reputations held by all users in all colonies are ordered in a list. The elements of this list are hashed pairwise, to end up with a shorter list of hashes. This process is repeated until only one hash remains: the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{center}
 \begin{tikzpicture}
  \node at (0,-5) (r1) {$R_1$};
@@ -84,9 +84,9 @@ The final \ascode{ReputationRootHash} is submitted to the contract by the miner 
 %
 \subsubsection*{Who can submit a new root hash?}
 CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} \rcth to submit the hash to the contract.
-It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is sufficiently small (\ascode{< target}). At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}\times10^{-3}$ after 150 blocks. The fact that the target is capped, rather than increasing to $2^{256}$ at the end of the submission period effectively creates a minimum number of tokens required to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see section \ref{}). This factor will be changeable by the \rc.
+It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is sufficiently small (\ascode{< target}). At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}\times10^{-3}$ after 150 blocks. The fact that the target is capped, rather than increasing to $2^{256}$ at the end of the submission period effectively creates a minimum number of tokens required to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see section \ref{sec:mining-possible-attacks}). This factor will be changeable by the \rc.
 
-The variable $N$ that goes into the hash is some number greater than 0 and less than the number of tokens the \rcth address has staked divided by $10^15$, meaning that users with a large stake have a higher chance of qualifying to submit a hash than smaller stake holders. The factor of $10^15$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client.
+The variable $N$ that goes into the hash is some number greater than 0 and less than the number of tokens the \rcth address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client.
 %
 \subsubsection*{Verifying a submission}
 If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurrence.\\
@@ -185,7 +185,7 @@ We must prove all but one submission incorrect by having each submission navigat
  \node at (4,-5) (label) {\textnormal{The Justification Tree}};
 \end{tikzpicture}
 \end{center}
-Note that in the first stage of the tree, every neighnouring pair of leaves is hashed, and so any pair has a shared merkle proof to the root.\\
+Note that in the first stage of the tree, every neighbouring pair of leaves is hashed, and so any pair has a shared merkle proof to the root.\\
 Any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$. Somewhere there is a transition  ($\mathcal{RH}_i$ to $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update, the calculation of which is able to be done on-chain. \\
 First, however, we must establish where the two overall calculations submitted differ.
 
@@ -199,11 +199,11 @@ The contract requires both parties to submit merkle proofs that specific reputat
 
 The contract then repeats this process using a binary search algorithm. If the merkle proof (iii) for both submissions had the same sibling values almost all the way up, but differing only in the the final sibling, then the discrepancy must occur later (i.e. the two sumbissions differ at some $i^\prime > \frac{n}{2}$) whereas if the merkle proofs already differ at an earlier sibling, then the submissions must also differ in an update before $\frac{n}{2}$. This final hash is stored as the new target hash for following challenges.
 
-The contract pseudorandomly selects a reputation update from within the subtree in which the first discrepancy is known to lie. Each newly submitted proof further reduces the size of the subtree by a factor of two\footnote{ By examing precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it’s likely that it is more gas efficient to just do the `naive' binary search.}.
+The contract pseudorandomly selects a reputation update from within the subtree in which the first discrepancy is known to lie. Each newly submitted proof further reduces the size of the subtree by a factor of two\footnote{ By examining precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it’s likely that it is more gas efficient to just do the `naive' binary search.}.
 
-If at any point in the process, a submission does not respond to the challenge, in a timely fashion they forfeit, and are assumed to be incorrect. If all submissions continue to be defended successfully, ultimately, the location of the first discrepancy in the series of state transitions is found: the submissions aggree on (i) but not (ii). The contract then requires
+If at any point in the process, a submission does not respond to the challenge, in a timely fashion they forfeit, and are assumed to be incorrect. If all submissions continue to be defended successfully, ultimately, the location of the first discrepancy in the series of state transitions is found: the submissions agree on (i) but not (ii). The contract then requires
 \begin{itemize}
- \item[(iv)] A merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update trasaction.
+ \item[(iv)] A merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update transaction.
 \end{itemize}
 Note: in point (iv), the \emph{exact same} merkle proof that proves the inclusion of $R_j$ (before the reputation update) in the root $\mathcal{RH}_{i-1}$ must also prove the inclusion of $R_j$ (after the reputation update) in the root $\mathcal{RH}_i$. This is because the trees $\mathcal{RH}_{i-1}$ and $\mathcal{RH}_i$ differ in only a single leaf.\\
 
@@ -215,7 +215,7 @@ If less than an hour elapses from submissions opening to only one submission rem
 
 
 
-\subsection{Implementation Details}
+\subsection{Implementation Details}\label{sec:mining-implementation-details}
 %
 \subsubsection{Keeping track of reputation changes}
 %
@@ -295,7 +295,7 @@ For further details about reputation transfers and disputes, see Appendix \ref{a
 The reputation decay process was describe above as being continuous. To have a user's reputation continuously decay, and end up with half of the starting amount after three months, an exponential decay makes most sense. However, such a calculation is not possible on-chain, so we must use an approximation. The details of the approximation we use, and a proof that this approximation is accurate and will not affect the running of (active) colonies can be found in appendix \ref{appendix:rep-decay}.
 
 
-\subsection{Possible Attacks}
+\subsection{Possible Attacks}\label{sec:mining-possible-attacks}
 \subsubsection*{Many false submissions}
 % If we cannot figure out what the correct submission is within the given timeframe, then the reputation update process stalls... that's about it though. Very expensive attack and only effect is to delay one update.
 In the event of multiple submissions, finding the correct one takes time --- the timeout $t$ for the challenge-response must be reasonable to allow the transaction defending a submission to propagate and be mined. A denial-of-service attack is therefore possible, whereby an attacker makes many false submissions. However, if these submissions were random hashes, unable to be defended, then none would be defended correctly within the first five minute window, and the attack would quickly end. 
@@ -325,7 +325,7 @@ If a hash is found to be incorrect, all those who submitted it lose their stake.
 
 $$\frac{A}{1-\exp\left(-k\right)}$$
 
-\noindent On where $k$ is the decay constant used in each update period (see appendix \ref{}). If we wish for 25\% of $R$ to come from mining, then the amount of reputation earned from mining in each update period should be 
+\noindent where $k$ is the decay constant used in each update period (see Appendix \ref{}). If we wish for 25\% of $R$ to come from mining, then the amount of reputation earned from mining in each update period should be 
 
 $$\frac{R}{4}\left(1-\exp\left(-k\right)\right).$$
 
