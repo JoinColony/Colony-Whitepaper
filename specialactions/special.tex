@@ -2,7 +2,7 @@
 
 
 \subsection{Proposing an arbitrary transaction by the Colony contract}\label{sec:arbitrary-transaction}
-It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurences with high threshhold requirements.
+It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurrences with high threshhold requirements.
 
 Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction.\\
 Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.
@@ -53,13 +53,12 @@ The work-for-payment model in the colony network is based around tasks, and you'
 
 A slaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a mandated funding proposal. The hiree would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good frontend could hide these implementation details from the users and render salaried positions differently from regular domains.
 
-
 \subsubsection{Awarding Reputation Bonuses}
 
 All reputation decays, as described in section \ref{sec:reputation}. This prevents an eternal `reputation aristocracy' and allows reputation to be meaningful even after major changes in the colony token's value. \\
 Reputation is awarded when a user receives payment of colony tokens - usually as payout from a task. We can use this mechanim to award users extra reputation provided there is consensus to do so. 
 
-Consider the scenario in which a founder, or an early important contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate set too high for the particular colony. To get around the limitations of the reputation system and to re-integrate the founder and make them eligible to receive their just rewards, the colony can create a special `fake' task that is solely designed to award reputation. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
+Consider the scenario in which a founder, or an early important contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate was suboptimally high for the particular colony\footnote{Finding an optimal decay rate for reputation in the network will depend on empirical data collected from early colonies. As with similar constants in this paper, the numerical values may change before the full network is live.}. To get around the limitations of the reputation system and to re-integrate the founder (and make them eligible to receive their just rewards), the colony can create a special `fake' task that is solely designed to award reputation. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
 
 The important point is that any limitations imposed by the system can be weakened \emph{if there is consensus to do so}. The system should not stand in the way of consensus, it should just provide conflict resolution mechanisms for those times in which there is dissent.
 
