@@ -48,7 +48,7 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 \end{tabular}
 \end{table}
 
-When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes, and the remainder from the previous match. Then, when a \rcth is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list. The user's client is required to do this iteration locally to find the row, but this does not require any gas expenditure.
+When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes, and the remainder from the previous match. Then, when a \rcth\ is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list. The user's client is required to do this iteration locally to find the row, but this does not require any gas expenditure.
 
 \subsection{Exact matching}\label{sec:exactMatching}
 

@@ -61,7 +61,7 @@ The 10\%/90\% split between rewards and capital can be altered based on a colony
 
 
 \subsection{The Revenue Model of the Colony Network}\label{sec:networkrevenue}
-The Colony Network must be able to sustain itself. In particular, the \rc (in control of the colony network and reputation mining) maintains the contracts that underpin the network and develops new functionality for the network, the development of which needs to be paid for. Long term, the development and maintenance of the network (including the reputation system) needs to be financed by the network itself. 
+The Colony Network must be able to sustain itself. In particular, the \rc\ (in control of the colony network and reputation mining) maintains the contracts that underpin the network and develops new functionality for the network, the development of which needs to be paid for. Long term, the development and maintenance of the network (including the reputation system) needs to be financed by the network itself. 
 
 \subsubsection{The Network Fee}\label{sec:networkfee}
 We propose a fee that is levied on task payments made. When a user claims payment for a task they have done (Section \ref{sec:claiming-bounty}), some small fraction is paid to the network. 
@@ -77,7 +77,7 @@ We propose a fee that is levied on task payments made. When a user claims paymen
    \node at (-2.4,-0.3) {{1\%}};
   \node[draw] at (-2,1) (user) {User};
   \node[draw] at (1,-2.8) (cnc) {Colony Network Contract};
-  \node[draw] at (4,-2) (root) {\rc revenue}
+  \node[draw] at (4,-2) (root) {\rc\ revenue}
     (dummy.east) edge[->, bend right=40,out=-25,thick] node[above=2pt] {99{\%}} (user) 
     (dummy.east) edge[->, bend left=30,out=12] node[fill=white,right=10pt] {\begin{tabular}{l} currency \\ tokens\end{tabular}} (root)
     (bounty.east) edge[->, bend left=30,out=35] node[fill=white, below right=-5pt] {\begin{tabular}{l} colony \\ tokens\end{tabular}} (cnc)
@@ -86,7 +86,7 @@ We propose a fee that is levied on task payments made. When a user claims paymen
  \end{tikzpicture}
 \end{center}
 
-The fees thus collected are sent to either the \rc (if the payment was in Ether or another whitelisted token) or the Colony Network Contract (if it was in a colony's token).
+The fees thus collected are sent to either the \rc\ (if the payment was in Ether or another whitelisted token) or the Colony Network Contract (if it was in a colony's token).
 
 
 This idea of a fee is a little unusual for such a decentralised service. One reason why decentralised systems on Ethereum are appealing is that you don't have to pay a fee for the service, other than gas costs. However, we believe that the reputation system will ultimately be appealing enough that a small fee to pay for its existence will be acceptable.
@@ -94,9 +94,9 @@ This idea of a fee is a little unusual for such a decentralised service. One rea
 The presence of a fee also means that we have to make some considerations that would be irrelevant to a more traditional decentralised system. For this reason, we will permission the read functions in the \ascode{EternalStorage} contract so that they can only be read by the Colony that owns the \ascode{EternalStorage} contract. This prevents a colony creating a contract that could be used to pay out Ether for tasks without paying the fee based on the status of tasks in the colony.
 
 \subsubsection{The token auction}
-The colony tokens collected are auctioned off by the Colony Network Contract, with the auctions denominated in \rcts, the proceeds of which are given to the \rc as revenue. These auctions - one for each type of token collected - occur on a regular basis of once a month.
+The colony tokens collected are auctioned off by the Colony Network Contract, with the auctions denominated in \rcts, the proceeds of which are given to the \rc\ as revenue. These auctions - one for each type of token collected - occur on a regular basis of once a month.
 
-We believe such behavior would be beneficial for the \rcths (whose \rcts gain value by having an explicit use) and the \rc itself (which turns the fees into \rcts which it can then use to fund further development of the network without explicitly buying them back or creating more, diluting existing holders). It also provides an immediate mechanism of price discovery for the colony tokens, which are unlikely to be traded on third-party exchanges until much later in the lifetime of the colony. By auctioning off the collected tokens, we also prevent the \rc collecting a large number of different tokens that it has to manage, which would prove cumbersome and annoying for the colony.
+We believe such behavior would be beneficial for the \rcths\ (whose \rcts\ gain value by having an explicit use) and the \rc\ itself (which turns the fees into \rcts\ which it can then use to fund further development of the network without explicitly buying them back or creating more, diluting existing holders). It also provides an immediate mechanism of price discovery for the colony tokens, which are unlikely to be traded on third-party exchanges until much later in the lifetime of the colony. By auctioning off the collected tokens, we also prevent the \rc\ collecting a large number of different tokens that it has to manage, which would prove cumbersome and annoying for the colony.
 
 
 

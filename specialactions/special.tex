@@ -2,7 +2,7 @@
 
 
 \subsection{Proposing an arbitrary transaction by the Colony contract}\label{sec:arbitrary-transaction}
-It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurances with high threshhold requirements.
+It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurences with high threshhold requirements.
 
 Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction.\\
 Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.
@@ -41,12 +41,14 @@ Conditions for restarting
 %
 
 \subsection{Example Configurations}\label{sec:example-configs}
-%
-Placeholder\\
-talk about frontend abstractions: how to realise certain functionality that doesn't *seem* to be part of our protocol but can actually be hacked into the governance system and made usable by a well designed frontend.
+The Colony Governance Protocol described in this whitepaper is concerned with what happens `on chain', i.e. those actions that directly affect the ethereum blockchain. Users of the network however are not expected to ever interact with the contracts manually; instead they will be using some front-end application that makes all of the network's functionality appear intuitive and simple.\\
+In any colony application we expect a certain amount of \textbf{front-end abstraction} in which complex tools and concepts are presented for the users' convenience, and translated in the backgrounnd into a sequence of contract interactions on the colony network.
+
+Front-end abstraction lets us realise certain functionality that doesn't \emph{seem} to be part of our protocol but can actually be coded into the governance system and made usable by a well designed application. Some examples follow.
 %
 
 \subsubsection{Salaried Positions}\label{sec:salary}
+
 %
 Placeholder\\
 every person is master of their own domain. 
