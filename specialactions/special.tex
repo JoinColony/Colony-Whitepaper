@@ -1,0 +1,70 @@
+\section{Special Actions and Example Configurations}\label{sec:special-cases}
+
+
+\subsection{Proposing an arbitrary transaction by the Colony contract}\label{sec:arbitrary-transaction}
+It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurances with high threshhold requirements.
+
+Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction.\\
+Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction - able to be made by anyone - is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.
+
+\subsection{Token-weighted, reputation-weighted and hybrid voting}
+The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, nor a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to vote. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
+
+The primary use of a token weighted vote is related to the management of the colony tokens itself; it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
+
+ 
+\subsection{Increasing a colony's token supply}\label{sec:colony-token-managements}
+
+%
+Placeholder\\
+How does a a colony increase/decrease its token issuance rate. Triggers, thersholds and quorum requirements.
+How to set/change the rate that tokens are available to domains.
+%
+
+\subsection{Emergency Shutdown}
+%
+Placeholder\\
+How to trigger an emergency shutdown -- the "big red button" we talked about.
+Conditions for restarting
+%
+
+\subsection{Example Configurations}\label{sec:example-configs}
+%
+Placeholder\\
+talk about frontend abstractions: how to realise certain functionality that doesn't *seem* to be part of our protocol but can actually be hacked into the governance system and made usable by a well designed frontend.
+%
+
+\subsubsection{Salaried Positions}\label{sec:salary}
+%
+Placeholder\\
+every person is master of their own domain. 
+Salaried positions as one-person domains.
+firing requires MFP etc.
+%
+
+
+\subsubsection{Awarding Reputation Bonuses}
+
+%
+Placeholder\\
+Section on how it is certainly possible to 'award' reputation by creating 'fake' tasks for the person that pay them tokens (that they pay back right away / before) ....
+The crucial point is that it only works of there is consensus.
+Describe this as a way to work around any limitations of the reputation system as it stands: perhaps a really important early contributor has almost no reputation by the time revenue starts to come in and the collective wants to re-integrate them... that sort of thing.
+%
+
+\subsubsection{Objections by non-members}
+%
+Placeholder\\
+explain how without reputation you cannot actually launch an objection, but describe how the frontend can make it easy for the user to propose an objection and ask rep-holders to join. This is analogous to users staking only 10\% of the requirement and waiting for other backers.
+%
+
+\subsubsection{Firing members of a colony}
+
+%
+Placeholder\\
+there isn't really a concept of firing per se, but what we mean here is a special action that sets all of a users reputation to zero.
+Threshold, 2/3 of all rep voting in favour, quorum at least 10\%. 
+%
+
+Did we want to keep this functionality? I don't remember.
+
