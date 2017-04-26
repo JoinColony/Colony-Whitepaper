@@ -49,22 +49,20 @@ Front-end abstraction lets us realise certain functionality that doesn't \emph{s
 
 \subsubsection{Salaried Positions}\label{sec:salary}
 
-%
-Placeholder\\
-every person is master of their own domain. 
-Salaried positions as one-person domains.
-firing requires MFP etc.
-%
+The work-for-payment model in the colony network is based around tasks, and you'd be forgiven for thinking that this implied colony-worker relationships that are purely transactional. However the system is in fact flexible enough to accomodate a wider range of employment models. One such example is a \emph{salaried position}.
+
+A slaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a mandated funding proposal. The hiree would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good frontend could hide these implementation details from the users and render salaried positions differently from regular domains.
 
 
 \subsubsection{Awarding Reputation Bonuses}
 
-%
-Placeholder\\
-Section on how it is certainly possible to 'award' reputation by creating 'fake' tasks for the person that pay them tokens (that they pay back right away / before) ....
-The crucial point is that it only works of there is consensus.
-Describe this as a way to work around any limitations of the reputation system as it stands: perhaps a really important early contributor has almost no reputation by the time revenue starts to come in and the collective wants to re-integrate them... that sort of thing.
-%
+All reputation decays, as described in section \ref{sec:reputation}. This prevents an eternal `reputation aristocracy' and allows reputation to be meaningful even after major changes in the colony token's value. \\
+Reputation is awarded when a user receives payment of colony tokens - usually as payout from a task. We can use this mechanim to award users extra reputation provided there is consensus to do so. 
+
+Consider the scenario in which a founder, or an early important contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate set too high for the particular colony. To get around the limitations of the reputation system and to re-integrate the founder and make them eligible to receive their just rewards, the colony can create a special `fake' task that is solely designed to award reputation. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
+
+The important point is that any limitations imposed by the system can be weakened \emph{if there is consensus to do so}. The system should not stand in the way of consensus, it should just provide conflict resolution mechanisms for those times in which there is dissent.
+
 
 \subsubsection{Objections by non-members}
 %
