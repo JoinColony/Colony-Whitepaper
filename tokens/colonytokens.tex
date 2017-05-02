@@ -1,0 +1,36 @@
+\section{The Colonies' own Tokens}\label{sec:colony-tokens}
+Every colony has its own tokens. These are the tokens that, when attached to a task bounty, confer reputation to the receiver. Beyond this, the tokens may be used in any number of ways; they may have financial value, or they may be purely symbolic (Section \ref{sec:colony-token-examples} below). The management of tokens falls to the token holders (Section \ref{sec:colony-token-management}).
+
+
+\subsection{Managing a colony's token supply}\label{sec:colony-token-management}
+A colony is in complete control of its own tokens. Crucially it is up to current token holders to decide on questions of token generation and destruction, and not up to reputation holders (alone).
+
+\subsubsection{Initial Supply}
+When a colony is created, the \ascode{TotalTokenSupply} and the \ascode{TokenIssaunceRate} are set. The former is the total number of colony tokens that will be created and the latter is the rate at which they become available to the colony-wide domain. Just as with any funding proposal (Section \ref{sec:finance}), users can issue a `ping' to update the totals available to the domain.
+
+\subsubsection{Increasing the Token Supply}
+To generate new tokens, there must be a large majority of current token holders in favour. Especially if the tokens have a financial value, it is crucial that new tokens cannot be generated without widespread consensus. Such decisions should therefore presumably have to be be made by a token-weighted vote with high quorum and majority requirements or possibly even a hybrid vote. How the latter option might work is described below:\\
+
+In order to increase the \ascode{TotalTokenSupply} and thereby allow for new tokens to be generated, the following events must occur
+\begin{itemize}
+ \item A proposal is made to increase the value of \ascode{TotalTokenSupply}
+ \item The proposal is backed by 10\% of all colony reputation
+ \item A colony wide vote of tokens and reputation is held
+ \item A majority of reputation voted in favour of the increase
+ \item A two-thirds supermajority of tokens voted in favour
+ \item Over 30\% of tokens participated in the vote.
+\end{itemize}
+
+\subsubsection{Changing the TokenIssaunceRate}
+The \ascode{TotalTokenSupply} represents the tokens that the token holders have granted to the reputation holders in order to conduct business: to fund tasks and domains, to hire workers and contributors; especially during the early life of a colony in which it has litte to no revenue in other tokens to fall back on.\\
+The \ascode{TokenIssaunceRate} is a measure of how rapidly the colony is able to absorb and allocate the new tokens. If the rate is `too high', tokens will accumulate in the colony wide domain's pot (or other pots lower in the hierarchy); usually this is not a big problem. If the rate is too low however, this signals that the colony has a healthy amount of activity and that the issuance rate has become a bottleneck. In such situations it may be desirable to increase the rate of issuance without necessarily increasing the maximum supply. \\
+Increasing and decreasing the \ascode{TokenIssaunceRate} by up to 10\% can be done by the reputation holders alone and this action can be taken no more than once every 4 weeks. Bigger changes to the issuance rate require a double majority of tokens and reputation.
+
+
+\subsection{Example of Token Usage}\label{sec:colony-token-examples}
+\subsubsection*{Tokens as early rewards}
+One of the chief benefits of having its own token is that a colony can offer rewards for work before it has any revenue or external funding to draw on. Similar perhaps to how a startup company may promise stock options, a new colony may offer token bounties for tasks that people may accept in the hope that the repuation conferred by these token payments and the future revenue earned by the colony will eventually reap financial rewards. In other words it allows for `spending' before fundraising and thus eases the startup phase of new colonies. Later in its life, when the colony is profitable, payment in tokens could very well be the expception instead of the norm.
+\subsubsection*{Tokens representing hours worked}
+We could imagine a colony in which all tasks are paid in Ether or some other valuable token, but include a number of the colony's own tokens as well, equal to the expected number of \emph{hours worked} on a task. The members of the colony would be responsible for assigning `correct' token and Ether bounties to tasks; this extra cognitive workload would have the great benefit of solving the `Palo Alto Problem', in which users who are paid more for the same work - such as those living in Palo Alto may be compared to those in South America - earn more influence in the colony. 
+\subsubsection*{Tokens as `upvotes'}
+Tokens themselves need not have a monetary value; (a Colony could even chose (Section \ref{sec:colony-token-management}) to continually generate new tokens at an ever increasing rate to \emph{ensure} that they do not have a direct value). In such a situation, the token would only be valuable in a context in which payout also confers \emph{reputation}.

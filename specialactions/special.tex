@@ -1,16 +1,6 @@
+
+
 \section{Special Actions and Example Configurations}\label{sec:special-cases}
-
-
-
-% PLAN:
-
-% - move to a separate section the stuff on how a colony manages its own tokens. Include examples in which a token has monetary value and examples in which it doesn't (is used more like an upvote perhaps. This is to set the expectation that not all colony tokens are alike and they are not 'currency' or 'equity' or anything else that you might have thought
-
-% - In this section collect examples such as the salaried position (1 person domain) and reputation bonuses etc and introduce the concept of frontend abstraction.
-%
-%
-
-
 
 \subsection{Proposing an arbitrary transaction by the Colony contract}\label{sec:arbitrary-transaction}
 It is desirable to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens beyond those whitelisted by the network in advance. Such transactions should be rare occurrences with high threshhold requirements.
@@ -21,28 +11,9 @@ Such a proposal requires the entire colony to be able to vote (possibly both tok
 \subsection{Token-weighted, reputation-weighted and hybrid voting}
 The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, nor a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to vote. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
 
-The primary use of a token weighted vote is related to the management of the colony tokens itself; it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
+The primary use of a token weighted vote is related to the management of the colony tokens itself (Section \ref{sec:colony-token-management}); it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
 
  
-\subsection{Managing a colony's token supply}\label{sec:colony-token-managements}
-\subsubsection{Initial Supply}
-When a colony is created, the \ascode{TotalTokenSupply} and the \ascode{TokenIssaunceRate} are set. The former is the total number of colony tokens that will be created and the latter is the rate at which they become available to the colony-wide domain. Just as with any funding proposal (Section \ref{sec:finance}), users can issue a `ping' to update the totals available to the domain.
-
-\subsubsection{Increasing the Token Supply}
-In order to increase the \ascode{TotalTokenSupply} and thereby allow for new tokens to be generated, the following events must occur
-\begin{itemize}
- \item A proposal is made to increase the value of \ascode{TotalTokenSupply}
- \item The proposal is backed by 10\% of all colony reputation
- \item A colony wide vote of tokens and reputation is held
- \item A majority of reputation voted in favour of the increase
- \item A two-thirds supermajority of tokens voted in favour
- \item Over 30\% of tokens participated in the vote.
-\end{itemize}
-
-\subsubsection{Changing the TokenIssaunceRate}
-The \ascode{TotalTokenSupply} represents the tokens that the token holders have granted to the reputation holders in order to conduct business: to fund tasks and domains, to hire workers and contributors; especially during the early life of a colony in which it has litte to no revenue in other tokens to fall back on.\\
-The \ascode{TokenIssaunceRate} is a measure of how rapidly the colony is able to absorb and allocate the new tokens. If the rate is `too high', tokens will accumulate in the colony wide domain's pot (or other pots lower in the hierarchy); usually this is not a big problem. If the rate is too low however, this signals that the colony has a healthy amount of activity and that the issuance rate has become a bottleneck. In such situations it may be desirable to increase the rate of issuance without necessarily increasing the maximum supply. \\
-Increasing and decreasing the \ascode{TokenIssaunceRate} by up to 10\% can be done by the reputation holders alone and this action can be taken no more than once every 4 weeks. Bigger changes to the issuance rate require a double majority of tokens and reputation.
 
 \subsection{Emergency Shutdown}
 %
