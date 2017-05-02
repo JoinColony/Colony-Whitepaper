@@ -296,13 +296,13 @@ The reputation decay process was describe above as being continuous. To have a u
 
 
 \subsection{Possible Attacks}\label{sec:mining-possible-attacks}
-\subsubsection*{Many false submissions}
-% If we cannot figure out what the correct submission is within the given timeframe, then the reputation update process stalls... that's about it though. Very expensive attack and only effect is to delay one update.
-In the event of multiple submissions, finding the correct one takes time --- the timeout $t$ for the challenge-response must be reasonable to allow the transaction defending a submission to propagate and be mined. A denial-of-service attack is therefore possible, whereby an attacker makes many false submissions. However, if these submissions were random hashes, unable to be defended, then none would be defended correctly within the first five minute window, and the attack would quickly end. 
+\subsubsection*{Many false submissions and Denial of Service}
 
-The denial of service attack can only be sustained when the false submissions are incorrect only in some leaves, and the majority of the state tree is correct. In this scenario, the attacker successfully defends each of their submissions for as long as possible to delay the resolution of the reputation mining protocol as much as possible.
+In the event of multiple submissions, finding the correct one takes time --- the timeout $t$ for the challenge-response must be reasonable to allow the transaction defending a submission to propagate and be mined. A denial-of-service attack is therefore possible, whereby an attacker makes many false submissions. However, if these false submissions were random hashes, unable to be defended, then none would be defended correctly within the first five minute window, and the attack would quickly end. 
 
-Any such attack is capped by the first round of pairings of submissions against each other. Even if the attacker made millions of submissions, only a finite number of those would be able to be successfully defended due to the block size --- currently, no more than 4500 submissions would be able to be defended, even if the attacker used up all block space during the timeout.\footnote{These figures assume $1.5\pi\times10^6$ gas in a block, and that each transaction is only 21000 gas for a worst-case-scenario calculation. In reality the transactions would be larger, and the attacker is unlikely to be able to exclusively fill every block. Furthermore, even though the attacker is filling the blocks with their transactions, we assume that the defense of the legitimate state is always successfully included in block, as a one-off increase in gas costs will always be worthwhile to ensure the legitimate state is defended. } With only 4500 submissions able to make it to the second round, the length of time the DoS attack would be sustained for is given by 
+The denial of service attack (the delay of a proper reputation update) can only be sustained when the false submissions are incorrect only in some leaves, and the majority of the state tree is correct. In this scenario, the attacker successfully defends each of their submissions for as long as possible to delay the resolution of the reputation mining protocol as much as possible.
+
+Any such attack is capped by the first round of pairings of submissions against each other. Even if the attacker made millions of submissions, only a finite number of those would be able to be successfully defended due to the block size --- currently, no more than 4500 submissions would be able to be defended, even if the attacker used up all block space during the timeout.\footnote{These figures assume $1.5\pi\times10^6$ gas in a block, and that each transaction is only 21000 gas for a worst-case-scenario calculation.} With only 4500 submissions able to make it to the second round, the length of time the DoS attack would be sustained for is given by 
 
 $$t \times \left\lceil\log_2\left(4500\right)\right\rceil\times \left\lceil\log_2\left(N_{\rm updates}\right)\right\rceil$$
 
@@ -314,7 +314,10 @@ There would be little effect on the rest of the colony network in this time. Use
 
 Assuming this attack continued, then the reputation mining protocol would effectively only update every 36 hours. Users staking would become more susceptible to variance in terms of the rewards, but otherwise little would change in the day-to-day functioning of any individual colony. 
 
-The attacker would lose all the \rct\ that they had staked (which would be around 4500 times the expected minimum stake) in order to perform the attack, and so would have to buy more to attack again.
+However, the attacker would lose \emph{all} the \rct\ that they had staked (which would be around 4500 times the expected minimum stake) in order to perform the attack, and so would have to buy more to attack again making this attack exceedingly expensive.
+
+
+Note: There is an edge case to consider in which the attacker is sending enough defending transactions to completely fill the blocks. In such a case however we assume that the defense of the legitimate state is always successfully included in block, as a one-off increase in gas costs will always be worthwhile to ensure the legitimate state is defended.  
 
 \subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
 In order to be involved in the reputation mining process, \rcths\ must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
