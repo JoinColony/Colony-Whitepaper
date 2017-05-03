@@ -199,7 +199,7 @@ The contract requires both parties to submit merkle proofs that specific reputat
 
 The contract then repeats this process using a binary search algorithm. If the merkle proof (iii) for both submissions had the same sibling values almost all the way up, but differing only in the the final sibling, then the discrepancy must occur later (i.e. the two sumbissions differ at some $i^\prime > \frac{n}{2}$) whereas if the merkle proofs already differ at an earlier sibling, then the submissions must also differ in an update before $\frac{n}{2}$. This final hash is stored as the new target hash for following challenges.
 
-The contract pseudorandomly selects a reputation update from within the subtree in which the first discrepancy is known to lie. Each newly submitted proof further reduces the size of the subtree by a factor of two\footnote{ By examining precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it’s likely that it is more gas efficient to just do the `naive' binary search.}.
+The contract pseudorandomly selects a reputation update from within the subtree in which the first discrepancy is known to lie. Each newly submitted proof further reduces the size of the subtree by a factor of two\footnote{By examining precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it’s likely that it is more gas efficient to just do the `na\"{i}ve' binary search.}.
 
 If at any point in the process, a submission does not respond to the challenge, in a timely fashion they forfeit, and are assumed to be incorrect. If all submissions continue to be defended successfully, ultimately, the location of the first discrepancy in the series of state transitions is found: the submissions agree on (i) but not (ii). The contract then requires
 \begin{itemize}
@@ -317,7 +317,7 @@ Assuming this attack continued, then the reputation mining protocol would effect
 However, the attacker would lose \emph{all} the \rct\ that they had staked (which would be around 4500 times the expected minimum stake) in order to perform the attack, and so would have to buy more to attack again making this attack exceedingly expensive.
 
 
-Note: There is an edge case to consider in which the attacker is sending enough defending transactions to completely fill the blocks. In such a case however we assume that the defense of the legitimate state is always successfully included in block, as a one-off increase in gas costs will always be worthwhile to ensure the legitimate state is defended.  
+Note: There is an edge case to consider in which the attacker is sending enough defending transactions to completely fill the blocks. In such a case however we assume that the defence of the legitimate state is always successfully included in block, as a one-off increase in gas costs will always be worthwhile to ensure the legitimate state is defended.  
 
 \subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
 In order to be involved in the reputation mining process, \rcths\ must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
@@ -347,11 +347,10 @@ The second factor in equation \eqref{eq:stakerweight} encourages users to submit
 The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
 
 
-FIXME\\
-Notes:\\
--token holders must stake in order to be miners\\
--reputational reward comes from tokens earned just like task payout
--how much rep exactly you get (similar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
--how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much reputation.
-- $k$ should be multiplied by the number of hours since the last update to accommodate for attack
-- Merkle proof of current $R$ should be submitted with hash, otherwise not accessible on-chain?
+%Notes:\\
+%-token holders must stake in order to be miners\\
+%-reputational reward comes from tokens earned just like task payout
+%-how much rep exactly you get (similar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
+%-how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much reputation.
+%- $k$ should be multiplied by the number of hours since the last update to accommodate for attack
+%- Merkle proof of current $R$ should be submitted with hash, otherwise not accessible on-chain?
