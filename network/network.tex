@@ -1,8 +1,8 @@
 \section{The Colony Network on Ethereum}\label{sec:colonynetwork}
 
-Much thought has been put into making sure that the system deployed can be upgraded going forward; we want people to start using Colony as soon as possible, before all the functionality described in this document is fully realised.
+Considerable thought has been put into ensuring the deployed system can be upgraded in the future; we want people to start using Colony as soon as possible, before all the functionality described in this document is fully realised.
 
-The Colony Network consists of a collection of contracts on the ethereum blockchain. The contracts that must be deployed to instantiate the Colony Network are:
+The Colony Network consists of a collection of contracts on the Ethereum blockchain. The contracts that must be deployed to instantiate the Colony Network are:
 
 \begin{itemize}
 \item The \code{ColonyNetworkResolver}
@@ -12,7 +12,7 @@ The Colony Network consists of a collection of contracts on the ethereum blockch
 \subsection{Contract overviews}
 
 \subsubsection{ColonyNetworkResolver contract}
-A static, very simple contract that acts only as a pointer to the location of the ColonyNetwork Contract. The address of the \code{RootColonyResolver} contract will never change, nor will we want it to. The address that it points to can be changed, initially by the Colony team, but ultimately only under the direction of the \code{ColonyNetwork} contract itself.
+A very simple, static contract that acts only as a pointer to the location of the ColonyNetwork Contract. The address of the \code{RootColonyResolver} contract will never change, nor will we want it to. The address to which it points can be changed, initially by the Colony team, but ultimately only under the direction of the \code{ColonyNetwork} contract itself.
 
 \subsubsection {ColonyNetwork contract}
 
