@@ -4,9 +4,9 @@ We see that the reputation system is a core component of any decentralised colon
 
 How well the parameters of the reputation system balance out competing interests will have to be subject to empirical review when the colony network begins live operation and any parameters proposed in this document should be seen as suggestions, not prescriptions for the final network.
 
-Due to the combined complexity of reputation scores across multiple colonies, domains and skills %; growing due to tasks completed and disputes won; shrinking due to decay and poor performance;
+Due to the combined complexity of reputation scores across multiple colonies, domains, and skills,
 \textbf{reputation scores cannot be stored and calculated on-chain}. Instead, the calculations will all take place off-chain, the results of which will be reported to the blockchain by participating CLNY holders --- in a process resembling a proof-of-stake blockchain consensus protocol. We call this procedure \textbf{`Reputation Mining'}.\\
-The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of truebit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong.}
+The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong.}
 
 
 \subsection{The Reputation Tree and the ReputationRootHash}\label{sec:reptree}
@@ -248,7 +248,7 @@ R =
 \]
 \end{center}
 
-%I suggest we do a little appendix of data structures. That way we can refer to reputations and rep_ids an other data here without having to fully document it here. We would not need to even mention the parent_id and parent_n_id here (as we need it onle elsewhere)...
+%I suggest we do a little appendix of data structures. That way we can refer to reputations and rep_ids an other data here without having to fully document it here. We would not need to even mention the parent_id and parent_n_id here (as we need it only elsewhere)...
 
 Furthermore for each $rep\_id$, the following data is also known
 \[

@@ -6,7 +6,7 @@ CLNY are generated during the Colony crowdsale period. Since the Colony Network 
 After the Colony Network Contract is deployed, the first colony created will be the \rc. Tokens in this Colony will be CLNY. At this point, users will be able to `burn' the tokens purchased during the crowdsale 1:1 for tokens that are tokens in the \rc. In short, \rcts\ are the same as CLNY.
 
 \subsection{Role of CLNY Holders}
-CLNY holders, in the case of the fully realised Colony Network, have two primary roles. The first is management of the Colony Network itself. Holders vote on parameters that affect the network as a whole - for example, the fee charged by the network when a payment is made upon completion of a task (Section \ref{sec:tasks}). There will be permissioned functions on the Network Contract to allow these parameters to be set. 
+CLNY holders, in the case of the fully realised Colony Network, have two primary roles. The first is management of the Colony Network itself. Holders vote on parameters that affect the network as a whole --- for example, the fee charged by the network when a payment is made upon completion of a task (Section \ref{sec:tasks}). There will be permissioned functions on the Network Contract to allow these parameters to be set. 
 
 In order for these permissioned \rc\ functions to be called by the colony contract, a vote must be taken where all CLNY holders and reputation holders are allowed to vote. Indeed, this restriction applies to all votes where the colony is making an arbitrary transaction (Section \ref{sec:arbitrary-transaction}).
 
@@ -31,13 +31,13 @@ At a later date, an intermediate contract will be set up, which will have these 
 \subsubsection*{Stage 3: Foundation Multisig retains veto}
 The next stage will be a second intermediate contract which will operate very similarly to the first, but after a timeout - with no interaction from the Colony Foundation's address - the change will automatically be made to the Colony Root Contract. The Colony Foundation's role will be to block changes if necessary. The proposal to move to this contract will, of course, have to come from the \rc\ itself.  Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.
 
-\subsubsection*{Stage 4: \rc\ fuly in charge of the network}
+\subsubsection*{Stage 4: \rc\ fully in charge of the network}
 Finally, the intermediate contract will be removed, and the \rc\ will have control over the Colony Root Contract with no direct control imbued to the Colony Foundation other than that provided by any \rct\ (CLNY) held by the Foundation. 
 
 \subsection{Contract security \& escape hatches}
 While it is extremely hard to make a contract with no flaws, it is slightly less hard to make a contract which is able to recover from flaws, or to minimise damage made by flaws.
 
-At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access a function that directly allows the state of the contract to be edited - in practise, this probably corresponds to access to the functions in the StorageContract to allow editing of variables. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. We require multiple whitelisted addresses to approve the removal from recovery mode to ensure that a whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode, making an edit to the contract state that would be difficult to otherwise detect.
+At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access a function that directly allows the state of the contract to be edited - in practise, this probably corresponds to access to the functions in the \ascode{StorageContract} to allow editing of variables. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. We require multiple whitelisted addresses to approve the removal from recovery mode to ensure that a whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode, making an edit to the contract state that would be difficult to otherwise detect.
 
 In general, the contract may enter `recovery mode' due to:
 \begin{itemize}

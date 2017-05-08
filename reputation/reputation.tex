@@ -54,7 +54,7 @@ When a new domain is created in a colony, it has had no reputation earned in it,
 Unlike the case of the new colony, we can proceed without any new reputation: we simply accept the fact the new domain has no reputation in it. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the \emph{domain} to contribute to the decision, users will still be able to vote based on their reputation in relevant \emph{skills}.
 
 \subsubsection{Reputation change from contributing to a task}\label{sec:earning-rep-from-task}
-Each task requires three roles to be assigned: the administrator, the worker and the evaluator (as described in Section \ref{sec:tasks}). If the bounty for the task is denominated in the colony's token, each of these roles are eligible to earn reputation when the task is completed as long as their work was well received. %We should write about how admins get `rated' ... indirectly, dispute period yada yada.
+Each task requires three roles to be assigned: the administrator, the worker and the evaluator (as described in Section \ref{sec:tasks}). If the bounty for the task is denominated in the colony's token, each of these roles are eligible to earn reputation when the task is completed as long as their work was well received.
 
 The performance of the user who has completed the work is established when the work is submitted and then evaluated. At this point, both the evaluator and the worker grade each other\footnote{These scores should be submitted using a pre-commit and reveal scheme to ensure secrecy during the rating process.} out of five stars.
 
@@ -77,22 +77,13 @@ Reputation lost or gained as a function of the star rating therefore varies line
 
 Similarly, the evaluator gets an amount of reputation based on their grading by the worker, but on a scale that only varies between $-t_{\rm ev}$ and $t_{\rm ev}$ (where $t_{\rm ev}$ is the evaluator's notional token payout for the task). They only earn this reputation in the current (and all parent) domains, not the skill reputation as they have not actually done the task. While it is likely some knowledge is required to perform the evaluation, this is not always the case; we believe that skill reputation should exclusively demonstrate ability to perform tasks.
 
-Reputation updates occur and payouts are only made available after the objection window (described in Section \ref{sec:tasks}) has closed and all disputes have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task.
-
-% We note that since reputation is conferred along with token payments, this creates a problem we have affectionately taken to calling the `Palo Alto Problem', whereby users who are paid more for the same work - such as those living in Palo Alto may be compared to those in South America - earn more influence in the colony. While we would like to solve this problem, we have been unable to do so to date; any possible solution either seems to introduce a great deal of complexity to the system or provide the ability for a bad actor to accrue undue influence in the colony.\\
+Upon completion of a task, the administrator also earns reputation based on their token reward. There is no explicit rating of the administrator, but as with all other payments and rewards, an objection can be raised before and payout occurs. For all participants, reputation updates occur and payouts are made available only \emph{after} the objection window (described in Section \ref{sec:tasks}) has closed and all disputes  (described in Section \ref{sec:disputes}) have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task.
 
 \subsubsection{Reputation change as a result of Disputes}\label{sec:earning-rep-in-disputes}
 If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. The same applies to reputation --- those on the `right' side will gain reputation that is lost by the losing side. Section \ref{sec:disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
 
-% Whenever a user stakes tokens, they are also risking their reputation. If the tokens are lost, then they also lose reputation. Reputation is not staked, and so while at risk it can still be used by users to vote on decisions where that reputation is relevant - they only lose the voting power associated with the reputation once it is lost. However, it should be noted that the same is not true of colony tokens - once staked, their voting power is lost. However, we expect that users will only ever stake a small proportion of their tokens - only small amounts of tokens are staked in the Colony Network to ensure a tangible financial punishment to the staking user can be made if they are a badly behaving actor.
-
-% The amount of tokens to be staked and reputation that can be lost depend on the context of the action being taken. The greater the proportion of reputation in the colony that is potentially inconvenienced by the action being taken in the event that it is fraudulent, the greater the reputation and tokens that must be staked by the user to take the action.
-
-
 \subsubsection{Reputation Decay}
 All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are as few incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation
-
-
 
 %we need more text here FIXME
 
