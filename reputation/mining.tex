@@ -55,10 +55,10 @@ The data leaves in the reputation tree are the reputations all users have in all
 $$
 R = 
 \begin{cases}
- rep\_id & \textnormal{the id of a skill or domain identifying the type of reputation},\\
- colony\_id & \textnormal{the colony the reputation is held in},\\
- user & \textnormal{the address holding the skill},\\
- amount & \textnormal{the numerical value of the reputation}.
+ \ascode{rep\_id} & \textnormal{the id of a skill or domain identifying the type of reputation},\\
+ \ascode{colony\_id} & \textnormal{the colony the reputation is held in},\\
+ \ascode{user} & \textnormal{the address holding the skill},\\
+ \ascode{amount} & \textnormal{the numerical value of the reputation}.
 \end{cases}
 $$
 
@@ -142,11 +142,16 @@ When a state is accepted, a number of (newly generated) \rcts\ are made availabl
 \subsection{Dealing with false submissions}\label{sec:challengeresponse}
 %
 \subsubsection{The Challenge-Response Protocol}
+
 We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false ones.
 
 We must prove all but one submission incorrect by having each submission navigate a series of \emph{challenges}. These challenges refer to events that happened in the colony network within the last update cycle that have an effect on reputation. The \emph{responses} to the challenges are Merkle proofs that the corresponding reputation update was properly handled.
 
 We consider first the scenario where only two submissions are made, and one is correct. 
+
+It is possible that the same hash has been submitted twice, but with a disagreement about the number of leaves it contained. In this situation, the users are required to submit a Merkle proof for the last leaf in their tree. We are able to tell if a submitted proof corresponds to the last leaf in the tree, as any hashes on the right must be hashed with themselves, and any hashes on the left must not be. The structure of the Merkle proof also allows us to tell the index of this last leaf; if it corresponds to either of the submitted states, that one is correct.
+
+We now consider the more complicated case where two different hashes have been submitted.
 
 \subsubsection*{1. The Justification Tree}
   \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
@@ -236,7 +241,7 @@ If the contract finds the reputation update where $\mathcal{RH}^A_{i-1}=\mathcal
 \begin{itemize}
  \item[(iv)] A Merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update transaction.
 \end{itemize}
-The Merkle proof supplied that proves the inclusion of $R_j$ (before the reputation update) in the root $\mathcal{RH}_{i-1}$ and the Merkle proof supplied of the inclusion of $R_j$ (after the reputation update) in the root $\mathcal{RH}_i$ must only differ in the state of $R_j$. This is because the trees $\mathcal{RH}_{i-1}$ and $\mathcal{RH}_i$ differ in only a single leaf (that of $R_j$). 
+The Merkle proof supplied that proves the inclusion of $R_j$ (before the reputation update) in the root $\mathcal{RH}_{i-1}$ and the Merkle proof supplied of the inclusion of $R_j$ (after the reputation update) in the root $\mathcal{RH}_i$ must only differ in the state of $R_j$ itself. This is because the trees $\mathcal{RH}_{i-1}$ and $\mathcal{RH}_i$ differ in only a single leaf (that of $R_j$). 
 
 When either party submits valid Merkle proofs, showing that the before and after state they claim to be correct is included in the $\mathcal{RH}_{i-1}$ and $\mathcal{RH}_{i}$ in the \jrh\ they submitted, the reputation update is also calculated on-chain to determine whether the submitting party has done their calculation correctly. It is still possible at this point that the first submitter is incorrect,\footnote{This is due to the possible addition of a new reputation node that is a duplicate of a previous one. This is explained fully in Section \ref{sec:earning-rep-for-first-time}.}  and so final resolution waits until either the second party forfeits through inaction, or demonstrates that the first submitter was wrong.
 
@@ -256,30 +261,15 @@ Fundamentally, there are two types of reputation update that occur:
  \item Addition or removal of reputation as a reward or punishment.
 \end{itemize}
 
+When a user earns reputation in a skill or domain, they also earn reputation in all parents, which corresponds to $2\times\left(\ascode{n_parents}+1\right)$ reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of $2\times\left(\ascode{n_parents + n\_children + 1}\right)$. The factors of two here come from also updating the relevant colony-wide totals.
 
-Recall also from section \ref{sec:reptree} that a reputation consists of
-\begin{center}
-\[
-R = 
-\begin{cases}
- rep\_id & \textnormal{the id of a skill or domain identifying the type of reputation},\\
- colony\_id & \textnormal{the colony the reputation is held in},\\
- user & \textnormal{the address holding the skill},\\
- amount & \textnormal{the numerical value of the reputation}.
-\end{cases}
-\]
-\end{center}
+In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n_parents} and \ascode{n_childen} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification state trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. It can then conduct the binary search.
 
-%I suggest we do a little appendix of data structures. That way we can refer to reputations and rep_ids an other data here without having to fully document it here. We would not need to even mention the parent_id and parent_n_id here (as we need it only elsewhere)...
+When the discrepant state transition is found, the users supply the index of the event in the on-chain log that corresponds to that reputation update.  This means that the contract does not have to iterate over the whole list expensively, but the contract can easily check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. In order to do this, we assert that children are always updated in order, then parents, and then the reputation in question itself. In addition, colony-wide totals of reputation are always updated before the user-specific reputation.
 
+In the event that the discrepant transaction is a decay transaction, which is easily determined by the Merkle path corresponding to an index smaller than the number of leaves in the tree at the end of the last successful update, they must also supply a Merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle.
 
-When a user earns reputation in a skill or domain, s/he also earns reputation in all parents and thus corresponds to \ascode{generation+1} number of reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of \ascode{generation + n\_children + 1}. (Note: parent\_id and parent\_n\_id are not used here; they are used during dispute escalation - see Section \ref{sec:disputes}).
-
-It is only by recording the number of parent reputations (\ascode{generation}) and how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification state trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. It can then conduct the binary search.
-
-When the discrepant state transition is found, the users supply the index of the update on-chain that corresponds to that reputation update. This means that the contract does not have to iterate over the whole list expensively, but the contract can easily check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. In the event that the discrepant transaction is a decay transaction, which is easily determined by the Merkle path corresponding to an index smaller than the number of leaves in the tree at the end of the last successful update, they must also supply a Merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle.
-
-Recording the number of leaves in the tree is required to allow the binary search to occur and accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decay (see Section \ref{sec:repdecay}). There is a decay calculation for every leaf in the previously accepted tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
+Recording the number of leaves in the tree is required to allow the binary search to occur, as well as accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decay (see Section \ref{sec:repdecay}). There is a decay calculation for every leaf in the previously accepted tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
 
 \subsubsection{Earning reputation for the first time}\label{sec:earning-rep-for-first-time}
 When a user earns reputation in a new skill, at least one new leaf is added to the tree --- if they have not earned reputation before in some of the parents, then they will also cause further new leaves to be added. New leaves will also be added if they are the first user in a colony to earn those particular skills, making the total reputation for that skill in the colony non-zero. During a dispute, when the user proves that they have included the update in the tree, it is not possible to check (efficiently) on-chain that they should not have added it to an existing leaf instead. However, because during a dispute we are always playing two submissions off against the other, one of two things will be true:
@@ -294,13 +284,13 @@ When a user earns reputation in a new skill, at least one new leaf is added to t
 
 \subsubsection{Transfers of reputation between accounts}\label{sec:reptransfer}
 
-The most important quality of reputation that distinguishes it from a token is that it is tied to an account and cannot be transferred. However, in the event of disputes (Section \ref{sec:disputes}) it can happen that one party to a dispute loses reputation while the other gains. This process has to be modelled as a `reputation transfer' to ensure that reputation is never created in this process (i.e. the reputation lost by the loser is at least as much as the reputation gained by the winner).
+The most important quality of reputation that distinguishes it from a token is that it is tied to an account and cannot be transferred. However, in the event of disputes (Section \ref{sec:objections-and-disputes}) it can happen that one party to a dispute loses reputation while the other gains. This process has to be modelled as a `reputation transfer' to ensure that reputation is never created in this process (i.e. the reputation lost by the loser is at least as much as the reputation gained by the winner).
 
-If an entry in the reputation update log indicates that the reputation has come from another user, then this entry represents updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
+If an entry in the reputation update log indicates that a dispute has occurred and been resolved, then there will be a number of transfers of reputation between users represented by a single entry. Each such transfer will have to accommodate the updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
 
 To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user’s reputation, prior to them losing it in this update, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
 
-Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used for as the voting weight should be done last i.e. all the children (and parents) should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the children reputation. %If any of these calculations need to be proved correct during the resolution protocol, 
+Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used for as the voting weight should be done last i.e. all the children and parents should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the children reputation. %If any of these calculations need to be proved correct during the resolution protocol, 
 
 For further details about reputation transfers and disputes, see Appendix \ref{appendix:rep-transfer}.
 
@@ -367,25 +357,26 @@ The last factor $B$ is the number of tokens the user has staked --- if they have
 
 % Let me try to make sense of this.
 
-If every hour $A$ reputation is awarded in \rc, and if there is a total $R_0$ \rc\ reputation, then at the next cycle we have reputation
-\[
-R_1^\prime = R_0 (1 - e^{-k}) + A
-\]
-So $R_1^\prime - R_0 = A - R_0e^{-k}$ and this should be $3/4$ of the total new rep awarded. In other words
-\[
-R_1 -R_0 \stackrel{!}{=} 4/3 (A - R_0 e^{-k})
-\]
-Therefore the new mining rep ($R_1 - R_0$) should be
-\[
-1/3 ( A - R_0 e^{-k} )
-\]
+If every hour $A$ reputation is awarded in \rc, % and if there is a total $R_0$ \rc\ reputation, then at the next cycle we have reputation
+%\[
+%R_1^\prime = R_0 (1 - e^{-k}) + A
+%\]
+%So $R_1^\prime - R_0 = A - R_0e^{-k}$ and this should be $3/4$ of the total new rep %awarded. In other words
+%\[
+%R_1 -R_0 \stackrel{!}{=} 4/3 (A - R_0 e^{-k})
+%\]
+%Therefore the new mining rep ($R_1 - R_0$) should be
+%\[
+%1/3 ( A - R_0 e^{-k} )
+%\]
 
-... besides, I think we should just say:
-
+%... besides, I think we should just say:
+we want
 \[
  A \stackrel{!}{=} 3 R_M
 \]
-where $R_M$ is the mining reward. $A$ (and thus $R_M$) is calculated on a one-month moving average. It's value is submitted by us as an oracle ... at least at first... because how would we do that on-chain?
+where $R_M$ is the mining reward. $A$ (and thus $R_M$) is calculated on a one-month moving average. 
+It's value is submitted by us as an oracle ... at least at first... because how would we do that on-chain?
 
 Weighting: We want 10 submissions per cycle. The submitters are ordered in a list (position = $n$ starting at 0) and given the weighting
 \[

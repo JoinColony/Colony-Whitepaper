@@ -71,10 +71,10 @@ Reputation lost or gained as a function of the star rating therefore varies line
 
 Similarly, the evaluator gets an amount of reputation based on their grading by the worker, but on a scale that only varies between $-t_{\rm ev}$ and $t_{\rm ev}$ (where $t_{\rm ev}$ is the evaluator's notional token payout for the task). They only earn this reputation in the current (and all parent) domains, not in the skill reputation hierarchy as they have not actually done the task. While it is likely some knowledge is required to perform the evaluation, this is not always the case; we believe that skill reputation should exclusively demonstrate ability to perform tasks.
 
-Upon completion of a task, the administrator also earns reputation based on their token reward. There is no explicit rating of the administrator, but as with all other payments and rewards, an objection can be raised before and payout occurs. For all participants, reputation updates occur and payouts are made available only \emph{after} the objection window (described in Section \ref{sec:tasks}) has closed and all disputes  (described in Section \ref{sec:disputes}) have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task.
+Upon completion of a task, the administrator also earns reputation based on their token reward. There is no explicit rating of the administrator, but as with all other payments and rewards, an objection can be raised before and payout occurs. For all participants, reputation updates occur and payouts are made available only \emph{after} the objection window (described in Section \ref{sec:tasks}) has closed and all disputes  (described in Section \ref{sec:objections-and-disputes}) have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task.
 
 \subsubsection{Reputation change as a result of Disputes}\label{sec:earning-rep-in-disputes}
-If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. There will also be a reputation change as a result --- those on the losing side will lose some reputation, and some of that will be gained by the winning side. Section \ref{sec:disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
+If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. There will also be a reputation change as a result --- those on the losing side will lose some reputation, and some of that will be gained by the winning side. Section \ref{sec:objections-and-disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
 
 \subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 Since a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
@@ -95,7 +95,7 @@ Each skill that reputation can be earned in is assigned a \ascode{rep\_id} that 
 \begin{equation*}
   \ascode{skill\_id} \rightarrow 
   \begin{cases}
-    \ascode{generation} &	\textnormal{total number of parents}\\
+    \ascode{n_parents} &	\textnormal{total number of parents}\\
     \ascode{parent\_n\_id} &	\parbox[t]{.6\linewidth}{\textnormal{the \ascode{rep\_id} of the $n^{\rm th}$ parent, where $n$ is an integer power of two larger than or equal to 1. }}\\
     \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all child skills}\\
     \ascode{n\_children} &	\textnormal{total number of child skills}
@@ -103,7 +103,7 @@ Each skill that reputation can be earned in is assigned a \ascode{rep\_id} that 
 \end{equation*}
 Upon creation, \ascode{children[]} and \ascode{n\_children} are empty. These two fields in all parents are updated with the \ascode{skill\_id} of the new skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Back-of-the-envelope calculations suggest this corresponds to a depth of around 80, which we don't believe our users will be limited by.}
 
-Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol and the procedures for escalating disputes, which are described in Section \ref{} and Section \ref{}, respectively.
+Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol (see next section) and the procedures for escalating disputes (see Section \ref{sec:objections-and-disputes}). They are stored under the control of the Colony Network contract.
 
 \subsection{Reputation update log}\label{subsec:reputation-update-log}
 
@@ -113,11 +113,11 @@ Whenever an event that causes one or more users to have their reputation updated
 \item The user suffering the reputation loss or gain.
 \item The amount of reputation to be lost or gained.
 \item The colony the update has occurred in.
-\item How many reputation entries will need to be updated (including parent, child and colony-wide total reputations). This is the motivation for storing \ascode{generation} and \ascode{n_children} for each skill and domain, as described in Section \ref{subsec:on-chain-representation-of-skills}
+\item How many reputation entries will need to be updated (including parent, child and colony-wide total reputations). This is the motivation for storing \ascode{generation} and \ascode{n\_children} for each skill and domain, as described in Section \ref{subsec:on-chain-representation-of-skills}.
 \item How many total updates to reputations have occurred before this one in this cycle, including decays and updates to parents and children.
 \end{itemize}
 
-If the reputation update is the result of a dispute being resolved (as outlined in Section \ref{sec:earning-rep-in-disputes}), then instead of these first three properties, there is a reference to the dispute-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see \ref{appendix:rep-transfer}.
+If the reputation update is the result of a dispute being resolved (as outlined in Section \ref{sec:earning-rep-in-disputes}), then instead of these first three properties, there is a reference to the dispute-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see Appendix \ref{appendix:rep-transfer}.
 
 This log exists to define an ordering of all reputation updates in a reputation update cycle that is accessible on-chain. In the event of a dispute during the reputation mining protocol (described in Section \ref{sec:reputationmining}), the Colony Network Contract can use this record to establish whether an update has been included correctly.
 
