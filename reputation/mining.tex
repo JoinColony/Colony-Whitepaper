@@ -323,21 +323,38 @@ Note: There is an edge case to consider in which the attacker is sending enough 
 \subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
 In order to be involved in the reputation mining process, \rcths\ must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
 
-If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash.
+If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash. The system allows for a maximum of 10 miners to be added to the list in each round.
 
-If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain root colony tokens and reputation. The total amount of reputation earned is controlled by the amount of reputation that exists in the colony, and tries to ensure that 25\% of the reputation in a colony comes from mining. If normal activity in a colony generates $A$ reputation per hour, the total reputation that exists $R$ is given by 
+If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain root colony tokens and reputation. 
 
+The total amount of reputation earned by miners is not fixed, but varies along with activity in the \rc. The system tries to ensure that over time, 25\% of \rc\ reputation comes from mining. %In times of growing activity, more reputation will go to tasks and in times of declining activity more reputation will go to the miners.
+%The total amount of reputation earned is controlled by the amount of reputation that exists in the colony, and tries to ensure that 25\% of the reputation in a colony comes from mining. If normal activity in a colony generates $A$ reputation per hour, the total reputation that exists $R$ is given by 
+
+Suppose that the reputation earned in the \rc\ every hour due to all activity (mining included) is constant at $h$, then eventually the colony will reach a steady state in which the decay of reputation is balanced out precisely by the newly earned reputation and
 \begin{equation}
-\frac{A}{1-\exp\left(-k\right)}
+ R_{tot} \left( 1 - e^{-k} \right) = h
+\end{equation}
+\noindent where $k$ is the decay constant used in each update period (see Appendix \ref{appendix:rep-decay}) and $R_{tot}$ is the total reputation in the \rc.\\
+The hourly mining reward $m$ in this situation would be given by
+\begin{equation}\label{eq:mining-reward}
+ m = \frac{h}{4} = \frac{R_{tot} \left( 1 - e^{-k} \right)}{4}.
 \end{equation}
 
-\noindent where $k$ is the decay constant used in each update period (see Appendix \ref{}). If we wish for 25\% of $R$ to come from mining, then the amount of reputation earned from mining in each update period should be 
+The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.
 
-\begin{equation}
-\frac{R}{4}\left(1-\exp\left(-k\right)\right).
+Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that hash is recorded, and the total weight submitted by all users for that hash is updated. The weight for the $n^{th}$ miner on the list of submitters is given by
+\begin{equation}\label{eq:miner-weighting}
+ W_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
+where $t$ is a number of blocks that the miner has staked their tokens for, $T$ and $N$ are normalising constants: $T$ and is set to number of blocks representing 3 months, and $N$ is set to twice the length of the list of submitters - in our case $N=20$.
 
-When a user makes their submission, their weighting for that hash is recorded, and the total weight submitted by all users for that hash is updated. A staker's weight is given by 
+The first factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. 
+
+The second factor in equation \eqref{eq:miner-weighting} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal.
+
+
+------------------------------------\\
+previous notes follow.
 
 \begin{equation}\label{eq:stakerweight}
 \left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
@@ -352,14 +369,6 @@ The second factor in equation \eqref{eq:stakerweight} encourages users to submit
 The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
 
 
------------------------
-
-Weighting: We want 10 submissions per cycle. The submitters are ordered in a list (position = $n$ starting at 0) and given the weighting
-\[
-W_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n}{N} \right)
-\]
-
-If we set N = 18, then the last submitter gets half the reward of the first. 
 
 
 
