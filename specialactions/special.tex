@@ -15,12 +15,8 @@ The primary use of a token weighted vote is related to the management of the col
 
  
 
-\subsection{Emergency Shutdown}
-%
-Placeholder\\
-How to trigger an emergency shutdown -- the "big red button" we talked about.
-Conditions for restarting
-%
+\subsection{Emergency Shutdown}\label{sec:big-red-button}
+As indicated in section \ref{sec:escape-hatches}, a transaction from a whitelisted address can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be pushed. In addition to being able to stop-and-repair colonies, the reputation mining process will also have an emergency stop-and-repair mechanism (at least initially). This will allow the whitelisted addresses to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved. The colonies will be able to continue operations as usual using the reputations of the last valid state.
 
 \subsection{Example Configurations}\label{sec:example-configs}
 The Colony Governance Protocol described in this document is concerned with what happens `on chain', i.e. those actions that directly affect the Ethereum blockchain. Users of the network however are not expected to ever interact with the contracts manually; instead they will be using some front-end application that makes all of the network's functionality appear intuitive and simple.\\

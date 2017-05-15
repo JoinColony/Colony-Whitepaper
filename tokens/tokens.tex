@@ -37,7 +37,7 @@ The next stage will be a second intermediate contract which will operate very si
 \subsubsection*{Stage 4: \rc\ fully in charge of the network}
 Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Root Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
 
-\subsection{Contract security and escape hatches}
+\subsection{Contract security and escape hatches}\label{sec:escape-hatches}
 While we can hope to make a system of contracts with no bugs in them, we intend to adopt a `defensive programming' mentality to try and limit the impact from any issues that manage to manifest themselves in the deployed contracts.
 
 At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions in the \ascode{StorageContract} to allow setting of variables, as well as the upgrade function. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. We require multiple whitelisted addresses to approve the removal from recovery mode to ensure that a whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode, making an edit to the contract state that would be difficult to otherwise detect.
