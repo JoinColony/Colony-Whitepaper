@@ -250,21 +250,12 @@ If less than an hour elapses from submissions opening to only one submission rem
 %
 \subsubsection{Keeping track of reputation changes}
 %
-There are two types of reputation update that occur:
+Fundamentally, there are two types of reputation update that occur:
 \begin{itemize}
- \item Decay of existing reputation
+ \item Decay of existing reputation.
  \item Addition or removal of reputation as a reward or punishment.
 \end{itemize}
-All reputation decays, and so it is only the latter that is explicitly recorded on the blockchain when an event occurs. Specifically, when a reputation affecting event occurs, an entry is added to the `reputation update log' in the \rc. Such an entry consists of
-\begin{center}
-\begin{tabular}{lll}
-$R$ &--& The reputation to be updated\\
-$\Delta_R$ &--& The reputation change\\
-source &--& An address if the reputation is coming from someone, zero otherwise\\
-$n\_updates$ &--& The cumulative number of all reputation changes that will have been made\\
-	    & & when this log entry is correctly processed.\\
-\end{tabular}
-\end{center}
+
 
 Recall also from section \ref{sec:reptree} that a reputation consists of
 \begin{center}

@@ -93,16 +93,17 @@ All reputation decays over time. Every 600000 blocks, a user's reputation in any
 %we need more text here FIXME
 \subsection{Reputation update log}\label{subsec:reputation-update-log}
 
-Whenever an event that causes one or more users to have their reputation updated in a colony, a corresponding entry is recorded in a log in the Colony Network Contract that is used for the reputation mining process. Each entry in the log contains
+Whenever an event that causes one or more users to have their reputation updated in a colony, a corresponding entry is recorded in a log in the Colony Network Contract. Each entry in the log contains
 
 \begin{itemize}
 \item The user suffering the reputation loss or gain.
 \item The amount of reputation to be lost or gained.
 \item The colony the update has occurred in.
-\item How many reputation entries will need to be updated (including parent, child and total reputations colony-wide).
+\item How many reputation entries will need to be updated (including parent, child and colony-wide total reputations).
 \item How many total updates to reputations have occurred before this one in this cycle, including decays and updates to parents and children.
 \end{itemize}
 
 If the reputation update is the result of a dispute being resolved (as outlined in Section \ref{sec:earning-rep-in-disputes}), then instead of these first three properties, there is a reference to the dispute-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see \ref{appendix:rep-transfer}.
 
-This 
+This log exists to define an ordering of all reputation updates in a reputation update cycle that is accessible on-chain. In the event of a dispute during the reputation mining protocol (described in Section \ref{sec:reputationmining}), the Colony Network Contract can use this record to establish whether an update has been included correctly.
+
