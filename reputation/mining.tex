@@ -272,17 +272,7 @@ R =
 
 %I suggest we do a little appendix of data structures. That way we can refer to reputations and rep_ids an other data here without having to fully document it here. We would not need to even mention the parent_id and parent_n_id here (as we need it only elsewhere)...
 
-Furthermore for each $rep\_id$, the following data is also known
-\[
-  rep\_id \rightarrow 
-  \begin{cases}
-    parent\_id &	\textnormal{the rep\_id of the parent domain/skill}\\
-    parent\_n\_id &	\textnormal{the rep\_id of the $n^{th}$ parent}\\
-    generation &	\textnormal{total number of parents}\\
-    children\left[\cdots\right] &	\textnormal{array of children}\\
-    n\_children &	\textnormal{total number of children}
-  \end{cases}
-\]
+
 When a user earns reputation in a skill or domain, s/he also earns reputation in all parents and thus corresponds to \ascode{generation+1} number of reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of \ascode{generation + n\_children + 1}. (Note: parent\_id and parent\_n\_id are not used here; they are used during dispute escalation - see Section \ref{sec:disputes}).
 
 It is only by recording the number of parent reputations (\ascode{generation}) and how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification state trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. It can then conduct the binary search.
