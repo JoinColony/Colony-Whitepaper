@@ -362,6 +362,40 @@ The second factor in equation \eqref{eq:stakerweight} encourages users to submit
 The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
 
 
+
+------------------------
+
+% Let me try to make sense of this.
+
+If every hour $A$ reputation is awarded in \rc, and if there is a total $R_0$ \rc\ reputation, then at the next cycle we have reputation
+\[
+R_1^\prime = R_0 (1 - e^{-k}) + A
+\]
+So $R_1^\prime - R_0 = A - R_0e^{-k}$ and this should be $3/4$ of the total new rep awarded. In other words
+\[
+R_1 -R_0 \stackrel{!}{=} 4/3 (A - R_0 e^{-k})
+\]
+Therefore the new mining rep ($R_1 - R_0$) should be
+\[
+1/3 ( A - R_0 e^{-k} )
+\]
+
+... besides, I think we should just say:
+
+\[
+ A \stackrel{!}{=} 3 R_M
+\]
+where $R_M$ is the mining reward. $A$ (and thus $R_M$) is calculated on a one-month moving average. It's value is submitted by us as an oracle ... at least at first... because how would we do that on-chain?
+
+Weighting: We want 10 submissions per cycle. The submitters are ordered in a list (position = $n$ starting at 0) and given the weighting
+\[
+W_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n}{N} \right)
+\]
+
+If we set N = 18, then the last submitter gets half the reward of the first. 
+
+
+
 %Notes:\\
 %-token holders must stake in order to be miners\\
 %-reputational reward comes from tokens earned just like task payout
