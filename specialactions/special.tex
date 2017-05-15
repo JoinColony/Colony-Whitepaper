@@ -33,7 +33,7 @@ Front-end abstraction lets us realise certain functionality that doesn't \emph{s
 
 The work-for-payment model in the colony network is based around tasks, and you'd be forgiven for thinking that this implied colony-worker relationships that are purely transactional. However the system is in fact flexible enough to accommodate a wider range of employment models. One such example is a \emph{salaried position}.
 
-A salaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a mandated funding proposal. The hiree would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good frontend could hide these implementation details from the users and render salaried positions differently from regular domains.
+A salaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a mandated funding proposal. The employee would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good frontend could hide these implementation details from the users and render salaried positions differently from regular domains.
 
 \subsubsection{Awarding Reputation Bonuses}
 
@@ -47,18 +47,17 @@ The important point is that any limitations imposed by the system can be weakene
 
 \subsubsection{Objections by non-members}
 
-%
-Placeholder\\
-explain how without reputation you cannot actually launch an objection, but describe how the frontend can make it easy for the user to propose an objection and ask rep-holders to join. This is analogous to users staking only 10\% of the requirement and waiting for other backers.
-%
+Having reputation is a prerequisite for creating an objection and triggering the dispute process. Therefore, if an outsider is hired by a colony to perform a task, s/he will not, on their own, be able to object to the evaluation of their work.
+However, a good colony frontend may allow them to create the template for an objection, effectively calling for members of the colony to support it and submit the objection to the colony network on-chain on their behalf.  
+Just as a member may stake only 10\% of the required amount and wait for further suppor from their peers (Section \ref{sec:costs-of-disputes}), with the difference being that without any third part support, this `objection' would never be processed on-chain.
 
-\subsubsection{Firing members of a colony}
-
-%
-Placeholder\\
-there isn't really a concept of firing per se, but what we mean here is a special action that sets all of a users reputation to zero.
-Threshold, 2/3 of all rep voting in favour, quorum at least 10\%. 
-%
-
-Did we want to keep this functionality? I don't remember.
+% \subsubsection{Firing members of a colony}
+% 
+% %
+% Placeholder\\
+% there isn't really a concept of firing per se, but what we mean here is a special action that sets all of a users reputation to zero.
+% Threshold, 2/3 of all rep voting in favour, quorum at least 10\%. 
+% %
+% 
+% Did we want to keep this functionality? I don't remember.
 
