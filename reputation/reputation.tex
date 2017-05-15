@@ -45,16 +45,11 @@ A user's reputation in a colony is the sum of their reputation in the top-level 
 
 
 \subsection{Earning and losing reputation}\label{sec:earning-losing-rep}
-There are three ways to earn reputation in a colony. The first is being involved with a successfully completed task (detailed in Section \ref{sec:earning-rep-from-task}) and the second is through the dispute process (described in Section \ref{sec:earning-rep-in-disputes}). In both of these cases, the user has been a productive member of the colony and is rewarded accordingly. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process (see Section \ref{sec:bootstrapping-rep}). In this case, the user receiving the reputation is the colony creator or an acquaintance, and the reputation should be seen as a representation of the trust they have for their colleague. 
+There are three ways to earn reputation in a colony. The first is being involved with a successfully completed task and the second is through the dispute process. In both of these cases, the user has been a productive member of the colony and is rewarded accordingly. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process (see Section \ref{sec:bootstrapping-rep}).
 
-\subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
-Since a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
+Reputation losses can arise from a user being found responsible for a badly executed task, or being involved in the dispute process and the dispute being resolved against them. In addition, all reputation earned by users is exposed to a continual decay over time. 
 
-To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them to allow the colony to bootstrap itself. There will be a global limit on the reputation that can be assigned in this manner in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. \textbf{This is the only time that reputation can be created without associated work being done.}
-
-When a new domain is created in a colony, it has no reputation in it, like a new colony, and so we must consider how to bootstrap the domain as well. We do not wish to allow the creation new reputation here, as this would devalue reputation already earned elsewhere in the colony. 
-
-Unlike the case of the new colony, we can proceed without any new reputation: we simply accept the fact the new domain has no reputation in it. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain where reputation does exist, if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the \emph{domain} to contribute to the decision, users will still be able to vote based on their reputation in relevant \emph{skills}.
+The rest of this section outlines each of these mechanisms, with references to the more detailed descriptions given elsewhere where appropriate.
 
 \subsubsection{Reputation change from contributing to a task}\label{sec:earning-rep-from-task}
 Each task requires three roles to be assigned: the administrator, the worker and the evaluator (as described in Section \ref{sec:tasks}). If the bounty for the task is denominated in the colony's token, each of these roles are eligible to earn reputation when the task is completed as long as their work was well received.
@@ -83,10 +78,31 @@ Similarly, the evaluator gets an amount of reputation based on their grading by 
 Upon completion of a task, the administrator also earns reputation based on their token reward. There is no explicit rating of the administrator, but as with all other payments and rewards, an objection can be raised before and payout occurs. For all participants, reputation updates occur and payouts are made available only \emph{after} the objection window (described in Section \ref{sec:tasks}) has closed and all disputes  (described in Section \ref{sec:disputes}) have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task.
 
 \subsubsection{Reputation change as a result of Disputes}\label{sec:earning-rep-in-disputes}
-If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. There will also be a reputation change as a result --- those on the losing side will lose some reputation, those on the `right' side will gain some of the reputation that is lost by the losing side. Section \ref{sec:disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
+If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. There will also be a reputation change as a result --- those on the losing side will lose some reputation, and some of that will be gained by the winning side. Section \ref{sec:disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
+
+\subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
+Since a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
+
+To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them to allow the colony to bootstrap itself. There will be a global limit on the reputation that can be assigned in this manner in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. \textbf{This is the only time that reputation can be created without associated work being done.} Users receiving the reputation are presumably the colony creator or their acquaintances, and this starting reputation should be seen as a representation of the existing trust the creator has for their colleagues. 
+
+We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation new reputation here, as this would devalue reputation already earned elsewhere in the colony. Happily, we can proceed without any new reputation. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain where reputation does exist, if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the \emph{domain} to contribute to the decision, users will still be able to vote based on their reputation in relevant \emph{skills}.
 
 \subsubsection{Reputation Decay}
-All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are as few incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation
+All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain. 
 
 %we need more text here FIXME
+\subsection{Reputation update log}\label{subsec:reputation-update-log}
 
+Whenever an event that causes one or more users to have their reputation updated in a colony, a corresponding entry is recorded in a log in the Colony Network Contract that is used for the reputation mining process. Each entry in the log contains
+
+\begin{itemize}
+\item The user suffering the reputation loss or gain.
+\item The amount of reputation to be lost or gained.
+\item The colony the update has occurred in.
+\item How many reputation entries will need to be updated (including parent, child and total reputations colony-wide).
+\item How many total updates to reputations have occurred before this one in this cycle, including decays and updates to parents and children.
+\end{itemize}
+
+If the reputation update is the result of a dispute being resolved (as outlined in Section \ref{sec:earning-rep-in-disputes}), then instead of these first three properties, there is a reference to the dispute-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see \ref{appendix:rep-transfer}.
+
+This 
