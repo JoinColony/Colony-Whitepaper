@@ -40,6 +40,7 @@ Even though the skill hierarchy is universal, reputation earned in the skill hie
 \subsubsection{Reputation by Colony}\label{sec:rep-by-colony}
 A user's reputation in a colony is the sum of their reputation in the top-level skill and the top-level domain. This is the reputation they will be voting with in any decisions that require input from everyone in the colony. Reputation in a colony has no effect outside the colony.
 
+
 %insert example diagram here ... maybe a cartoon rep-tree
 %A cartoon rep tree is going to be.... extremely similar to the cartoon domain tree we already have?
 
@@ -89,8 +90,22 @@ We note that the same is not required when a new domain is created in a colony. 
 
 \subsubsection{Reputation Decay}
 All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain. 
-
 %we need more text here FIXME
+
+\subsection{On-chain representation of skills and domains}
+In the context of reputation, domains and skills are the same, differing only in that domains are colony-specific categorisation and skills are universal categorisation. For each domain or skill that reputation can be earned in, there is a \ascode{rep\_id} that is unique. When a domain or skill is created, additional properties are recorded.
+\[
+  \ascode{rep\_id} \rightarrow 
+  \begin{cases}
+    \ascode{parent\_id} &	\textnormal{the \ascode{rep\_id} of the parent domain or skill}\\
+    \ascode{parent\_n\_id} &	\textnormal{the \ascode{rep\_id} of the $n^{th}$ parent}\\
+    \ascode{generation} &	\textnormal{total number of parents}\\
+    \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all children}\\
+    \ascode{n\_children} &	\textnormal{total number of children}
+  \end{cases}
+\]
+Upon creation, \ascode{children[]}
+
 \subsection{Reputation update log}\label{subsec:reputation-update-log}
 
 Whenever an event that causes one or more users to have their reputation updated in a colony, a corresponding entry is recorded in a log in the Colony Network Contract. Each entry in the log contains
