@@ -261,9 +261,9 @@ Fundamentally, there are two types of reputation update that occur:
  \item Addition or removal of reputation as a reward or punishment.
 \end{itemize}
 
-When a user earns reputation in a skill or domain, they also earn reputation in all parents, which corresponds to $2\times\left(\ascode{n_parents}+1\right)$ reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of $2\times\left(\ascode{n_parents + n\_children + 1}\right)$. The factors of two here come from also updating the relevant colony-wide totals.
+When a user earns reputation in a skill or domain, they also earn reputation in all parents, which corresponds to $2\times\left(\ascode{n\_parents}+1\right)$ reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of $2\times\left(\ascode{n\_parents + n\_children + 1}\right)$. The factors of two here come from also updating the relevant colony-wide totals.
 
-In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n_parents} and \ascode{n_childen} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification state trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. It can then conduct the binary search.
+In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n\_parents} and \ascode{n\_children} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification state trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. It can then conduct the binary search.
 
 When the discrepant state transition is found, the users supply the index of the event in the on-chain log that corresponds to that reputation update.  This means that the contract does not have to iterate over the whole list expensively, but the contract can easily check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. In order to do this, we assert that children are always updated in order, then parents, and then the reputation in question itself. In addition, colony-wide totals of reputation are always updated before the user-specific reputation.
 
@@ -272,10 +272,10 @@ In the event that the discrepant transaction is a decay transaction, which is ea
 Recording the number of leaves in the tree is required to allow the binary search to occur, as well as accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decay (see Section \ref{sec:repdecay}). There is a decay calculation for every leaf in the previously accepted tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
 
 \subsubsection{Earning reputation for the first time}\label{sec:earning-rep-for-first-time}
-When a user earns reputation in a new skill, at least one new leaf is added to the tree --- if they have not earned reputation before in some of the parents, then they will also cause further new leaves to be added. New leaves will also be added if they are the first user in a colony to earn those particular skills, making the total reputation for that skill in the colony non-zero. During a dispute, when the user proves that they have included the update in the tree, it is not possible to check (efficiently) on-chain that they should not have added it to an existing leaf instead. However, because during a dispute we are always playing two submissions off against the other, one of two things will be true:
+When a user earns reputation in a new skill, at least one new leaf is added to the tree --- if they have not earned reputation before in some of the parents, then they will also cause further new leaves to be added. New leaves will also be added if they are the first user in a colony to earn those particular skills, making the total reputation for that skill in the colony non-zero. During a dispute, when the user proves that they have included the update in the tree, it is not possible to check (efficiently) on-chain that they should not have added it to an existing leaf instead. However, because during the resolution process we are always comparing two submissions against each other, one of two things will be true:\footnote{Assuming that one of the two submissions is correct.}
 \begin{itemize}
- \item Both submissions add a new leaf to the tree. If there was a discrepancy, then it is in the maths conducted on this leaf, not the addition of the leaf itself. The maths can be checked on-chain to establish which result is correct.
- \item The other submission adds the new reputation to an existing leaf (the correctness of which can be checked on-chain easily). In this case, the user who added the leaf incorrectly is wrong.
+ \item Both submissions added a new leaf to the tree. If there was a discrepancy, then it is in the maths conducted on this leaf, not the addition of the leaf itself. The maths can be checked on-chain to establish which result is correct.
+ \item One submission adds the new reputation to an existing leaf (the correctness of which can be checked on-chain easily). In this case, the user who added the leaf incorrectly is wrong.
 \end{itemize}
 
 
@@ -288,7 +288,7 @@ The most important quality of reputation that distinguishes it from a token is t
 
 If an entry in the reputation update log indicates that a dispute has occurred and been resolved, then there will be a number of transfers of reputation between users represented by a single entry. Each such transfer will have to accommodate the updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
 
-To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user’s reputation, prior to them losing it in this update, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
+To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user's reputation, prior to them losing it in this update, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
 
 Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used for as the voting weight should be done last i.e. all the children and parents should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the children reputation. %If any of these calculations need to be proved correct during the resolution protocol, 
 
@@ -352,31 +352,7 @@ The second factor in equation \eqref{eq:stakerweight} encourages users to submit
 The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
 
 
-
-------------------------
-
-% Let me try to make sense of this.
-
-If every hour $A$ reputation is awarded in \rc, % and if there is a total $R_0$ \rc\ reputation, then at the next cycle we have reputation
-%\[
-%R_1^\prime = R_0 (1 - e^{-k}) + A
-%\]
-%So $R_1^\prime - R_0 = A - R_0e^{-k}$ and this should be $3/4$ of the total new rep %awarded. In other words
-%\[
-%R_1 -R_0 \stackrel{!}{=} 4/3 (A - R_0 e^{-k})
-%\]
-%Therefore the new mining rep ($R_1 - R_0$) should be
-%\[
-%1/3 ( A - R_0 e^{-k} )
-%\]
-
-%... besides, I think we should just say:
-we want
-\[
- A \stackrel{!}{=} 3 R_M
-\]
-where $R_M$ is the mining reward. $A$ (and thus $R_M$) is calculated on a one-month moving average. 
-It's value is submitted by us as an oracle ... at least at first... because how would we do that on-chain?
+-----------------------
 
 Weighting: We want 10 submissions per cycle. The submitters are ordered in a list (position = $n$ starting at 0) and given the weighting
 \[
