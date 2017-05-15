@@ -40,11 +40,6 @@ Even though the skill hierarchy is universal, reputation earned in the skill hie
 \subsubsection{Reputation by Colony}\label{sec:rep-by-colony}
 A user's reputation in a colony is the sum of their reputation in the top-level skill and the top-level domain. This is the reputation they will be voting with in any decisions that require input from everyone in the colony. Reputation in a colony has no effect outside the colony.
 
-
-%insert example diagram here ... maybe a cartoon rep-tree
-%A cartoon rep tree is going to be.... extremely similar to the cartoon domain tree we already have?
-
-
 \subsection{Earning and losing reputation}\label{sec:earning-losing-rep}
 There are three ways to earn reputation in a colony. The first is being involved with a successfully completed task and the second is through the dispute process. In both of these cases, the user has been a productive member of the colony and is rewarded accordingly. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process (see Section \ref{sec:bootstrapping-rep}).
 
@@ -89,22 +84,22 @@ To prevent this, when a colony is created, the creator can choose addresses to h
 We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation new reputation here, as this would devalue reputation already earned elsewhere in the colony. Happily, we can proceed without any new reputation. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain where reputation does exist, if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the \emph{domain} to contribute to the decision, users will still be able to vote based on their reputation in relevant \emph{skills}.
 
 \subsubsection{Reputation Decay}
-All reputation decays over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain. 
-%we need more text here FIXME
+All reputation decays\footnote{The rate of decay in the final network may be different than specified here.} over time. Every 600000 blocks, a user's reputation in any domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain. 
+
+The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per task) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time.
 
 \subsection{On-chain representation of skills and domains}
-In the context of reputation, domains and skills are the same, differing only in that domains are colony-specific categorisation and skills are universal categorisation. For each domain or skill that reputation can be earned in, there is a \ascode{rep\_id} that is unique. When a domain or skill is created, additional properties are recorded.
+In the context of reputation, domains and skills are the same, differing only in that domains are colony-specific categorisation and skills are universal categorisation. Each domain or skill that reputation can be earned in is assigned a \ascode{rep\_id} that is unique across the whole network. When a domain or skill is created, additional properties are recorded and initialised.
 \[
   \ascode{rep\_id} \rightarrow 
   \begin{cases}
-    \ascode{parent\_id} &	\textnormal{the \ascode{rep\_id} of the parent domain or skill}\\
-    \ascode{parent\_n\_id} &	\textnormal{the \ascode{rep\_id} of the $n^{th}$ parent}\\
     \ascode{generation} &	\textnormal{total number of parents}\\
+    \ascode{parent\_n\_id} &	\textnormal{the \ascode{rep\_id} of the $n^{th}$ parent, where $n$ is a power of two. All  }\\
     \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all children}\\
     \ascode{n\_children} &	\textnormal{total number of children}
   \end{cases}
 \]
-Upon creation, \ascode{children[]}
+Upon creation, \ascode{children[]} and \ascode{n\_children} are empty.
 
 \subsection{Reputation update log}\label{subsec:reputation-update-log}
 
