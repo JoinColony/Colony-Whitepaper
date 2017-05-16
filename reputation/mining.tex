@@ -342,7 +342,7 @@ The hourly mining reward $m$ in this situation would be given by
 
 The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.
 
-Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that hash is recorded, and the total weight submitted by all users for that hash is updated. The weight for the $n^{th}$ miner on the list of submitters is given by
+Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that submission is recorded, and the rewards of all miners having submitted the same hash is calculated based on their relative weighting. The weight for the $n^{th}$ miner on the list of submitters is given by
 \begin{equation}\label{eq:miner-weighting}
  W_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
@@ -352,7 +352,7 @@ The first factor in equation \eqref{eq:miner-weighting} encourages users to stak
 
 The second factor in equation \eqref{eq:miner-weighting} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal.
 
-
+%next step: actual rewards payout formula.
 ------------------------------------\\
 previous notes follow.
 
