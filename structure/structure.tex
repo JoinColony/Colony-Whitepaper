@@ -22,7 +22,7 @@ The administrator (usually the creator of the task) is responsible for selecting
 \item A specification or brief for the task, to be used by the worker to guide the work, and by the evaluator for deciding if the work has been completed.
 \end{itemize}
 
-In order to create a task, the administrator must stake some number of Colony Tokens. This small stake is used to help discourage spamming of nonsense tasks, and provide a mechanism whereby the administrator can be punished upon bad behaviour. 
+In order to create a task, the administrator must stake some number of Colony Tokens. This (small) stake is used to help discourage spamming of nonsense tasks, and provide a mechanism whereby the administrator can be punished upon bad behaviour. 
 
 Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the administrator is the natural person to do so.
 
@@ -30,13 +30,13 @@ Assigning the worker can only occur after the funds to satisfy the proposed payo
 
 Once all these elements have been set and funding is secured, the worker is able to make a `final submission', which includes some proof that the work has been completed. We don't prescribe what the contents of this generic field should be, but we would expect an IPFS or Swarm hash referring to a longer file containing the proof to be the most common usage.
 
-Once the due date has passed or the worker has made their submission, the evaluator is able to grade the work. Regardless of whether the grading is positive or not, the task then enters a state where \textbf{disputes} (see Section \ref{sec:objections-and-disputes}) can be made over the final state of the task but no other changes can be made. Once three days have passed, no more disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
+Once the due date has passed or the worker has made their submission, the evaluator is able to grade the work. Regardless of whether the grading is positive or not, the task then enters a state where \textbf{objections} to the final state of the task can still be made and \textbf{disputes} can be initiated (see Section \ref{sec:objections-and-disputes}), but no other changes are possible. Once three days have passed, no more objections or disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
 
 If the evaluator's grading for the work is changed as a result of a dispute, they get a reduced payout based on the discrepancy between their original score and the score that their peers determined to be more appropriate. If an objection has determined the administrator should be punished, they lose their stake, otherwise the stake is able to be reclaimed. The worker is paid based on the final score awarded to their work, taking into account the result of any disputes.
 
 \subsection{Domains}\label{sec:domains}
 
-Of course, in a large colony, it would quickly become difficult for users to find relevant tasks due to the number of tasks. We therefore encourage users to create domains in their colony. These domains can contain both sub-domains and tasks, allowing users to structure their work. A toy example is shown in in Figure \ref{fig:domainhierarchysample}. 
+Of course, in a large colony, it would quickly become difficult for users to find relevant tasks due to the sheer number of tasks. We therefore encourage users to create domains in their colony. These domains can contain both sub-domains and tasks, allowing users to structure their work. A toy example is shown in in Figure \ref{fig:domainhierarchysample}. 
 
 \begin{figure}[h]
     \centering

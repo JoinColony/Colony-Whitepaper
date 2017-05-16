@@ -81,3 +81,18 @@ All of the data in \code{EternalStorage} is now available to the new contract, a
 If the contract has an \code{EternalWallet}, its owner should also be changed in the same transaction so that the new contract has all the token assets of the original. An alternative implementation, sending each of these token balances to the new contract could get arbitrarily expensive. In addition, any tokens sent that the contract didn't know to transfer would be lost. These are the main motivations for us to use the \code{EternalWallet} contract.
 
 We stress that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
+
+
+\subsection{Contract security and escape hatches}\label{sec:escape-hatches}
+While we can hope to make a system of contracts with no bugs in them, we intend to adopt a `defensive programming' mentality to try and limit the impact from any issues that manage to manifest themselves in the deployed contracts.
+
+At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions in the \ascode{StorageContract} to allow setting of variables, as well as the upgrade function. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in quick succession enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
+
+In general, the contract may enter `recovery mode' due to:
+\begin{itemize}
+ \item A transaction from a whitelisted address signalling that the contract should enter recovery mode.
+ \item Something that should always be true of the colony not being true --- for example, after a task payout checking that the amount of funds promised to tasks and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
+ \item A qualitative trigger suggesting something amiss --- perhaps too many tokens have been paid out in a short amount of time.
+\end{itemize}
+
+We recommend that the Colony Foundation be added as one of these whitelisted addresses as a `trusted party'.

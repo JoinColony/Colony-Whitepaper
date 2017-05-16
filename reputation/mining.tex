@@ -14,7 +14,7 @@ This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \ci
 
 Consider the tree shown in Figure \ref{fig:merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself. 
 
-The resulting structure is known as a Merkle tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{1, [B,F], [l,l]}. The first argument is the element whose existence is to be proved. The second argument is the list of hashes that the hash of the first element should be hashed pairwise with. The last argument is an array of \ascode{l}'s and \ascode{r}'s that indicates whether the hash calculated so far should be hashed on the left or the right of next element in question. So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{3, [D,E], [l,r]}.
+The resulting structure is known as a Merkle tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{1, [B,F], [l,l]}. The first argument is the element whose existence is to be proved. The second argument is the list of hashes that the hash of the first element should be hashed with in succession. The last argument is an array of \ascode{l}'s and \ascode{r}'s that indicates whether the hash calculated so far should be hashed on the left or the right of next element in question. So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{3, [D,E], [l,r]}.
 \begin{figure}
 \centering
  \begin{tikzpicture}
@@ -124,7 +124,7 @@ While the calculation is too large to be done on-chain due to technical and econ
 The final \ascode{ReputationRootHash} is submitted to the contract by the miner along with the number of leaves in the tree. Further, the miner also submits the IPFS or Swarm hash of a document containing the entire state tree, though this is only for convenience; any user can construct this locally based on the blockchain history.
 %
 \subsubsection*{Who can submit a new root hash?}
-CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} \rcth\ to submit the hash to the contract.
+All CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} miner to submit the hash to the contract.
 
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is below the \ascode{target}. At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 10.
 
@@ -137,7 +137,7 @@ If more than one state has been submitted, then either someone has made a mistak
 
 \subsubsection*{Mining Rewards}
 
-When a state is accepted, a number of (newly generated) \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
+When a state is accepted, a number of \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
 
 \subsection{Dealing with false submissions}\label{sec:challengeresponse}
 %
@@ -147,15 +147,15 @@ We assume that the correct hash is one of the  submitted hashes. This is a reaso
 
 We must prove all but one submission incorrect by having each submission navigate a series of \emph{challenges}. These challenges refer to events that happened in the colony network within the last update cycle that have an effect on reputation. The \emph{responses} to the challenges are Merkle proofs that the corresponding reputation update was properly handled.
 
-We consider first the scenario where only two submissions are made, and one is correct. 
+We begin by considering the scenario where only two submissions are made, and one is correct. 
 
-It is possible that the same hash has been submitted twice, but with a disagreement about the number of leaves it contained. In this situation, the users are required to submit a Merkle proof for the last leaf in their tree. We are able to tell if a submitted proof corresponds to the last leaf in the tree, as any hashes on the right must be hashed with themselves, and any hashes on the left must not be. The structure of the Merkle proof also allows us to tell the index of this last leaf; if it corresponds to either of the submitted states, that one is correct.
+First we consider the case in which the same hash has been submitted twice, but with a disagreement about the number of leaves it contained. In this situation, the users are required to submit a Merkle proof for the last leaf in their tree. We are able to tell if a submitted proof corresponds to the last leaf in the tree, as all sibling hashes must be hashed on the left. Noting the positions in the Merkle proof in which a hash is hashed with itself also allows us to tell the index of this last leaf; if it corresponds to either of the submitted states, that one is correct.
 
 We now consider the more complicated case where two different hashes have been submitted.
 
 \subsubsection*{1. The Justification Tree}
   \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
- The first step is for both parties to upload a second Merkle root. This is the root of a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}. The right-most leaf ($\mathcal{RH}_n$) is the hash they originally submitted, and the left-most leaf ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. The intermediate leaves ($\mathcal{RH}_i$) represent the evolution of the reputation state after the $n$ reputation updates in this cycle are applied one-at-a-time. We refer to the Merkle root of this tree as the justification root hash (\jrh).
+ The first step is for both parties to upload a second Merkle root. This is the root of a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}. The right-most leaf ($\mathcal{RH}_n$) is the hash they originally submitted, and the left-most leaf ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. The intermediate leaves represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputations state after the first $i$ reputation updates in this cycle have been applied. We refer to the Merkle root of this tree as the justification root hash (\jrh).
  %
  %
 \begin{figure}
@@ -215,12 +215,12 @@ We now consider the more complicated case where two different hashes have been s
 \end{figure}
 An example of such a tree is shown in Figure \ref{fig:justification-tree}. Note that in the first stage of the tree, every neighbouring pair of data leaves is hashed, and so any pair has a shared Merkle proof to the root. We do this so that each element in the first row of hashes (indicated by $j_{0,1}, j_{0,2} ...j_{n-1,n}$ in Figure \ref{fig:justification-tree}) represents a transition between two states. It is these transitions that we wish to validate on-chain during the mining dispute resolution process, rather than the intermediate states themselves.
 
-Any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (which is the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$. Somewhere there is a transition  ($j_{i,i+1}$ that represents the transaction between $\mathcal{RH}_i$ and $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update, the calculation of which is able to be done on-chain to establish which submission --- if either --- is correct.
+Any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (which is the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$. Somewhere there is a transition  ($j_{i,i+1}$ that represents the transaction between $\mathcal{RH}_i$ and $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update, the calculation of which can be done on-chain to establish which submission is correct.
 
 First, however, we must establish where the two submissions first differ.
 
 \subsubsection*{2. Searching for the discrepancy}
-The contract now requires both parties to submit Merkle proofs that specific reputation updates were handled correctly. It begins by pseudorandomly\footnote{This pseudorandomness is to help mitigate an attack described in Section \ref{sec:mining-possible-attacks}. This affect the average runtime of the binary search, which still reduces the search space by a factor of two \emph{on average} every iteration.} picking the $i$th reputation update from all updates to be applied this cycle, (Appendix \ref{appendix:rep-transfer}) and requires both parties to provide:
+The contract now requires both parties to submit Merkle proofs that specific reputation updates were handled correctly. It begins by pseudorandomly\footnote{This pseudorandomness is to help mitigate an attack described in Section \ref{sec:mining-possible-attacks}. This affects the average runtime of the binary search, which still reduces the search space by a factor of two \emph{on average} every iteration.} picking the $i$th reputation update from all updates to be applied this cycle, (Appendix \ref{appendix:rep-transfer}) and requires both parties to provide:
 \begin{itemize}
  \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{i-1}$).
  \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_i$).
@@ -249,7 +249,7 @@ In the event of more than two submissions for the new $\mathcal{RH}_n$, this pro
 
 If less than an hour elapses from submissions opening to only one submission remaining, the next submission window only opens when an hour has passed from the start of this window. If more than an hour has passed, the next submission window opens immediately.
 
-\subsection{Calculating Reputation Updates}\label{sec:calculating-reputation-updates}
+\subsection{Calculating reputation updates}\label{sec:calculating-reputation-updates}
 %
 \subsubsection{Keeping track of reputation changes}
 %

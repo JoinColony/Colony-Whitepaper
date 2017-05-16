@@ -5,25 +5,23 @@ CLNY are generated during the Colony crowdsale period. Since the Colony Network 
 
 After the Colony Network Contract is deployed, the first colony created will be the \rc. Tokens in this Colony will be CLNY. 
 
-\subsection{Role of CLNY Holders}
+\subsection{Role of CLNY Holders and the \rc}
 In the case of the fully realised Colony Network, CLNY holders have two primary roles. The first of these is the process we have termed \textbf{Reputation Mining}, which is fully described in Section \ref{sec:reputationmining}.
 
 The second role for CLNY holders is management of the Colony Network itself. There will be permissioned functions on the Network Contract to allow fundamental parameters of the network to be set, which can only be called by the \rc.
 
 In order for these permissioned functions to be called by the \rc, a vote must be taken where all CLNY holders and reputation holders are allowed to vote (see also Section \ref{sec:arbitrary-transaction}).
 
-Management of the Colony network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for coding these updates, but the updates are only able to be deployed to the Colony Network with their assent. They are therefore responsible for at least doing due diligence to avoid introducing a security hole or other undesirable behaviour to the network. It is anticipated that actual development work would take place within the \rc\ itself as a series of tasks.
+Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for coding these updates, but the updates are only able to be deployed to the Colony Network with their assent. They are therefore responsible for at least doing due diligence to avoid introducing a security hole or other undesirable behaviour to the network. It is anticipated that actual development work would take place within the \rc\ itself as a series of tasks.
 
-
-\subsection{Role of the \rc}
-Once the \rc\ and associated token are deployed, the CLNY token becomes the token of the \rc, with the old crowdsale contract only entitling holders to (irreversibly) burn their tokens for \rc\ tokens. Like any other colony, the \rc\ has both tokens and reputation and its decision making is affected by both.
+Once the \rc\ and associated token are deployed, the CLNY token becomes the token of the \rc. Like any other colony, the \rc\ has both tokens and reputation and its decision making is affected by both.
 
 As a colony, the \rc\ is responsible for the development of the Colony Network i.e. the family of smart contracts that underpin the governance of and interaction between all colonies. In return, the \rc\ is the beneficiary of the network fee (see Section \ref{sec:networkrevenue}).
 
 Reputation in the \rc\ can be earned by earning CLNY tokens on tasks and administrative duties just as in any other colony (see Section \ref{sec:earning-losing-rep}). Reputation in the \rc\ can also be earned by participating in the reputation mining process (defined in Section \ref{subsec:mining-costs-and-rewards}), which is unique to the \rc.
 
 \subsection{Handing off decision-making power to the \rc}\label{subsec:ceding-control-to-rc}
-CLNY holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by holders of a multisig key, owned by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will be released to the \rc, and the token holders within it.
+\rct\ holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by holders of a multisig key, owned by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will be released to the \rc, and the token holders within it.
 
 \subsubsection*{Stage 1: Foundation Multisig in control}
 Initially, the Network Contract's functions for making these changes will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
@@ -37,16 +35,3 @@ The next stage will be a second intermediate contract which will operate very si
 \subsubsection*{Stage 4: \rc\ fully in charge of the network}
 Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Root Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
 
-\subsection{Contract security and escape hatches}\label{sec:escape-hatches}
-While we can hope to make a system of contracts with no bugs in them, we intend to adopt a `defensive programming' mentality to try and limit the impact from any issues that manage to manifest themselves in the deployed contracts.
-
-At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions in the \ascode{StorageContract} to allow setting of variables, as well as the upgrade function. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in quick succession enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
-
-In general, the contract may enter `recovery mode' due to:
-\begin{itemize}
- \item A transaction from a whitelisted address signalling that the contract should enter recovery mode.
- \item Something that should always be true of the colony not being true --- for example, after a task payout checking that the amount of funds promised to tasks and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
- \item A qualitative trigger suggesting something amiss --- perhaps too many tokens have been paid out in a short amount of time.
-\end{itemize}
-
-The Colony Foundation can be added as one of these whitelisted addresses as a `trusted party'.
