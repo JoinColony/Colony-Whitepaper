@@ -335,16 +335,16 @@ Suppose that the reputation earned in the \rc\ every hour due to all activity (m
  R_{tot} \left( 1 - e^{-k} \right) = h
 \end{equation}
 \noindent where $k$ is the decay constant used in each update period (see Appendix \ref{appendix:rep-decay}) and $R_{tot}$ is the total reputation in the \rc.\\
-The hourly mining reward $m$ in this situation would be given by
+The hourly mining reward $M$ in this situation would be given by
 \begin{equation}\label{eq:mining-reward}
- m = \frac{h}{4} = \frac{R_{tot} \left( 1 - e^{-k} \right)}{4}.
+ M = \frac{h}{4} = \frac{R_{tot} \left( 1 - e^{-k} \right)}{4}.
 \end{equation}
 
 The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.
 
 Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that submission is recorded, and the rewards of all miners having submitted the same hash is calculated based on their relative weighting. The weight for the $n^{th}$ miner on the list of submitters is given by
 \begin{equation}\label{eq:miner-weighting}
- W_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n-1}{N} \right)
+ w_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
 where $t$ is a number of blocks that the miner has staked their tokens for, $T$ and $N$ are normalising constants: $T$ and is set to number of blocks representing 3 months, and $N$ is set to twice the length of the list of submitters - in our case $N=20$.
 
@@ -352,22 +352,23 @@ The first factor in equation \eqref{eq:miner-weighting} encourages users to stak
 
 The second factor in equation \eqref{eq:miner-weighting} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal.
 
-%next step: actual rewards payout formula.
-------------------------------------\\
-previous notes follow.
-
-\begin{equation}\label{eq:stakerweight}
-\left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
+The actual reward earned by each miner on the list is then given by
+\begin{equation}\label{eq:miner-payout}
+ m_n = \frac{M W_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{10} w_n
 \end{equation}
 
-where $B$ is the total number of tokens they have staked, $n$ is their position in the list, $S$ and $T$ are normalising constants, and $t$ is the number of blocks they have staked their tokens for. 
-
-The first factor in equation \eqref{eq:stakerweight} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. We expect $T$ to represent around a month.
-
-The second factor in equation \eqref{eq:stakerweight} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal. This factor also means that users are not incentivised to split up their holdings, as some of the split up tokens will have lower weightings. $S$ should be a number on the order of the number of people that are staking in each round to ensure the discrepancy between the rewards for being first and last are not huge; it should be under the control of the \rc.
-
-The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
-
+% \begin{equation}\label{eq:stakerweight}
+% \left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
+% \end{equation}
+% 
+% where $B$ is the total number of tokens they have staked, $n$ is their position in the list, $S$ and $T$ are normalising constants, and $t$ is the number of blocks they have staked their tokens for. 
+% 
+% The first factor in equation \eqref{eq:stakerweight} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. We expect $T$ to represent around a month.
+% 
+% The second factor in equation \eqref{eq:stakerweight} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal. This factor also means that users are not incentivised to split up their holdings, as some of the split up tokens will have lower weightings. $S$ should be a number on the order of the number of people that are staking in each round to ensure the discrepancy between the rewards for being first and last are not huge; it should be under the control of the \rc.
+% 
+% The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
+% 
 
 
 
