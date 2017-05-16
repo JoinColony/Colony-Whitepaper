@@ -8,22 +8,9 @@ A colony is in control of changing the supply of its own tokens. More specifical
 When a colony is created, the \ascode{TokenSupplyCeiling} and the \ascode{TokenIssuanceRate} are set. The former is the total number of colony tokens that will be created and the latter is the rate at which they become available to the colony-wide domain to assign to tasks or subdomains. The number of tokens available to the colony-wide domain can be updated at any time by a transaction from any user. 
 
 \subsubsection{Increasing the TokenSupplyCeiling}
-To increase the \ascode{TokenSupplyCeiling}, there must be a large majority of current token holders in favour. Especially if the tokens have a financial value, it is crucial that new tokens cannot be generated without widespread consensus. We therefore believe such decisions should be made by a token-weighted vote with high quorum and majority requirements.
+To increase the \ascode{TokenSupplyCeiling}, there must be a large majority of current token holders in favour. Especially if the tokens have a financial value, it is crucial that new tokens cannot be generated without widespread consensus. We therefore believe such decisions should be made by a token-weighted vote with high quorum and majority requirements. %or possibly even a hybrid vote. 
 
 %FIXME - the statement at sec:colony-token-management contradicts the one here ^^ no?
-%
-%
-%or possibly even a hybrid vote. How the latter option might work is described below:\\
-
-%In order to increase the \ascode{TotalTokenSupply} and thereby allow for new tokens to be generated, the following events must occur
-%\begin{itemize}
-% \item A proposal is made to increase the value of \ascode{TotalTokenSupply}
-% \item The proposal is backed by 10\% of all colony reputation
-% \item A colony wide vote of tokens and reputation is held
-% \item A majority of reputation voted in favour of the increase
-% \item A two-thirds supermajority of tokens voted in favour
-% \item Over 30\% of tokens participated in the vote.
-%\end{itemize}
 
 \subsubsection{Changing the TokenIssuanceRate}
 The \ascode{TokenSupplyCeiling} represents the tokens that the token holders have granted to the colony in order to conduct business: to fund tasks and domains, and to hire workers and contributors. This is especially important during the early life of a colony en it has little-to-no revenue in other tokens to fall back on.

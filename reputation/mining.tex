@@ -52,7 +52,7 @@ Note also that the array of \ascode{l}'s and \ascode{r}'s nothing more than a bi
 
 \subsection{The Reputation Tree and the ReputationRootHash}\label{sec:reptree}
 The data leaves in the reputation tree are the reputations all users have in all skills, as well as the colony-wide totals. Such a leaf consists of the following data:
-$$
+\[
 R = 
 \begin{cases}
  \ascode{rep\_id} & \textnormal{the id of a skill or domain identifying the type of reputation},\\
@@ -60,7 +60,7 @@ R =
  \ascode{user} & \textnormal{the address holding the skill},\\
  \ascode{amount} & \textnormal{the numerical value of the reputation}.
 \end{cases}
-$$
+\]
 
 All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a Merkle tree of all individual reputations in a colony, as well as the total reputation of each type held by the users in each colony. The leaves that represent these colony-wide totals are indicated by setting \ascode{user} to zero. These leaves are then put into a Merkle tree in the usual way (described in Section \ref{sec:merkle-summary}).\footnote{The ordering of the data leaves is only determined by when these reputations were first earned.} We term the root hash of the resulting tree the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{figure}
@@ -126,7 +126,7 @@ The final \ascode{ReputationRootHash} is submitted to the contract by the miner 
 \subsubsection*{Who can submit a new root hash?}
 CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} \rcth\ to submit the hash to the contract.
 
-It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is below the \ascode{target}. At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks.
+It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if \ascode{SHA3(address, N, hash)} is below the \ascode{target}. At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 10.
 
 The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}). 
 %
@@ -247,9 +247,7 @@ When either party submits valid Merkle proofs, showing that the before and after
 
 In the event of more than two submissions for the new $\mathcal{RH}_n$, this process is conducted in parallel between multiple pairs of submitted hashes, and then repeated, until only one submission remains.
 
-If less than an hour elapses from submissions opening to only one submission remaining, the next submission window only opens when a hour has passed from the start of this window. If more than an hour has passed, the next submission window opens immediately.
-
-
+If less than an hour elapses from submissions opening to only one submission remaining, the next submission window only opens when an hour has passed from the start of this window. If more than an hour has passed, the next submission window opens immediately.
 
 \subsection{Calculating Reputation Updates}\label{sec:calculating-reputation-updates}
 %
@@ -277,10 +275,6 @@ When a user earns reputation in a new skill, at least one new leaf is added to t
  \item Both submissions added a new leaf to the tree. If there was a discrepancy, then it is in the maths conducted on this leaf, not the addition of the leaf itself. The maths can be checked on-chain to establish which result is correct.
  \item One submission adds the new reputation to an existing leaf (the correctness of which can be checked on-chain easily). In this case, the user who added the leaf incorrectly is wrong.
 \end{itemize}
-
-
-
-
 
 \subsubsection{Transfers of reputation between accounts}\label{sec:reptransfer}
 
@@ -325,10 +319,9 @@ In order to be involved in the reputation mining process, \rcths\ must stake the
 
 If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash. The system allows for a maximum of 10 miners to be added to the list in each round.
 
-If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain root colony tokens and reputation. 
+If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain \rcts\ and reputation. 
 
 The total amount of reputation earned by miners is not fixed, but varies along with activity in the \rc. The system tries to ensure that over time, 25\% of \rc\ reputation comes from mining. %In times of growing activity, more reputation will go to tasks and in times of declining activity more reputation will go to the miners.
-%The total amount of reputation earned is controlled by the amount of reputation that exists in the colony, and tries to ensure that 25\% of the reputation in a colony comes from mining. If normal activity in a colony generates $A$ reputation per hour, the total reputation that exists $R$ is given by 
 
 Suppose that the reputation earned in the \rc\ every hour due to all activity (mining included) is constant at $h$, then eventually the colony will reach a steady state in which the decay of reputation is balanced out precisely by the newly earned reputation and
 \begin{equation}
@@ -369,14 +362,3 @@ The actual reward earned by each miner on the list is then given by
 % 
 % The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
 % 
-
-
-
-
-%Notes:\\
-%-token holders must stake in order to be miners\\
-%-reputational reward comes from tokens earned just like task payout
-%-how much rep exactly you get (similar to 5 star rating for work) determined by how long you lock your tokens. Short term = 3 stars, long term 5 stars.\\
-%-how many tokens are paid out to miners must vary as the price of the token changes. Idea: make it scale with the total paid out in other domains of root colony. If feasible, use one month rolling average. Prevent miners overpowering rest of root colony with too much reputation.
-%- $k$ should be multiplied by the number of hours since the last update to accommodate for attack
-%- Merkle proof of current $R$ should be submitted with hash, otherwise not accessible on-chain?

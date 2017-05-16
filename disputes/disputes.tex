@@ -32,8 +32,7 @@ For example, suppose that the objection concerns a task in the domain `developme
 
 The highest domain any decision can be escalated to is the entire colony.
 
-
-Whenever an escalation occurs, we need to ensure that the reputation we are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the reputations (for skills and domains) when they are created, which includes pointers to at least the direct parent.\footnote{Each reputation type contains pointers to its parent \ascode{parent\_id} and its ``$n^{th}$ parent'' \ascode{parent\_n\_id} for all $n$ that are powers of $2$.} When a user creates an objection, instead of directly specifying the skill or domain they are escalating to, they provide the steps needed to get there from the skill or domain associated with the variable that is to be changed. This ensures that the skill or domain they escalate to are direct parents of those associated with the variable.
+Whenever an escalation occurs, we need to ensure that the reputation we are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the reputations (for skills and domains) when they are created, which includes pointers to at least the direct parent.\footnote{Each reputation type contains pointers to its parent \ascode{parent\_id} and its ``$n^{th}$ parent'' \ascode{parent\_n\_id} for all $n$ that are powers of $2$. See also Section \ref{subsec:on-chain-representation-of-skills}} When a user creates an objection, instead of directly specifying the skill or domain they are escalating to, they provide the steps needed to get there from the skill or domain associated with the variable that is to be changed. This ensures that the skill or domain they escalate to are direct parents of those associated with the variable.
 
 \subsection{Costs and Rewards}\label{sec:costs-of-disputes}
 \subsubsection{Cost of raising an objection}
@@ -46,9 +45,6 @@ However, if there are users who oppose the suggested `change', they may add thei
 
 If the `change' side does not garner enough support in three days, the objection fails and is rejected.
 If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs. 
-
-
-%As staking occurs, metadata is saved to the blockchain along with each stake, to allow a gas-efficient method of inspecting a specific reputation transfer (required in the event of there being a dispute in the reputation state). There is a rough implementation in Python for those who wish to see how exactly it happens, but broadly speaking by keeping running totals for both sides staking as stakes are made and noting any partial matches that get made (e.g. first person stakes 100 on one side, the next person stakes 50 on the other, the first person has their stake partially unmatched), this allows for an arbitrary transfer to able to be referenced by index and not have to compute all previous transfers at that time (essentially, some of the calculation is done when the stake is made).  The number of reputation updates that need to be made (excluding the children and parent reputations) in such a situation will be equal to twice the number of stakers; some updates are `null' updates with no transfer to ensure this figure is always correct.
 
 \subsubsection{Voting on Disputes}
 If both sides stake the required number of tokens and reputation within their three days time limit, then the proposal goes to a vote.
@@ -77,17 +73,17 @@ At the conclusion of the poll, losing stakers receive 0-90\% of their staked tok
 
 At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side's vote weight ($w$) reaches a landslide threshold ($L$) of the total vote weight, then they receive 0\% of their staked tokens back. $L$ varies based on the fraction of total reputation in the colony that voted ($R$):
 
-\[
-L = 1 - \frac{R}{3}
-\]
+\begin{equation}
+L = 1 - \frac{R}{3}    
+\end{equation}
 
 So for a small vote with little reputation in the colony being allowed to vote, the decision has to be close to unanimous for the losing side to be punished harshly. For a vote of the whole colony, the landslide threshold $L$ reduces to 67\% of the votes - i.e. the reputation of the colony overall was split 2-to-1 on the decision.
 
 Between these extremes of a landslide loss and a very slim loss, the loss of tokens and reputation suffered by the losing side ($\Delta$) varies linearly:
 
-\[
- \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace
-\]
+\begin{equation}
+ \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace    
+\end{equation}
 
 \subsubsection*{What happens to the tokens lost?}
 Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).

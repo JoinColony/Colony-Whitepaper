@@ -3,25 +3,10 @@
 
 Within Colony, reputation is a number tied to an account. Reputation quantifies the contribution that user has made to the colony in recent history. Reputation will primarily be used for two things within a colony --- weighing votes of users, and determining rewards that should be allocated to users. The more reputation a user has, the more weight their vote has when making a decision. More reputation also means they receive a larger payout when rewards are issued (see Section \ref{sec:claimrewards}). We believe that because reputation is awarded to users by either direct or indirect peer approval of their actions, the consequences of this will be that influence and rewards in a colony will be assigned in meritocratic way.
 
-\textbf{The Colony Governance System aims to be broadly meritocratic. For this reason, the majority of day-to-day decisions in a colony are weighted by the relevant reputation.} %Thus for example. any dispute in the development team will be resolved by a vote weighted by development reputation.
+\textbf{The Colony Governance System aims to be broadly meritocratic. For this reason, the majority of day-to-day decisions in a colony are weighted by the relevant reputation.}
 
-Unlike tokens, reputation cannot be transferred between accounts, and it cannot be bought or sold; it represents an appraisal of the account holder's activities by their peers. Reputation must therefore be earned by direct action within the colony. This reputation that is earned will eventually be lost through inaction, bad behaviour or being deemed to be wrong; an description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}. 
+Unlike tokens, reputation cannot be transferred between accounts, and it cannot be bought or sold; it represents an appraisal of the account holder's activities by their peers. Reputation must therefore be earned by direct action within the colony. This reputation that is earned will eventually be lost through inaction, bad behaviour or being deemed to be wrong; an description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 
-% Reputations held in one colony have no bearing on reputations held by the same account in another colony.
-
-% Since it is not a tradable asset, reputation must be \emph{earned}. The primary method of earning reputation is by completing tasks in a colony and earning the colony's tokens. As soon as you successfully complete your first task in a colony and claim a reward of the colony's tokens, you also earn \emph{reputation} in that colony. The amount of reputation earned will be based on a combination of the performance of the user completing the task, and the payout associated with the task itself. Aside from tasks, there are administrative and managerial duties that allow users to earn reputation as well. (Section \ref{sec:earning-rep}).
-
-% Any reputation earned is earned in a \emph{context}. The Colony Network tracks the domain in which reputation was earned and the skills associated with the action that earned it. As an example, reputation earned for the completion of a task in the `development' domain, tagged with the `solidity-dev' skill tag will be recorded as colony reputation as well as development reputation and solidity-dev reputation. (See Sections \ref{sec:rep-by-domain} and \ref{sec:rep-by-skill} for details).
-
-% Reputation can also be lost. Any account engaged in bad behaviour will lose reputation as punishment. Furthermore \textbf{all reputation decays with time}. %Reputation has a half life of 3 months\footnote{The exact decay rate may change before release.}. 
-% In order to maintain a high reputation score, an account must continue to contribute to the colony. (Section \ref{sec:losing-rep}).\\
-
-
-
-%
-
-%
-%
 \subsubsection{Reputation by Domain}\label{sec:rep-by-domain}
 The organisational hierarchy of a colony provided by domains was described in Section \ref{sec:domains}. Reputation is earned in this hierarchy, and a user has a reputation in all domains that exist --- even if that reputation is zero. When a user earns or loses reputation in a domain, the reputation in all parent domains changes by the same amount. In the case of a user losing reputation, they also lose reputation in all child domains. Quantitatively, all child domains lose the same fraction of reputation that the user lost in the domain the reputation loss is notionally in. If ever a user would lose reputation and go below zero reputation, the relevant reputation becomes zero.
 
@@ -38,7 +23,7 @@ This global hierarchy of skills is available for all colonies to use. When a tas
 Even though the skill hierarchy is universal, reputation earned in the skill hierarchy is unique to each colony. Earning reputation in a skill in one colony has no effect on the user's reputation in that skill in any other colonies.
 
 \subsubsection{Reputation by Colony}\label{sec:rep-by-colony}
-A user's reputation in a colony is the sum of their reputation in the top-level skill and the top-level domain. This is the reputation they will be voting with in any decisions that require input from everyone in the colony. Reputation in a colony has no effect outside the colony.
+A user's total reputation in a colony is the sum of their reputation in the top-level skill and the top-level domain. This is the reputation they will be voting with in any decisions that require input from everyone in the colony. Reputation in a colony has no effect outside the colony. In particular, reputations held in one colony have no bearing on reputations held by the same account in another colony
 
 \subsection{Earning and losing reputation}\label{sec:earning-losing-rep}
 There are three ways to earn reputation in a colony. The first is being involved with a successfully completed task and the second is through the dispute process. In both of these cases, the user has been a productive member of the colony and is rewarded accordingly. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process (see Section \ref{sec:bootstrapping-rep}).
@@ -79,7 +64,7 @@ If a dispute occurs, causing a vote among some portion of the colony, each side 
 \subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 Since a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
-To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them to allow the colony to bootstrap itself. There will be a global limit on the reputation that can be assigned in this manner in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. \textbf{This is the only time that reputation can be created without associated work being done.} Users receiving the reputation are presumably the colony creator or their acquaintances, and this starting reputation should be seen as a representation of the existing trust the creator has for their colleagues. 
+To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them to allow the colony to bootstrap itself. There will be a global limit on the reputation that can be assigned in this manner equivalent to five times the volume of tokens distributed. This limit exists in order to prevent an extreme reputation aristocracy. Given that reputation decays over time, this initial bootstrapping of reputation will not have an impact on the long-term operation of the colony. \textbf{This is the only time that reputation can be created without associated work being done.} Users receiving the reputation are presumably the colony creator or their acquaintances, and this starting reputation should be seen as a representation of the existing trust the creator has for their colleagues. 
 
 We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation new reputation here, as this would devalue reputation already earned elsewhere in the colony. Happily, we can proceed without any new reputation. The colony is still able to make decisions and resolve disputes, because any objections can be escalated to a parent domain where reputation does exist, if necessary. Furthermore, even this escalation is not necessarily required in the event of a disagreement, because, even if there is no reputation in the \emph{domain} to contribute to the decision, users will still be able to vote based on their reputation in relevant \emph{skills}.
 
