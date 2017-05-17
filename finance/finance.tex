@@ -83,7 +83,7 @@ When a user backs a proposal, both the user and their reputation at the time are
 We emphasised that a user could back a proposal with their reputation at the time of backing because the reputation backing a proposal will not change when that user's reputation does so. If by a quirk in this sytem, the reputation recorded as backing a funding proposal ends up higher than 100\% of the total of that reputation in the colony, then the funding occurs no quicker than it would at 100\%.
 
 \subsubsection*{Completing an RFP}
-If an update finds that a proposal is funded (i.e. \ascode{TotalPaid = TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
+If an update finds that a proposal is funded (i.e. \ascode{TotalPaid} = \ascode{TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
 \begin{itemize}
  \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated% (and is recorded as \ascode{LastUpdated})
  \item[\textbf{2.}] \ascode{TotalPaid} is set to \ascode{TotalRequested}
