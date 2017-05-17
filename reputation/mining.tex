@@ -294,6 +294,10 @@ If there are more than two submissions for the new \ascode{ReputationRootHash}, 
 
 If less than an hour elapses from submissions opening to only one submission remaining, the next submission window only opens when an hour has passed from the start of this window. If more than an hour has passed, the next submission window opens immediately.
 
+\subsubsection*{Gas-cost Considerations and Alternative Implementations}
+There is a tradeoff between the number of transactions needed until the first discrepancy between two submissions is found and the size of the storage required by the contract. As written above, the contract stores only the last hashes of the Merkle proof, thereby reducing the range of possible values of $i$ by a factor of two at each step. If the contract stores more of the submitted hashes that constitute the Merkle proofs, the range can be reduced faster and fewer challenges will be required. Ultimately it will be a gas-cost analysis that determines the exact algorithm to use.\\
+We also note at this point that a malicious submission, performing the attack described in section \ref{sec:mining-possible-attacks}, can carefully craft their false justification trees to require the maximum number of challenges to resolve. Such a worst-case submission can not be made in the alternative implementation in which the full Merkle proofs are stored (and compared) on-chain, and in which challenges are issued for an index $j$ picked pseudorandomly from within the range of possible values.
+
 \subsection{Calculating reputation updates}\label{sec:calculating-reputation-updates}
 %
 \subsubsection{Keeping track of reputation changes}
