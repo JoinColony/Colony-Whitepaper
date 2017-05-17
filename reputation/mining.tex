@@ -251,7 +251,7 @@ The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k
 The contract begins its search by %pseudorandomly%\footnote{This pseudorandomness is to help mitigate an attack described in Section \ref{sec:mining-possible-attacks}.}
 %picking an index $j$ from within the range the first discrepancy in known to lie in. It then 
 %
-picking an index $j$ from within the range the first discrepancy in known to lie in (say always the smallest), and requiring both parties to provide a Merkle proof showing how the $j^{th}$ reputation update from all updates to be applied this cycle (Appendix \ref{appendix:rep-transfer}) was included in their justification tree. The required target of this proof is no longer the $\jrh$ itself, but rather the retained value for $h_{0,2^k}$ or $\overline{h_{0,2^k}}$. Specifically this proof consists of
+picking an index $j$ from within the range the first discrepancy in known to lie in (say always the smallest), and requiring both parties to provide a Merkle proof showing how the $j^{th}$ reputation update from all updates to be applied this cycle (Appendix \ref{subsec:reputation-update-log}) was included in their justification tree. The required target of this proof is no longer the $\jrh$ itself, but rather the retained value for $h_{0,2^k}$ or $\overline{h_{0,2^k}}$. Specifically this proof consists of
 
 \begin{itemize}
  \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{j}$).
