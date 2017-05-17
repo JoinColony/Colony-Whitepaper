@@ -319,37 +319,42 @@ In order to be involved in the reputation mining process, \rcths\ must stake the
 
 If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash. The system allows for a maximum of 10 miners to be added to the list in each round.
 
-If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is found to be correct, however, the users who submitted it gain \rcts\ and reputation. 
+If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is deemed correct, however, the miner who submitted it gain \rcts\ and reputation. 
 
-The total amount of reputation earned by miners is not fixed, but varies along with activity in the \rc. The system tries to ensure that over time, 25\% of \rc\ reputation comes from mining. %In times of growing activity, more reputation will go to tasks and in times of declining activity more reputation will go to the miners.
+The total amount of reputation earned by miners is not fixed, but varies along with activity in the \rc. The system tries to ensure that on average, 25\% of \rc\ reputation comes from mining. %In times of growing activity, more reputation will go to tasks and in times of declining activity more reputation will go to the miners.
 
 Suppose that the reputation earned in the \rc\ every hour due to all activity (mining included) is constant at $h$, then eventually the colony will reach a steady state in which the decay of reputation is balanced out precisely by the newly earned reputation and
 \begin{equation}
  R_{tot} \left( 1 - e^{-k} \right) = h
 \end{equation}
 \noindent where $k$ is the decay constant used in each update period (see Appendix \ref{appendix:rep-decay}) and $R_{tot}$ is the total reputation in the \rc.\\
-The hourly mining reward $M$ in this situation would be given by
+If one quarter of all reputation is to come from mining, then the hourly mining reward $M$ in this situation should be given by
 \begin{equation}\label{eq:mining-reward}
  M = \frac{h}{4} = \frac{R_{tot} \left( 1 - e^{-k} \right)}{4}.
 \end{equation}
 
 The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.\\
 
-Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that submission is recorded, and the rewards of all miners having submitted the same hash is calculated based on their relative weighting. The weight for the $n^{th}$ miner on the list of submitters is given by
+Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. The reward is calculated when a submission is received. Specifically, when a miner makes their submission, two things happen:
+\begin{itemize}
+ \item[(i)] the weighting for that submission is calculated and recorded,
+ \item[(ii)] the rewards of all miners having submitted the same hash is (re-)calculated based on their relative weighting.
+\end{itemize}
+\noindent The details of these calculations are:\\
+
+\noindent (i) The weight for the $n^{th}$ miner on the list of submitters is given by
 \begin{equation}\label{eq:miner-weighting}
  w_n = \left(1 - e^{\frac{t}{T}}\right) \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
 where $t$ is a number of blocks that the miner has staked their tokens for, $T$ and $N$ are normalising constants: $T$ and is set to number of blocks representing 3 months, and $N$ is set to twice the length of the list of submitters - in our case $N=20$.
 
-The first factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. 
+The first factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor apporaches 1 as the locking time approaches infinity. The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.\\
 
-The second factor in equation \eqref{eq:miner-weighting} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal.
-
-The actual reward earned by each miner on the list is then given by
+\noindent (ii) The reward earned by each miner on the list is then given by
 \begin{equation}\label{eq:miner-payout}
- m_n = \frac{M W_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{10} w_n
+ m_n = M \frac{w_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{10} w_n.
 \end{equation}
-
+Therefore the mining reward $M$ is devided among the miners exactly according to their relative weighting. 
 % \begin{equation}\label{eq:stakerweight}
 % \left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
 % \end{equation}
