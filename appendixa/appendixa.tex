@@ -1,13 +1,26 @@
 \clearpage
 \section{Gas-efficient reputation penalty in dispute resolution}\label{appendix:rep-transfer}
 
-Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. All of the reputation changes for each user who was involved in the dispute are only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
+Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. A dispute may affect the reputations of many users, but all of these reputation changes are represented by only a single entry in the `reputation update log', so it is necessary to expand upon the process used to resolve this.
 
-Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. We must therefore not have any (on-chain) loops in this implementation.
+Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. Gas limits dictate that we must therefore not have any (on-chain) loops in this implementation.
 
 \subsection{Staking}
 
-Let's consider a situation where three users initiate an objection, and two users oppose it with matching funds. In the dispute, the initiating users were found to have been wrong and so will lose their stake.
+Let's consider a situation where an objection requires 600 tokens (and appropriate reputation) to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens respectively.  
+
+\begin{table}[h]
+\centering
+\caption{}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Stake \# & User  & Staked Amount & $\Sigma^+$ \\ \hline
+1 & A & 100           & 100                                                                                          \\ \hline
+2 & B & 200           & 300                                                                                           \\ \hline
+3 & C & 300           & 600                                                                                           \\ \hline
+\end{tabular}
+\end{table}
+Once the cumulative backing (by $\Sigma^+$) reaches the threshold (600) required the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively\footnote{We write negative numbers in the table to denote \emph{opposing} stake.}. Once the cumulative backing on the keep side ($\Sigma^-$} reaches the required threshold (-600) a dispute is triggered.
 
 \begin{table}[h]
 \centering
@@ -22,6 +35,9 @@ Stake \# & User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
 5 & E & -450          & 600                      & -600                                                                    \\ \hline
 \end{tabular}
 \end{table}
+
+We assume that, in the dispute, the initiating users (A,B and C) were found to have been wrong and so will lose their stake.
+
 
 Let's also assume that all users have the appropriate amount reputation to lose. There are four transfers of reputation that must occur here:
 
