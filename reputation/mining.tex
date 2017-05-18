@@ -377,13 +377,12 @@ Suppose that the reputation earned in the \rc\ every hour due to all activity (m
 \begin{equation}
  R_{tot} \left( 1 - e^{-k} \right) = h
 \end{equation}
-\noindent where $k$ is the decay constant used in each update period (see Appendix \ref{appendix:rep-decay}) and $R_{tot}$ is the total reputation in the \rc.\\
-If one quarter of all reputation is to come from mining, then the hourly mining reward $M$ in this situation should be given by
+\noindent where $k$ is the decay constant used in each update period (see Appendix \ref{appendix:rep-decay}) and $R_{tot}$ is the total reputation in the \rc. If one quarter of all reputation is to come from mining, then the hourly mining reward $M$ in this situation should be given by
 \begin{equation}\label{eq:mining-reward}
  M = \frac{h}{4} = \frac{R_{tot} \left( 1 - e^{-k} \right)}{4}.
 \end{equation}
 
-The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.\\
+The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.
 
 Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. The reward is calculated when a submission is received. Specifically, when a miner makes their submission, two things happen:
 \begin{itemize}
