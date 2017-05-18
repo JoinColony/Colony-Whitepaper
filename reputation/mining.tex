@@ -9,10 +9,10 @@ Due to the combined complexity of reputation scores across multiple colonies, do
 The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong.}
 
 
-\subsection{Merkle Trees and Proofs}\label{sec:merkle-summary}
+\subsection{Merkle Trees and Proofs}\label{sec:Merkle-summary}
 This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \cite{MerkleInEthereum}) and proofs to establish some terminology, and can be skipped if already familiar with them.
 
-Consider the tree shown in Figure \ref{fig:merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself. 
+Consider the tree shown in Figure \ref{fig:Merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself. 
 
 The resulting structure is known as a Merkle tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{1, [B,F], [l,l]}. The first argument is the element whose existence is to be proved. The second argument is the list of hashes that the hash of the first element should be hashed with in succession. The last argument is an array of \ascode{l}'s and \ascode{r}'s that indicates whether the hash calculated so far should be hashed on the left or the right of next element in question. So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{3, [D,E], [l,r]}.
 \begin{figure}
@@ -44,7 +44,7 @@ The resulting structure is known as a Merkle tree. In order to prove that the el
    edge[-] (f);
  \end{tikzpicture}
  \caption{A simple Merkle tree. Elements A, B, C and D correspond to the hashes of 1, 2, 3 and 4. E is the hash of A concatenated with B.}
- \label{fig:merkleexample}
+ \label{fig:Merkleexample}
 \end{figure}
 
 Note also that the array of \ascode{l}'s and \ascode{r}'s nothing more than a binary representation of the leaf node's index in the tree. When expressed in this way, we refer to the index as the `path' in the Merkle proof. We refer to the objects that get hashed along the way (i.e. \ascode{D} and \ascode{E}) as the `siblings'.
@@ -62,7 +62,7 @@ R =
 \end{cases}
 \]
 
-All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a Merkle tree of all individual reputations in a colony, as well as the total reputation of each type held by the users in each colony. The leaves that represent these colony-wide totals are indicated by setting \ascode{user} to zero. These leaves are then put into a Merkle tree in the usual way (described in Section \ref{sec:merkle-summary}).\footnote{The ordering of the data leaves is only determined by when these reputations were first earned.} We term the root hash of the resulting tree the \ascode{ReputationRootHash}, $\mathcal{RH}$.
+All individual reputations are assembled into the \textbf{``Reputation Tree''} which is a Merkle tree of all individual reputations in a colony, as well as the total reputation of each type held by the users in each colony. The leaves that represent these colony-wide totals are indicated by setting \ascode{user} to zero. These leaves are then put into a Merkle tree in the usual way (described in Section \ref{sec:Merkle-summary}).\footnote{The ordering of the data leaves is only determined by when these reputations were first earned.} We term the root hash of the resulting tree the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{figure}
 \centering
 \begin{tikzpicture}
@@ -159,7 +159,7 @@ The Merkle root in questions is the \ascode{JustificationRootHash} (\jrh); it is
 
 The left-most leaf of the Justification Tree ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. Both parties must submit a proof that their tree does indeed start at $\mathcal{RH}_0$. Note that in a Merkle proof for a left-most leaf, all siblings are hashed on the right.
 
-The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a merkle proof that their tree does indeed end with this hash. Note that in a merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hased with itself, we can determine the index of the last leaf. This index is required to be $n$ -- the number of reputation updates in the log.
+The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hased with itself, we can determine the index of the last leaf. This index is required to be $n$ -- the number of reputation updates in the log.
 
 The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputations state after the first $i$ reputation updates in this cycle have been applied. 
 
@@ -228,9 +228,9 @@ Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0
 \subsubsection*{2. Searching for the discrepancy}
 The contract requires both parties to submit repeated Merkle proofs that specific reputation updates were handled correctly until the first discrepancy between the two submissions is found. 
 
-We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree. If $h$ does not have an immediate sibling, we define $\overline{h}$ to be equal to $h$ as per our rule of hashing these elements with themselves.
+We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree. Recall that if $h$ does not have an immediate sibling, $\overline{h}$ is taken to be equal to $h$ as per our rule of hashing these elements with themselves.
 
-Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. These proofs have the (simplified) form:
+Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. These proofs have the simplified\footnote{Since we know that the proofs concern the first and last leaf of the tree, no array of left-right information is needed.} form:
 \[
  \overline{\mathcal{RH}_0}^A, \overline{h_{0,1}}^A, \overline{h_{0,2}}^A, \ldots \overline{h_{0,2^k}}^A \qquad \textnormal{ terminating at } \jrh^A 
 \]
@@ -238,9 +238,9 @@ and
 \[
  \overline{\mathcal{RH}_0}^B, \overline{h_{0,1}}^B, \overline{h_{0,2}}^B, \ldots \overline{h_{0,2^k}}^B \qquad \textnormal{ terminating at } \jrh^B 
 \]
-where $k$ is the largest power of 2 smaller than $n$.
+where $k$ is the largest integer such that $2^k$ is smaller than $n$.
 
-When the first miner (say $A$) submits their proof the contract saves the values of $h_{0,2^k}^A$ and $\overline{h_{0,2^k}}^A$. When the second miner submits their proof the contract compares $h_{0,2^k}^A$ to $h_{0,2^k}^B$. If they are not equal, the contract saves both of these values (and forgets $\overline{h_{0,2^k}}^A$), and if, on the other hand, they are equal, the contract retains the values of $\overline{h_{0,2^k}}^A$ and $\overline{h_{0,2^k}}^B$ (forgetting $h_{0,2^k}^A$).
+When the first miner (say $A$) submits their proof the contract saves the values of $h_{0,2^k}^A$ and $\overline{h_{0,2^k}}^A$. When the second miner submits their proof the contract compares $h_{0,2^k}^A$ to $h_{0,2^k}^B$. If they are not equal, the contract saves both of these values (and forgets $\overline{h_{0,2^k}}^A$). If they are equal, the contract retains the values of $\overline{h_{0,2^k}}^A$ and $\overline{h_{0,2^k}}^B$ (forgetting $h_{0,2^k}^A$).
 
 The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k}^B$ then the two justification trees are equal between $\mathcal{RH}_0$ and $\mathcal{RH}_{2^k-1}$ and the first discrepancy must lie in the right-hand subtree whose root is $\overline{h_{0,2^k}}^A$ for miner $A$ and $\overline{h_{0,2^k}}^B$ for miner $B$. If on the other hand $h_{0,2^k}^A \neq h_{0,2^k}^B$, then the first discrepancy must lie in the left-hand subtrees given by $h_{0,2^k}^A$ and $h_{0,2^k}^B$. The situation is summarised by
 \begin{eqnarray*}
@@ -259,7 +259,7 @@ picking an index $j$ from within the range the first discrepancy in known to lie
  \item[(iii)] A Merkle proof showing the inclusion of $h_{j,j+1}$ in the relevant justification sub-tree.
 \end{itemize}
 
-The same process as before of comparing hashes and retaining the roots of either the left-side subtree or the right-side subtree is repeated. With each iteration, the range of possible values for the index of the first discrepancy is reduced by a factor of two and the length of the required Merkle proofs is reduced by one.
+The same process as before of comparing hashes and retaining the roots of either the left-side subtree or the right-side subtree is repeated. With each iteration, the range of possible values for the index of the first discrepancy is reduced by (on average) a factor of two and the length of the required Merkle proofs is reduced by one.
 
 % and requires both parties to provide:
 % \begin{itemize}
@@ -284,7 +284,7 @@ Once the contract has found the index $i$ such that $\mathcal{RH}^A_{i}=\mathcal
 \begin{itemize}
  \item[(iv)] A Merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update transaction.
 \end{itemize}
-The Merkle proof that proves the inclusion of $R_j$ (before the reputation update) in the root $\mathcal{RH}_{i}$ and the Merkle proof of the inclusion of $R_j$ (after the reputation update) in the root $\mathcal{RH}_{i+1}$ must only differ in the state of $R_j$ itself. This is because the trees with roots $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ differ in only a single leaf (that of $R_j$). 
+The Merkle proof that proves the inclusion of $R_j$ (before the reputation update) in the reputation root hash $\mathcal{RH}_{i}$ and the Merkle proof of the inclusion of $R_j$ (after the reputation update) in $\mathcal{RH}_{i+1}$ must only differ in the state of the reputation $R_j$ itself. This is because the reputation trees with roots $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ differ in only a single leaf (that of $R_j$). 
 
 When either party submits valid Merkle proofs, showing that the before and after state they claim to be correct is included in the $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ in their justification tree, the reputation update is also calculated on-chain to determine whether the submitting party has done their calculation correctly. If the calculation was not done correctly, the submission is identified as false.
 

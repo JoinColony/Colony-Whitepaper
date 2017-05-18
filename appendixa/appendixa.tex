@@ -1,7 +1,7 @@
 \clearpage
 \section{Gas-efficient reputation penalty in dispute resolution}\label{appendix:rep-transfer}
 
-Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. All of the reputation changes that each user who was involved in the dispute is only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
+Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. All of the reputation changes for each user who was involved in the dispute are only represented by a single entry in the `reputation update log', and so it is necessary to expand upon the process used to do this.
 
 Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. We must therefore not have any (on-chain) loops in this implementation.
 
