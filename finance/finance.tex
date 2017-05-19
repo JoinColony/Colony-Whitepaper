@@ -29,7 +29,7 @@ All tokens and currencies are administered by the colony contract; it is respons
  \end{itemize}
 
 \end{description}
-We distinguish between two types of funding proposals; one intended for normal use (Regular Funding Proposals, BFP) , and one intended to be used when atypical circumstances present themselves (Priority Funding Proposals, PFP). The basic funding proposal may start funding the target straight away, whereas a priority funding proposal must be explicitly voted on before it starts directing funds. Furthermore, in a normal funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a priority funding proposal has not such restrictions.\\
+We distinguish between two types of funding proposals; one intended for normal use (Basic Funding Proposals, BFP) , and one intended to be used when atypical circumstances present themselves (Priority Funding Proposals, PFP). The basic funding proposal may start funding the target straight away, whereas a priority funding proposal must be explicitly voted on before it starts directing funds. Furthermore, in a basic funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a priority funding proposal has not such restrictions.\\
 Priority funding proposals should be used: when funds need to be directed somewhere that is not a direct descendant of the source or when the funding rate needs to be very high (fast/immediate payment), or when the funding rate should be otherwise controlled (eg. salary).\\
 
 In either case, the assignment to pots associated with domains or tasks is purely a bookkeeping mechanism; from the perspective of the blockchain, ether and tokens are held by the colony contract until paid out when a task is completed. 
@@ -48,29 +48,22 @@ The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \a
 The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount. 
 
 \subsubsection*{Rate and LastUpdated}
-When a funding proposal is elligible to accrue funds (see Section \ref{subsec:funding-queue}) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- i.e. the user manually requests and update. Upon being pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.\\
-Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occured.
+When a funding proposal is eligible to accrue funds (see Section \ref{subsec:funding-queue}) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal -- i.e. the user manually requests and update. Upon being pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.\\
+Note: \ascode{TotalPaid} in only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occurred.
 
 \subsubsection{The Funding Queue}\label{subsec:funding-queue}
-Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the priority funding proposals, followed by the basic funding proposals. PFPs are ordered by the total reputation in their domain\footnote{The domain of an PFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while basic funding proposals are ordered by `backing'.  The details of this procedure are outlined below.\\
+Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the priority funding proposals, followed by the basic funding proposals. PFPs are ordered by the total reputation in their domain\footnote{The domain of a PFP is the domain that voted on it becoming active - usually this is the last common ancestor of the source and target pot domains.} - while basic funding proposals are ordered by `backing'.  The details of this procedure are outlined below.\\
 
-
-
-%Insert schematic picture here of funding proposals in a queue.\\[2cm]
-
-
-
-
-
-
-
+%
+%
+%
 
 \subsubsection{Regular Funding Proposals}\label{subsubsec:BFPs}
 A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism.
 
 \subsubsection*{Ordering of BFPs}
 Basic funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by `amount of reputation backing the proposal'.\\
-When created, a basic funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of an BFP is the domain of the pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them `staking their reputation', it merely helps the proposal achieve funding.
+When created, a basic funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of a BFP is the domain of the pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them `staking their reputation', it merely helps the proposal achieve funding.
 
 The more reputation backs a proposal, the higher up the queue it is placed. Every transaction that adds backing to a proposal (or otherwise updates the backing level) inserts the proposal in the correct place in the queue. Only the funding proposal at the top of the queue accrues funds.\\
 
@@ -82,7 +75,7 @@ When a user backs a proposal, both the user and their reputation at the time are
 
 We emphasised that a user could back a proposal with their reputation at the time of backing because the reputation backing a proposal will not change when that user's reputation does so. If by a quirk in this sytem, the reputation recorded as backing a funding proposal ends up higher than 100\% of the total of that reputation in the colony, then the funding occurs no quicker than it would at 100\%.
 
-\subsubsection*{Completing an BFP}
+\subsubsection*{Completing a BFP}
 If an update finds that a proposal is funded (i.e. \ascode{TotalPaid} = \ascode{TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
 \begin{itemize}
  \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated% (and is recorded as \ascode{LastUpdated})
@@ -97,7 +90,9 @@ When the BFP enters the \ascode{completed} state, for a period of three days any
 
 %Details: what is the variable that we are changing here?
 
-
+%
+%
+%
 
 \subsubsection{Priority Funding Proposals}
 A priority funding proposal (\textbf{PFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. PFPs begin in the \ascode{inactive} state and can only become \ascode{active} via an explicit vote. The vote is based on reputation in the domain that is the most recent common ancestor of the two pots that money is being transferred between.
@@ -114,7 +109,7 @@ We imagine PFPs may be used to
 
 \subsubsection*{PFPs and the Funding Queue}
 
-Active Priority Funding Proposals take priority over regular proposals and so they are placed at the top of the funding queue. They are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus PFPs that are higher in the domain hierarchy come before those lower down.
+Active Priority Funding Proposals take priority over Basic Funding Proposals and so they are placed at the top of the funding queue. They are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus PFPs that are higher in the domain hierarchy come before those lower down.
 
 Just like with BFPs, any user can `ping' an active PFP at the top of the queue to cause the contract to update the funds available to the recipient pot. \ascode{TotalPaid}, \ascode{LastUpdated} and \ascode{CurrentState} are updated as required.
 
