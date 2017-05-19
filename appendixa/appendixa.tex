@@ -7,19 +7,21 @@ Given that users are able stake small amounts on each objection, an arbitrarily 
 
 \subsection{Staking}
 
-Let's consider a situation where an objection requires 600 tokens (and appropriate reputation) to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens respectively.  
+As noted in section \ref{sec:costs-of-disputes}, an objection requires ``1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.\\
+Let's consider a situation where an objection requires 600 tokens and 1200 reputation points to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens (and 200, 400 and 600 reputation points) respectively.  
 
 \begin{table}[h]
 \centering
 \caption{}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-Stake \# & User  & Staked Amount & $\Sigma^+$ \\ \hline
+Stake \# & User  & Staked Tokens & $\Sigma^+$ \\ \hline
 1 & A & 100           & 100                                                                                          \\ \hline
 2 & B & 200           & 300                                                                                           \\ \hline
 3 & C & 300           & 600                                                                                           \\ \hline
 \end{tabular}
 \end{table}
+(For simplicity, the table doesn't contain entries for reputation. Corresponding stakes of reputation are implied.)\\
 Once the cumulative backing (by $\Sigma^+$) reaches the threshold (600) required the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively\footnote{We write negative numbers in the table to denote \emph{opposing} stake.}. Once the cumulative backing on the keep side ($\Sigma^-$) reaches the required threshold (-600) a dispute is triggered.
 
 \begin{table}[h]
@@ -36,10 +38,9 @@ Stake \# & User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
 \end{tabular}
 \end{table}
 
-We assume that, in the dispute, the initiating users (A,B and C) were found to have been wrong and so will lose their stake.
+We assume that, in the dispute, the initiating users (A,B and C) were found to have been wrong and so will lose some of their stake. To keep this example simple, let us pretend that they lose 50\% of their staked reputation to the opposing side (D and E).
 
-
-Let's also assume that all users have the appropriate amount reputation to lose. There are four transfers of reputation that must occur here:
+We also assume that all users have the appropriate amount reputation to lose (i.e. A, B and C did not lose reputation between the time of backing this proposal and the resolution of the dispute). There are four transfers of reputation that must occur here:
 
 \begin{enumerate}
 \item User A loses 100 reputation to User D
