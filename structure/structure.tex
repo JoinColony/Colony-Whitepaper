@@ -1,25 +1,25 @@
 \section{Structure and Hierarchy within a Colony}\label{sec:colony-structure}
-The purpose of a colony is to facilitate coordination among its members and direct their collective effort towards some goal(s). In light of this, one of the most central functions of a colony is to manage work assignments.
+Colonies exist to enable collaboration between their members, and direct collective efforts towards some common goal(s). Facilitating effective division of labour is therefore, one of the most important capabilities of the Colony protocol.
 
-Work in a colony is divided up into well-defined jobs called `tasks', which can then be organised within a colony into `domains'. In this section, we describe each of these in detail and how we anticipate each to be used.
+Work is divided into discrete `tasks', which can then be organised into `domains'.
 
 \subsection{Tasks}\label{sec:tasks}
 
-The smallest structural unit in a colony is the `task'. A task represents a small unit of work that requires no further subdivision or delegation. A task has three roles associated with it:
+The smallest structural unit in a colony is the `task'. A task represents a unit of work requiring no further subdivision or delegation. A task has three roles associated with it:
 \begin{itemize}
-\item An administrator --- someone responsible for defining the task.
+\item An administrator --- someone responsible for defining, and coordinating the delivery of the task.
 \item A worker --- someone responsible for executing the task.
-\item An evaluator --- someone responsible for checking the work has been completed.
+\item An evaluator --- someone responsible for assessing whether the work has been completed satisfactorily.
 \end{itemize}
 
-These roles are assigned to addresses. While we anticipate that tasks will be mainly be defined such that each of these roles is assigned to an individual, there is nothing preventing these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
+These roles are assigned to addresses. While it is anticipate that roles within tasks will be assigned to individuals, there is nothing preventing these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
 
-The administrator (usually the creator of the task) is responsible for selecting the evaluator and worker (by whatever means they deem appropriate) and setting additional metadata for the task:
+The administrator (usually the creator of the task) is responsible for selecting the evaluator and worker and setting additional metadata for the task:
 
 \begin{itemize}
 \item A due date, represented by a block number.
-\item Payouts for each of the administrator, the worker and the evaluator. We anticipate that the worker will get the bulk of each payout, as they are actually doing the task.
-\item A specification or brief for the task, to be used by the worker to guide the work, and by the evaluator for deciding if the work has been completed.
+\item Bounties for each of the administrator, the worker and the evaluator.
+\item A specification, or brief: to be used by the worker to guide the work, and by the evaluator for assessing the satisfactory completion of the task.
 \end{itemize}
 
 In order to create a task, the administrator must stake some number of Colony Tokens. This (small) stake is used to help discourage spamming of nonsense tasks, and provide a mechanism whereby the administrator can be punished upon bad behaviour. 

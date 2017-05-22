@@ -7,8 +7,9 @@ Given that users are able stake small amounts on each objection, an arbitrarily 
 
 \subsection{Staking}
 
-As noted in section \ref{sec:costs-of-disputes}, an objection requires ``1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.\\
-Let's consider a situation where an objection requires 600 tokens and 1200 reputation points to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens (and 200, 400 and 600 reputation points) respectively.  
+As noted in section \ref{sec:costs-of-disputes}, an objection requires ``1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
+
+Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens (and 200, 400 and 600 reputation points) respectively.  
 
 \begin{table}[h]
 \centering
@@ -21,8 +22,9 @@ Stake \# & User  & Staked Tokens & $\Sigma^+$ \\ \hline
 3 & C & 300           & 600                                                                                           \\ \hline
 \end{tabular}
 \end{table}
-(For simplicity, the table doesn't contain entries for reputation. Corresponding stakes of reputation are implied.)\\
-Once the cumulative backing ($\Sigma^+$) reaches the threshold required (600) the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively\footnote{We write negative numbers in the table to denote \emph{opposing} stake.}. Once the cumulative backing on the keep side ($\Sigma^-$) reaches the required threshold (-600) a dispute is triggered.
+For simplicity, the table does not contain entries for reputation. The corresponding stakes of reputation are implied.
+
+Once the cumulative backing ($\Sigma^+$) reaches the threshold required (600) the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively.\footnote{We write negative numbers in the table to denote \emph{opposing} stake.} Once the cumulative backing on the keep side ($\Sigma^-$) reaches the required threshold (-600) a dispute is triggered.
 
 \begin{table}[h]
 \centering
@@ -61,7 +63,7 @@ When a user stakes and opposes some existing stake that does not yet have a coun
 Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 -150  & 1          & 2        & 50      & 1 & 2 \\ \hline
 -450  & 2          & 3        & 0       &  3 & 4 \\ \hline
-0\tablefootnote{The justification for this line being present is given in section \ref{sec:exactMatching}}  & 0         & 0        & 0 & 5 & 5            \\ \hline
+0\tablefootnote{The justification for this line being present is given in section \ref{sec:exactMatching}.}  & 0         & 0        & 0 & 5 & 5            \\ \hline
 \end{tabular}
 \end{table}
 
@@ -99,7 +101,7 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To \\ \hline
 \end{tabular}
 \end{table}
 
-These dummy insertions occur whenever the remainder is 0 --- i.e. when the new stake has matched only the first unmatched stake (or its remainder) and has done so exactly. This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
+These dummy insertions occur whenever the remainder is 0 --- i.e. when the new stake has exactly matched the first unmatched stakes. This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
 
 \subsection{Generalisation}
 
@@ -135,4 +137,4 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 
 \end{table}
 
-So for example, in table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. (what remains of) the stake from user B.
+So for example, in table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.

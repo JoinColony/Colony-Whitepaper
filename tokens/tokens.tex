@@ -1,37 +1,37 @@
 \section{CLNY Tokens and the Common Colony}\label{sec:clny}
 
 \subsection{Creation of CLNY Tokens}
-CLNY are generated during the Colony crowdsale period. Since the Colony Network will not yet be deployed at that time and thus not able to conduct a token sale internally; we will run the crowdsale using a widely-available crowdsale contract, which will be standalone.
+CLNY are generated during the Colony crowdsale period. Since the Colony Network will not yet be deployed at that time and thus not able to conduct a token sale internally; the crowdsale contract will be standalone.
 
 After the Colony Network Contract is deployed, the first colony created will be the \rc. Tokens in this Colony will be CLNY. 
 
 \subsection{Role of CLNY Holders and the \rc}
-In the case of the fully realised Colony Network, CLNY holders have two primary roles. The first of these is the process we have termed \textbf{Reputation Mining}, which is fully described in Section \ref{sec:reputationmining}.
+CLNY holders have two primary roles. The first is the process termed \textbf{Reputation Mining}, described in Section \ref{sec:reputationmining}.
 
-The second role for CLNY holders is management of the Colony Network itself. There will be permissioned functions on the Network Contract to allow fundamental parameters of the network to be set, which can only be called by the \rc.
+The second is management of the Colony Network itself. There will be permissioned functions on the Network Contract to allow fundamental parameters of the network to be set, which can only be called by the \rc.
 
-In order for these permissioned functions to be called by the \rc, a vote must be taken where all CLNY holders and reputation holders are allowed to vote (see also Section \ref{sec:arbitrary-transaction}).
+For these permissioned functions to be called by the \rc, a vote open to all CLNY and reputation holders must be conducted  (see also Section \ref{sec:arbitrary-transaction}).
 
-Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for coding these updates, but the updates are only able to be deployed to the Colony Network with their assent. They are therefore responsible for at least doing due diligence to avoid introducing a security hole or other undesirable behaviour to the network. It is anticipated that actual development work would take place within the \rc\ itself as a series of tasks.
+Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for the development of these updates, but are required to vote to deploy them. They are therefore responsible for at least ensuring due diligence is done, either by themselves, or by service providers, to avoid introducing security weaknesses or other undesirable behaviour.
 
 Once the \rc\ and associated token are deployed, the CLNY token becomes the token of the \rc. Like any other colony, the \rc\ has both tokens and reputation and its decision making is affected by both.
 
-As a colony, the \rc\ is responsible for the development of the Colony Network i.e. the family of smart contracts that underpin the governance of and interaction between all colonies. In return, the \rc\ is the beneficiary of the network fee (see Section \ref{sec:networkrevenue}).
+In return for the responsibility of the development and maintenance of the Colony Network, the \rc\ is the beneficiary of the network fee (see Section \ref{sec:networkrevenue}).
 
-Reputation in the \rc\ can be earned by earning CLNY tokens on tasks and administrative duties just as in any other colony (see Section \ref{sec:earning-losing-rep}). Reputation in the \rc\ can also be earned by participating in the reputation mining process (defined in Section \ref{subsec:mining-costs-and-rewards}), which is unique to the \rc.
+Reputation in the \rc\ can be acquired by earning CLNY tokens completing tasks, and administrative and evaluative duties just as in any other colony (see Section \ref{sec:earning-losing-rep}). Reputation in the \rc\ can also be earned by participating in the reputation mining process (defined in Section \ref{subsec:mining-costs-and-rewards}), which is unique to the \rc.
 
 \subsection{Handing off decision-making power to the \rc}\label{subsec:ceding-control-to-rc}
-\rct\ holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by holders of a multisig key, owned by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will be released to the \rc, and the token holders within it.
+\rct\ holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by holders of a multisig key, owned by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will cede to the \rc.
 
 \subsubsection*{Stage 1: Foundation Multisig in control}
-Initially, the Network Contract's functions for making these changes will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
+Initially, the Network Contract's functions will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
 
 \subsubsection*{Stage 2: Foundation Mutisig approval required}
-At a later date, an intermediate contract will be set up, which will have these permissions given to it instead. This contract will be set up to allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Root Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc\ will be able to propose changes, but the foundation must sign off on them.
+At a later date, an intermediate contract will be set up, to receive these permissions. This contract will allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Root Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc\ will be able to propose changes, but the foundation must sign off on them.
 
 \subsubsection*{Stage 3: Foundation Multisig retains veto}
-The next stage will be a second intermediate contract which will operate very similarly to the first, but after a timeout --- with no interaction from the Colony Foundation's address --- the change will be able to be forwarded to the Colony Root Contract by anyone. The Colony Foundation's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
+The next stage will be a second intermediate contract operating similarly to the first, but after a timeout --- with no interaction from the Colony Foundation's address --- the change will be able to be forwarded to the Colony Root Contract by anyone. The Colony Foundation's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
 
-\subsubsection*{Stage 4: \rc\ fully in charge of the network}
+\subsubsection*{Stage 4: \rc\ fully controls the network}
 Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Root Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
 

@@ -10,7 +10,7 @@ The Colony Network consists of a collection of contracts on the Ethereum blockch
 
 The \code{ColonyFactory} contract deploys instances of the \code{Colony} contract, alongside associated \code{EternalStorage} and \code{EternalWallet} contracts.
 
-We want to ensure the deployed system can be upgraded in the future as we foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves using new features as they are added to the Network. This motivates the existence of the \code{Eternal} contracts, which can be passed from old to new instances of their associated contracts with no loss of data.
+We want to ensure the future upgradability of the deployed system as we foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves using new features as they are added to the Network. This motivates the existence of the \code{Eternal} contracts, which can be passed from old to new instances of their associated contracts with no loss of data.
 
 \subsection{Contract overviews}
 
@@ -22,11 +22,11 @@ A very simple, static contract that acts only as a pointer to the location of th
 The Colony Network hinges on the Colony Network Contract, which acts as the hub of the network. This contract is primarily responsible for managing the reputation mining process (described in section \ref{sec:reputationmining}), but also for general control of the network --- for example, setting the fees associated with using the network, or deploying a new version of the \code{ColonyFactory}.
 
 \subsubsection {ColonyFactory contract}
-This the contract used to deploy new instances of the \code{Colony} contract. These contracts can either be new colonies, or this contract deployment might be part of the process of upgrading a colony.
+This contract is used to deploy new instances of the \code{Colony} contract. These can either be new colonies, or part of the process of upgrading a colony.
 
 \subsubsection {EternalStorage contract}
 
-When deployed, the  \code{ColonyNetwork} contract has an \code{EternalStorage} contract deployed alongside them. For each of the types \code{uint}, \code{int}, \code{string}, \code{address}, \code{bytes}, \code{boolean}, the \code{EternalStorage} contract has a mapping and two functions:
+When deployed, the  \code{ColonyNetwork} contract has an \code{EternalStorage} contract deployed alongside them. For each of the types \code{uint}, \code{int}, \code{string}, \code{address}, \code{bytes}, and \code{boolean}, the \code{EternalStorage} contract has a mapping and two functions:
 
 \begin{minipage}[c]{0.9\linewidth}
 \begin{lstlisting}[language=JavaScript]
@@ -49,22 +49,22 @@ When deployed, the  \code{ColonyNetwork} contract has an \code{EternalStorage} c
 
 \noindent where \code{TYPE} is one of the six types. The functions to get and set the value in storage have the modifier \code{onlyOwner}; this ensures that values are able to be read and set only by the contract that this \code{EternalStorage} contract belongs to. The associated contract must define its own public getter if it wishes other contracts to have access to a variable. There is also an associated \code{changeOwner} function, only callable by the current owner, to change the owner of the contract. This allows the data contained within the contract to be moved to a new (upgraded) contract when necessary. 
 
-Using \code{EternalStorage} from within a contract is straightforward. If you would have had a string variable called \code{someString}, to set it you use
+Using \code{EternalStorage} from within a contract is straightforward. Given a string variable called \code{someString}, use
 \[
 \code{EternalStorage.setStringValue(sha3("someString"), value)}
 \]
-and to get it you use
+to set it, and
 \[
 \code{EternalStorage.getStringValue(sha3("someString")}
 \]
-If one would have had an array of strings, you can use \code{sha3("someStringArray",x)} as the reference, where \code{x} is the index you are accessing in your pseudo-array.
+to get it. Given an array of strings \code{sha3("someStringArray",x)} is the reference, where \code{x} is the index you are accessing in your pseudo-array.
 
-Contracts that are not intended to be upgraded do not have an \code{EternalStorage} contract deployed alongside them to use. We admit that there is a gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add a gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed. This functionality was previously described on the Colony site in a blog post\cite{UpgradingContracts}. 
+Contracts not intended to be upgraded lack an \code{EternalStorage} contract deployed alongside them. We admit that there is a gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add a gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed. This functionality was detailed in an earlier article on the Colony blog. \cite{UpgradingContracts}. 
 
 \subsubsection{EternalWallet Contract}
 Each colony has an associated \code{EternalWallet} contract. The intention is to have this separate contract handling all tokens on behalf of the colony for the colony's lifetime. The \code{EternalWallet} handles the colony's Ether, CLNY and other tokens whitelisted by the network. 
 
-If someone mistakenly sends tokens to the \code{Colony} contract rather than its \code{EternalWallet}, there will be a function on the \code{Colony} that anyone will be able to call that sends specified ERC20 compatible tokens from the colony's address to the \code{EternalWallet} address. However, if the colony were upgraded in between, and therefore the \code{Colony} contract moved to a new address, those tokens would be forever lost. These tokens would not have been able to be assigned to any task, however, and so the colony would not have any (on-chain) obligations it would be unable to pay --- it would have `only' lost tokens that it was sent incorrectly. This is an unavoidable risk with the \code{EternalWallet} approach, the benefits of which hinge around the upgrade process.
+If someone mistakenly sends tokens to the \code{Colony} contract rather than its \code{EternalWallet}, there will be a function on the \code{Colony} callable by anyone, that sends specified ERC20 compatible tokens from the colony's address to the \code{EternalWallet} address. However, if the colony were upgraded in between, and therefore the \code{Colony} contract moved to a new address, those tokens would be irrevocably lost. These tokens would not have been able to be assigned to any task, however, and so the colony would not have any (on-chain) obligations it would be unable to pay --- it would have `only' lost tokens that it was sent incorrectly. This is an unavoidable risk with the \code{EternalWallet} approach, the benefits of which hinge around the upgrade process.
 
 \subsection{The upgrade process}
 
@@ -84,7 +84,7 @@ We stress that in the case of a colony, the choice of upgrading the underlying \
 
 
 \subsection{Contract security and escape hatches}\label{sec:escape-hatches}
-While we can hope to make a system of contracts with no bugs in them, we intend to adopt a `defensive programming' mentality to try and limit the impact from any issues that manage to manifest themselves in the deployed contracts.
+While we aspire to bug free contracts, the adoption of a `defensive programming' mentality endeavours to limit the impact of any issues that manifest in the deployed contracts.
 
 At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions in the \ascode{StorageContract} to allow setting of variables, as well as the upgrade function. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in quick succession enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
 
