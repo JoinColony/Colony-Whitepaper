@@ -1,7 +1,7 @@
 \section{Revenue and Rewards}\label{sec:revenue}
 
 \subsubsection*{What is Colony Revenue?}
-A colony may sell goods and services in exchange for tokens, for Ether or for one of the  ERC20 tokens whitelisted for use on the network. Whenever a colony receives such payments, we say that the colony has earned \emph{revenue}.\foonote{A colony contract can of course receive any tokens, even those that are not whitelisted. Only payments that can be used within a colony for funding proposals and tasks payouts count as revenue.}
+A colony may sell goods and services in exchange for tokens, for Ether or for one of the  ERC20 tokens whitelisted for use on the network. Whenever a colony receives such payments, we say that the colony has earned \emph{revenue}.\footnote{A colony contract can of course receive any tokens, even those that are not whitelisted. Only payments that can be used within a colony for funding proposals and tasks payouts count as revenue.}
 
 Revenue is distinct from a colony's working capital. The latter is the sum of all tokens held by the colony for use in funding requests i.e. the funds in the pot belonging to the colony-wide domain in the colony (see Section \ref{sec:finance}), while the former, revenue, has its own dedicated pot.
 
@@ -81,8 +81,9 @@ We propose a fee that is levied on task payments made. When a user claims paymen
     (cnc.south) edge[->, bend right=60, dashed] node[below] {auction} (root)
     ;
  \end{tikzpicture}
- \label{fig:revenueSplit}
  \caption{Summary of the revenue split upon payout for a task.}
+ \label{fig:revenueSplit}
+
 \end{figure}
 
 The fees thus collected are sent to either the \rc\ (if the payment was in Ether or another whitelisted token) or the Colony Network Contract (if it was in a colony's token).

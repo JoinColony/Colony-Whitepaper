@@ -13,7 +13,7 @@ Let us consider a situation where an objection requires 600 tokens and 1200 repu
 
 \begin{table}[h]
 \centering
-\caption{A table of stakes showing what is recorded during the dispute process up to the point where the `change' side has received enough support of 600 total tokens staked.}
+\caption{A table of stakes showing part of what is recorded during the dispute process up to the point where the `change' side has received enough support of 600 total tokens staked.}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 \textbf{Stake \#} & \textbf{User}  & \textbf{Staked Tokens} & \textbf{$\Sigma^+$} \\ \hline
@@ -28,7 +28,7 @@ Once the cumulative backing ($\Sigma^+$) reaches the threshold required (600) th
 
 \begin{table}[h]
 \centering
-\caption{A table of stakes showing what is recorded during the dispute process up to the point where both the `change' and `keep' sides have received 600 tokens of support.}
+\caption{A table of stakes showing part of what is recorded during the dispute process up to the point where both the `change' and `keep' sides have received 600 tokens of support.}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Stake \# & User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
@@ -57,13 +57,12 @@ When a user stakes and opposes some existing stake that does not yet have a coun
 
 \begin{table}[ht]
 \centering
-\caption{}
+\caption{Table showing additional data recorded for stakes that match against earlier stakes on the opposite side.}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 -150  & 1          & 2        & 50      & 1 & 2 \\ \hline
 -450  & 2          & 3        & 0       &  3 & 4 \\ \hline
-0\tablefootnote{The justification for this line being present is given in section \ref{sec:exactMatching}.}  & 0         & 0        & 0 & 5 & 5            \\ \hline
 \end{tabular}
 \end{table}
 
@@ -75,7 +74,7 @@ For the `reputation update log' to work correctly, we must know exactly how many
 
 \begin{table}[ht]
 \centering
-\caption{}
+\caption{An example staking for each side where fewer than the upper limit of transfers for four people are required. Only two transfers are required to exactly balance the users.}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Stake \# & User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
@@ -90,7 +89,8 @@ Even though there are four people, only two transfers are required --- from user
 
 \begin{table}[ht]
 \centering
-\caption{}
+\caption{Table showing what is recorded for stakes that match against earlier stakes on the opposing side, in the case where some match exactly. The entries with 0 stake are used to ensure there are four transactions recorded, even if not all are needed.}
+\label{tab:matchFromTo}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
 Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To \\ \hline
@@ -109,7 +109,7 @@ This procedure can also be extended to account for stakes being made in arbitrar
 
 \begin{table}[ht]
 \centering
-\caption{}
+\caption{Generalised case of staking where stakes from each side occur in an arbitrary order.}
 \label{appa:modifiedexample}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
@@ -124,7 +124,7 @@ E & -450          & 600                      & -600                             
 
 \begin{table}[ht]
 \centering
-\caption{}
+\caption{Equivalent of Table \ref{tab:matchFromTo} in the case where stakes can be made on either side in any order. The `Match From' and `Match To' indices now refer to lists of stakes for each side, which are recorded separately.}
 \label{appa:modifiedexamplelog}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -137,4 +137,4 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 
 \end{table}
 
-So for example, in table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.
+So for example, in Table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.

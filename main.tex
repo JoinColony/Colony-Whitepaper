@@ -120,7 +120,7 @@ captionpos=b
 
 
 \usepackage[nottoc]{tocbibind} %https://tex.stackexchange.com/questions/8458/making-the-bibliography-appear-in-the-table-of-contents
-\settocbibname{Bibliography and References}
+\settocbibname{References}
 
 
 %until we agree on a name
@@ -178,6 +178,8 @@ captionpos=b
 
 
 % {Bibliography}
-\input{bibliography/biblio.tex}
+\bibliographystyle{./bibliography/custom.bst}
+\bibliography{./bibliography/biblio}
+% \input{bibliography/biblio.tex}
 
 \end{document}
