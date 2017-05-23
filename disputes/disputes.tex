@@ -31,21 +31,20 @@ The first point identifies the subject of the objection, and what the initiator 
 
 For example, suppose that the objection concerns a task in the domain `development of our website'. The objector could choose to have all `development' reputation vote on it --- we say the decision was `escalated to the development domain'. In this example, the third point would be a proof that the domain `development of our website' was indeed a subdomain of `development'.
 
-The highest domain any decision can be escalated to is that of the entire colony, where all domain reputation is entitled to vote. Similarly, the all-encompassing top-level skill allows all skil
+The highest domain any decision can be escalated to is that of the entire colony, where all domain reputation is entitled to vote. Similarly, an escalation to the all-encompassing top-level skill allows all skill reputation to vote.
 
 Whenever an escalation occurs, we need to ensure that the reputation we are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the reputations (for skills and domains) when they are created, which includes pointers to at least the direct parent.\footnote{Each reputation type contains pointers to its parent \ascode{parent\_id} and its ``$n^{th}$ parent'' \ascode{parent\_n\_id} for all $n$ that are powers of $2$. See also Section \ref{subsec:on-chain-representation-of-skills}} When a user creates an objection, instead of directly specifying the skill or domain they are escalating to, they provide the steps needed to get there from the skill or domain associated with the variable that is to be changed. This ensures that the skill or domain they escalate to are direct parents of those associated with the variable.
 
 \subsection{Costs and Rewards}\label{sec:costs-of-disputes}
 \subsubsection{Cost of raising an objection}
-To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. How much reputation they need and how much they have to pay depends on the level they are escalating to; the `higher up' the decision goes, the higher the cost. To be considered a valid objection, the full requirement is for 1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked. Thus, if an objection appeals to 13\% of total colony reputation, then the objection must be backed by 0.13\% (1\% of 13\%) of reputation and the required stake is 0.13\% of all colony tokens.\\
-If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the reputation and tokens required.\footnote{This minimum amount required to even propose a change prevents users from spamming objections - even those that won’t ever be voted on - to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be processed until other users add their support to it, taking it over the 1\% threshold. The precise amounts of tokens and reputation required for a particular objection are recorded at the time when it is created.
+To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. How much reputation they need and how much they have to pay depends on the level they are escalating to; the `higher up' the decision goes, the higher the cost. To be considered a valid objection, the full requirement is for 1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked. Thus, if an objection appeals to 13\% of total colony reputation, then the objection must be backed by 0.13\% (1\% of 13\%) of reputation and the required stake is 0.13\% of all colony tokens.
+
+If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the reputation and tokens required.\footnote{This minimum amount required to even propose a change prevents users from spamming objections --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be processed until other users add their support to it, taking it over the 1\% threshold. The precise amounts of tokens and reputation required for a particular objection are recorded at the time when it is created.
 
 \subsubsection{Cost of defending against a raised objection}
-Once an objection has received sufficient backing it becomes active and, barring any further user actions for three days, the suggested change will take place. 
-However, if there are users who oppose the suggested `change', they may add their support to the `keep' side. If the keep side receives sufficient support, a dispute is raised. 
+Once an objection has received sufficient backing it becomes active and, barring any further user actions for three days, the suggested change will take place when the objection is `pinged' by a user. However, if there are users who oppose the suggested `change', they may add their support to the `keep' side. If the keep side receives sufficient support, a dispute is raised. 
 
-If the `change' side does not garner enough support in three days, the objection fails and is rejected.
-If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs. 
+If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'. 
 
 \subsubsection{Voting on Disputes}
 If both sides stake the required number of tokens and reputation within their three days time limit, then the proposal goes to a vote.
@@ -53,43 +52,41 @@ If both sides stake the required number of tokens and reputation within their th
 The exact mechanisms of the vote are described elsewhere (\cite{ColonyVoting}). The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
 
 
-10\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision (c.f. \cite{KeynesianBeauty}). Any tokens assigned to users that do not vote in a poll are returned to the colony pot.
+10\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest\cite{KeynesianBeauty}. Any tokens that would have been awarded to users who abstained from voting are sent to the top-level colony pot.
 
 
 \subsubsection{Time to vote and quorum requirements}
-The length of the voting period scales with the size of the reputation pool queried. A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, the change side is deemed to have lost. No changes are made and all participants get their remaining staked tokens returned\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}. We define quorum to be more than 10\% of the reputation eligible to vote has done so.
+The length of the voting period scales with the size of the reputation pool queried. We define quorum to be more than 10\% of the reputation eligible to vote has done so. A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, the change side is deemed to have lost. No changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
 
 \subsubsection{Consequences of the vote}
-If quorum has been reached, if the `change' side won then the variable in question is changed, assuming that the reputation that voted for this outcome is more than previous vote on the same variable (see \ref{sec:repeated-disputes} below). If the `keep' side won, then the variable is not changed. In either case, the rest of the consequences are the same.
-
-Alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
+If quorum has been reached, if the `change' side won then the variable in question is changed, assuming that the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes} below). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
 
 At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens back and the complementary percentage of the reputation they put at risk is lost. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
 
 \begin{itemize}
  %\item The number of people that voted in a decision
- \item The fraction of the reputation in the colony that voted
- \item How close the vote ultimately was
+ \item The fraction of the reputation in the colony that voted.
+ \item How close the vote ultimately was.
 \end{itemize}
 
 At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side's vote weight ($w$) reaches a landslide threshold ($L$) of the total vote weight, then they receive 0\% of their staked tokens back. $L$ varies based on the fraction of total reputation in the colony that voted ($R$):
 
 \begin{equation}
-L = 1 - \frac{R}{3}    
+L = 1 - \frac{R}{3}.
 \end{equation}
 
-So for a small vote with little reputation in the colony being allowed to vote, the decision has to be close to unanimous for the losing side to be punished harshly. For a vote of the whole colony, the landslide threshold $L$ reduces to 67\% of the votes - i.e. the reputation of the colony overall was split 2-to-1 on the decision.
+So for a small vote with little reputation in the colony being allowed to vote, the decision has to be close to unanimous for the losing side to be punished harshly. For a vote of the whole colony, the landslide threshold $L$ reduces to 67\% of the votes --- i.e. the reputation of the colony overall was split 2-to-1 on the decision.
 
 Between these extremes of a landslide loss and a very slim loss, the loss of tokens and reputation suffered by the losing side ($\Delta$) varies linearly:
 
 \begin{equation}
- \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace    
+ \Delta = 0.1 + 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace    
 \end{equation}
 
 \subsubsection*{What happens to the tokens lost?}
 Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).
 
-The motivation behind this scheme is again one of efficiency. We aim to discourage spurious objections and disputes. We regard a close vote as a sign that the decision was indeed not a simple one and that forcing a vote on the issue may have been wise; on the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible long before the dispute process is invoked.
+The motivation behind this scheme is again one of efficiency. We aim to discourage spurious objections and disputes. We regard a close vote as a sign that the decision was indeed not a simple one and that forcing a vote on the issue may have been wise and so those that started it shouldn't be harshly punished. On the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible long before the dispute process is invoked.
 
 \subsubsection*{Summary}
 If you staked on the losing side of a dispute
@@ -102,6 +99,6 @@ If you staked on the losing side of a dispute
 
 
 \subsubsection{Repeated Disputes}\label{sec:repeated-disputes}
-In order to prevent repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in a future vote in order to change the variable again. Note: this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
+In order to reduce the number of repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in any future vote in order to change the variable again. We reiterate that this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
 
-
+To ensure that the variable can always be changed if necessary, this threshold for changing the variable is ignore if the dispute was raised to the top-level domain of the colony.
