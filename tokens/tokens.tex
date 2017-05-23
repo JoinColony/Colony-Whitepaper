@@ -12,7 +12,7 @@ The second is management of the Colony Network itself. There will be permissione
 
 For these permissioned functions to be called by the \rc, a vote open to all CLNY and reputation holders must be conducted  (see also Section \ref{sec:arbitrary-transaction}).
 
-Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for the development of these updates, but are required to vote to deploy them. They are therefore responsible for at least ensuring due diligence is done, either by themselves, or by service providers, to avoid introducing security weaknesses or other undesirable behaviour.
+Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for the development of these updates, but are required to vote to deploy them. They are therefore responsible for at least ensuring due diligence is done, either by themselves or by service providers, to avoid introducing security weaknesses or other undesirable behaviour.
 
 Once the \rc\ and associated token are deployed, the CLNY token becomes the token of the \rc. Like any other colony, the \rc\ has both tokens and reputation and its decision making is affected by both.
 
@@ -27,11 +27,11 @@ Reputation in the \rc\ can be acquired by earning CLNY tokens completing tasks, 
 Initially, the Network Contract's functions will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
 
 \subsubsection*{Stage 2: Foundation Mutisig approval required}
-At a later date, an intermediate contract will be set up, to receive these permissions. This contract will allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Root Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc\ will be able to propose changes, but the foundation must sign off on them.
+At a later date, an intermediate contract will be set up, to receive these permissions. This contract will allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Network Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc\ will be able to propose changes, but the foundation must sign off on them.
 
 \subsubsection*{Stage 3: Foundation Multisig retains veto}
-The next stage will be a second intermediate contract operating similarly to the first, but after a timeout --- with no interaction from the Colony Foundation's address --- the change will be able to be forwarded to the Colony Root Contract by anyone. The Colony Foundation's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
+The next stage will be a second intermediate contract operating similarly to the first, but after a timeout --- with no interaction from the Colony Foundation's address --- the change will be able to be forwarded to the Colony Network Contract by anyone. The Colony Foundation's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
 
 \subsubsection*{Stage 4: \rc\ fully controls the network}
-Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Root Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
+Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Network Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
 
