@@ -70,7 +70,7 @@ When staking, the user supplies the `Match From' and `Match To' arguments. These
 
 \subsection{Exact matching}\label{sec:exactMatching}
 
-For the `reputation update log' to work correctly, we must know exactly how many reputation updates we have to consider. In the above example, it was $4\times (2+2p+c)$, which could be calculated and recorded easily in the update log. However, consider an example where the staked amounts were
+For the `reputation update log' to work correctly, we must know exactly how many reputation updates we have to consider. In the above example, it was $4\times (3+3p+c)$, which could be calculated and recorded easily in the update log. However, consider an example where the staked amounts were
 
 \begin{table}[ht]
 \centering
@@ -103,38 +103,38 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To \\ \hline
 
 These dummy insertions occur whenever the remainder is 0 --- i.e. when the new stake has exactly matched the first unmatched stakes. This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
 
-\subsection{Generalisation}
-
-This procedure can also be extended to account for stakes being made in arbitrary orders (i.e. not all of one side followed by all of the other). This can be achieved by making the indices in the `Match From' and `Match To' columns only refer to stakes on one side or the other, and keeping matching lists that map those indices onto the stakes. Altering our first example slightly, we might end up with the stakes in table \ref{appa:modifiedexample} and the log entries in table \ref{appa:modifiedexamplelog}. The list of positive stakes would be [1, 3, 4] and the list of negative stakes would be [2, 5]. The `Match From' and `Match To' indices then refer to the list corresponding to the opposite sign of the stake currently being considered.
-
-\begin{table}[ht]
-\centering
-\caption{Generalised case of staking where stakes from each side occur in an arbitrary order.}
-\label{appa:modifiedexample}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
-A & 100           & 100                      & 0                                                                       \\ \hline
-B & -150           & 100                      & -150                                                                     \\ \hline
-C & 300           & 400                      & -150                                                                       \\ \hline
-D & 200          & 600                      & -150                                                                    \\ \hline
-E & -450          & 600                      & -600                                                                    \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{Equivalent of Table \ref{tab:matchFromTo} in the case where stakes can be made on either side in any order. The `Match From' and `Match To' indices now refer to lists of stakes for each side, which are recorded separately.}
-\label{appa:modifiedexamplelog}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline
-Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
--150  & 1          & 1        & -50      & 1 & 1 \\ \hline
-300   & 1          & 1        & 250      & 2 & 2 \\ \hline
--450  & 2          & 3        & 0       &  3 & 4 \\ \hline
-0  & 0         & 0        & 0 & 5 & 5            \\ \hline
-\end{tabular}
-
-\end{table}
-
-So for example, in Table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.
+% \subsection{Generalisation}
+% 
+% This procedure can also be extended to account for stakes being made in arbitrary orders (i.e. not all of one side followed by all of the other). This can be achieved by making the indices in the `Match From' and `Match To' columns only refer to stakes on one side or the other, and keeping matching lists that map those indices onto the stakes. Altering our first example slightly, we might end up with the stakes in table \ref{appa:modifiedexample} and the log entries in table \ref{appa:modifiedexamplelog}. The list of positive stakes would be [1, 3, 4] and the list of negative stakes would be [2, 5]. The `Match From' and `Match To' indices then refer to the list corresponding to the opposite sign of the stake currently being considered.
+% 
+% \begin{table}[ht]
+% \centering
+% \caption{Generalised case of staking where stakes from each side occur in an arbitrary order.}
+% \label{appa:modifiedexample}
+% \begin{tabular}{|c|c|c|c|c|}
+% \hline
+% User  & Staked Amount & $\Sigma^+$ & $\Sigma^-$ \\ \hline
+% A & 100           & 100                      & 0                                                                       \\ \hline
+% B & -150           & 100                      & -150                                                                     \\ \hline
+% C & 300           & 400                      & -150                                                                       \\ \hline
+% D & 200          & 600                      & -150                                                                    \\ \hline
+% E & -450          & 600                      & -600                                                                    \\ \hline
+% \end{tabular}
+% \end{table}
+% 
+% \begin{table}[ht]
+% \centering
+% \caption{Equivalent of Table \ref{tab:matchFromTo} in the case where stakes can be made on either side in any order. The `Match From' and `Match To' indices now refer to lists of stakes for each side, which are recorded separately.}
+% \label{appa:modifiedexamplelog}
+% \begin{tabular}{|c|c|c|c|c|c|}
+% \hline
+% Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
+% -150  & 1          & 1        & -50      & 1 & 1 \\ \hline
+% 300   & 1          & 1        & 250      & 2 & 2 \\ \hline
+% -450  & 2          & 3        & 0       &  3 & 4 \\ \hline
+% 0  & 0         & 0        & 0 & 5 & 5            \\ \hline
+% \end{tabular}
+% 
+% \end{table}
+% 
+% So for example, in Table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.
