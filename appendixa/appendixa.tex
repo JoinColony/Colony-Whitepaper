@@ -1,4 +1,4 @@
-\clearpage
+% \clearpage
 \section{Gas-efficient reputation penalty in dispute resolution}\label{appendix:rep-transfer}
 
 Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. A dispute may affect the reputations of many users, but all of these reputation changes are represented by only a single entry in the `reputation update log', so it is necessary to expand upon the process used to resolve this.
@@ -11,7 +11,7 @@ As noted in section \ref{sec:costs-of-disputes}, an objection requires ``1\% of 
 
 Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate. User A initiates the objections and puts up a stake of 100 tokens. In order to do this, A must have at least 200 relevant reputation points at the time. Assume that users B and C support the objection, staking 200 and 300 tokens (and having 400 and 600 reputation points) respectively.  
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{A table of stakes showing part of what is recorded during the dispute process up to the point where the `change' side has received enough support of 600 total tokens staked.}
 \begin{tabular}{|c|c|c|c|c|}
@@ -26,7 +26,7 @@ For simplicity, the table does not contain entries for reputation. The correspon
 
 Once the cumulative backing ($\Sigma^+$) reaches the threshold required (600) the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively.\footnote{We write negative numbers in the table to denote \emph{opposing} stake.} Once the cumulative backing on the keep side ($\Sigma^-$) reaches the required threshold (-600) a dispute is triggered.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{A table of stakes showing part of what is recorded during the dispute process up to the point where both the `change' and `keep' sides have received 600 tokens of support.}
 \begin{tabular}{|c|c|c|c|c|c|}
