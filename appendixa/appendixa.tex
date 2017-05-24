@@ -9,7 +9,7 @@ Given that users are able stake small amounts on each objection, an arbitrarily 
 
 As noted in section \ref{sec:costs-of-disputes}, an objection requires ``1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
 
-Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate, and there are three users (A, B and C) that initiate this objection, staking 100, 200 and 300 tokens (and 200, 400 and 600 reputation points) respectively.  
+Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate. User A initiates the objections and puts up a stake of 100 tokens. In order to do this, A must have at least 200 relevant reputation points at the time. Assume that users B and C support the objection, staking 200 and 300 tokens (and having 400 and 600 reputation points) respectively.  
 
 \begin{table}[h]
 \centering
@@ -22,7 +22,7 @@ Let us consider a situation where an objection requires 600 tokens and 1200 repu
 3 & C & 300           & 600                                                                                           \\ \hline
 \end{tabular}
 \end{table}
-For simplicity, the table does not contain entries for reputation. The corresponding stakes of reputation are implied.
+For simplicity, the table does not contain entries for reputation. The corresponding `stakes' of reputation are implied.
 
 Once the cumulative backing ($\Sigma^+$) reaches the threshold required (600) the objection becomes active. Now we assume that two users (D and E) oppose the objection with matching funds of 150 and 450 respectively.\footnote{We write negative numbers in the table to denote \emph{opposing} stake.} Once the cumulative backing on the keep side ($\Sigma^-$) reaches the required threshold (-600) a dispute is triggered.
 
@@ -51,7 +51,7 @@ We also assume that all users have the appropriate amount reputation to lose (i.
 \item User C loses 300 reputation to User E
 \end{enumerate}
 
-Indeed, in a group of $m$ people where some owe the others a debt, the maximum possible of transfers required to make everyone whole is equal to $m-1$. If the reputation being lost has $p$ parents and $c$ children, then there are $2 + 2p + c$ reputation updates that must occur at each of these steps. There are therefore $\left(m-1\right)\times\left(2+2p+c\right)$ reputation updates in total. In the event of a disagreement regarding the reputation state, we must be able to access the $n$th update directly when calculating an update on-chain. This is made possible by additional logging of data when stakes are made.
+Indeed, in a group of $m$ people where some owe the others a debt, the maximum possible of transfers required to make everyone whole is equal to $m-1$. If the reputation being lost has $p$ parents and $c$ children, there are up to $(p+1)$ domain-totals to be updated, and thus there are up to $2 + 2p + c + (p+1)$ reputation updates that must occur at each of these steps. There are therefore $\left(m-1\right)\times\left(3+3p+c\right)$ reputation updates in total. In the event of a disagreement regarding the reputation state, we must be able to access the $n$th update directly when calculating an update on-chain. This is made possible by additional logging of data when stakes are made.
 
 When a user stakes and opposes some existing stake that does not yet have a counterpart, we record the stakes that it is matching against as well as any remainder.
 
