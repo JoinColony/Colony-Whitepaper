@@ -7,12 +7,6 @@ It is desirable to have a mechanism by which a colony can create an arbitrary tr
 
 Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; however the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction. Such a proposal requires the entire colony to be able to vote (possibly both token holders and/or reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction --- able to be made by anyone --- is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.
 
-\subsection{Token-weighted, reputation-weighted and hybrid voting}
-The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, or a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to vote. When a hybrid vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
-
-The primary use of a token weighted vote is related to the management of the colony tokens itself (Section \ref{sec:colony-token-management}); it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
-
- 
 
 \subsection{Emergency Shutdown}\label{sec:big-red-button}
 As indicated in section \ref{sec:escape-hatches}, a transaction from a whitelisted address can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be pushed. In addition to being able to stop-and-repair colonies, the reputation mining process will also have an emergency stop-and-repair mechanism (at least initially). This will allow the whitelisted addresses to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved. The colonies will be able to continue operations as usual using the reputations of the last valid state.

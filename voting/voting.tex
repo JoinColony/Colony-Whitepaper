@@ -1,0 +1,17 @@
+\section{Voting}
+Voting is a necessity in the Colony Network. 
+
+\subsection{Reputation weighted voting}
+Most votes in a colony will be due to disputes (see Section \ref{sec:disputes}). In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents several unwanted behaviours that might otherwise be encouraged.
+
+Voting takes place using a commit-and-reveal-scheme.
+
+\subsection{Token weighted voting}
+
+\subsection{Hybrid voting}
+A hybrid vote would allow both reputation holders and token holders to vote on a decision. When such a vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
+
+\subsection{Token-weighted, reputation-weighted and hybrid voting}
+The majority of decisions in a colony are purely reputation weighted (even though creating a vote requires stake of both tokens and reputation), though there is no reason why a more traditional token-weighted vote shouldn't be available for some decisions, or a hybrid vote based on both reputation and token holdings. In both of these cases, every account is allowed to vote, and in the case of a hybrid vote, all reputation is eligible to vote.
+
+The primary use of a token weighted vote is related to the management of the colony tokens itself (Section \ref{sec:colony-token-management}); it seems reasonable that the decision and ability to create more tokens should lie with the colony token holders.
