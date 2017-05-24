@@ -1,16 +1,18 @@
-\section{Voting}
+\section{Voting}\label{sec:voting}
 Voting is a necessity in the Colony Network. 
 
 \subsection{Reputation weighted voting}
 Most votes in a colony will be due to disputes (see Section \ref{sec:disputes}). In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents unwanted behaviours that might otherwise be encouraged (for example, delaying submission of a task until closer to voting so that the reputation earned has not decayed as much).
 
-Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak(secret, vote_id)}, where \ascode{vote_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, vote_id} and the contract calculates \ascode{keccak(secret, vote_id)} to verify it is what they originally submitted.
+Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak(secret, vote\_id)}, where \ascode{vote\_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, vote\_id} and the contract calculates \ascode{keccak(secret, vote\_id)} to verify it is what they originally submitted.
 
-As the secret is revealed, and 
+As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. We suggest a (hash) of the question the poll is asking signed with their private key. This is easily reproducible by a client at a later date with no local storage required.
 
-
+When revealing their vote, the user also supplies a Merkle proof of their relevant reputation contained within the reputation state that was saved at the start of the vote. The total vote for the option they demonstrated they voted for is then incremented appropriately.
 
 \subsection{Token weighted voting}
+Unlike with reputation weighted voting, we do not have the ability 
+
 
 \subsection{Hybrid voting}
 A hybrid vote would allow both reputation holders and token holders to vote on a decision. When such a vote takes place, the total reputation and the total token holdings each represent 50\% of the voting weight.
