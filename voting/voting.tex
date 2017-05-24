@@ -4,7 +4,9 @@ Voting is a necessity in the Colony Network.
 \subsection{Reputation weighted voting}
 Most votes in a colony will be due to disputes (see Section \ref{sec:disputes}). In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents unwanted behaviours that might otherwise be encouraged (for example, delaying submission of a task until closer to voting so that the reputation earned has not decayed as much).
 
-Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak(secret, vote_id)}, where \ascode{vote_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \
+Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak(secret, vote_id)}, where \ascode{vote_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, vote_id} and the contract calculates \ascode{keccak(secret, vote_id)} to verify it is what they originally submitted.
+
+As the secret is revealed, and 
 
 
 
