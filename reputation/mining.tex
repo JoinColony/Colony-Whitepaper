@@ -32,10 +32,10 @@ The resulting structure is known as a Merkle tree. In order to prove that the el
   \node[shape=circle, draw] at (4.5,-5) (4) {\texttt{4}}
    edge[-] (d);
   %
-  \node[shape=circle, draw] at (1,-2) (e) {\texttt{E}}
+  \node[shape=circle, draw] at (0.75,-2) (e) {\texttt{E}}
    edge[-] (a)
    edge[-] (b);
-  \node[shape=circle, draw] at (3.5,-2) (f) {\texttt{F}}
+  \node[shape=circle, draw] at (3.75,-2) (f) {\texttt{F}}
    edge[-] (c)
    edge[-] (d);
   %
@@ -84,7 +84,7 @@ All individual reputations are assembled into the \textbf{``Reputation Tree''} w
  \node at (8,-4) (rnhash) {$\mathcal{H}(R_N)$}
   edge[-] (rn);
  %
- \node at (1,-2.5) (r01) {$\mathcal{H}_{0,1}$}
+ \node at (0.75,-2.5) (r01) {$\mathcal{H}_{0,1}$}
   edge[-] (r0hash)
   edge[-] (r1hash);
  \node at (3.75,-2.5) (r23) {$\mathcal{H}_{2,3}$}
@@ -94,7 +94,7 @@ All individual reputations are assembled into the \textbf{``Reputation Tree''} w
   edge[-] (rnhash)
   edge[dashed] (6.5,-4);
  %
- \node at (2.5,-1) (r14) {$\mathcal{H}_{0,3}$}
+ \node at (2.25,-1) (r14) {$\mathcal{H}_{0,3}$}
   edge[-] (r01)
   edge[-] (r23);
  %
@@ -127,9 +127,9 @@ The final \ascode{ReputationRootHash} is submitted to the contract by the miner 
 All CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} miner to submit the hash to the contract.
 
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if 
-\begin{equation}\label{eq:mining-difficulty}
-\ascode{SHA3(address, N, hash)} < \ascode{target} 
-\end{equation}
+\begin{equation*}\label{eq:mining-difficulty}
+\ascode{SHA3(address, N, hash)} < \ascode{target}. 
+\end{equation*}
 At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 12.
 
 The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}). 
@@ -141,13 +141,13 @@ If more than one state has been submitted, then either someone has made a mistak
 
 \subsubsection*{Mining Rewards}
 
-When a state is accepted, a number of \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
+When a state is accepted, a number of (newly minted) \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
 
 \subsection{Dealing with false submissions}\label{sec:challengeresponse}
 %
 \subsubsection{The Challenge-Response Protocol}
 
-We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false ones.
+We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (the reward defined in Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false ones.
 
 We must prove all but one submission incorrect by having each submission navigate a series of \emph{challenges}. These challenges refer to events that happened in the colony network within the last update cycle that have an effect on reputation. The \emph{responses} to the challenges are Merkle proofs that the corresponding reputation update was properly handled. We begin with the scenario where only two submissions are made, and one is correct. 
 
@@ -176,7 +176,8 @@ The intermediate leaves of the Justification Tree represent the evolution of the
  \node at (3,-4) (rh2) {$\mathcal{RH}_2$};
  \node at (4.5,-4) (rh3) {$\mathcal{RH}_3$};
  \node at (6,-4) (rh4) {$\mathcal{RH}_4$};
- \node at (7.5,-4) (rdots) {$\cdots$};
+ \node at (7,-4) (rdots) {$\cdots$};
+ \node at (8,-4) (rhn1) {$\mathcal{RH}_{n-1}$};
  \node at (9.5,-4) (rhn) {$\mathcal{RH}_n$};
  %
  \node at (0.75,-2.5) (rh01) {$h_{0,1}$}
@@ -197,7 +198,7 @@ The intermediate leaves of the Justification Tree represent the evolution of the
  %
  \node at (8.5,-2.5) (rhnn) {$h_{n-1,n}$}
   edge[-] (rhn)
-  edge[dashed] (8,-4);
+  edge[-] (rhn1);
  %
  \node at (1.5,-1) (rh02) {$h_{0,2}$}
   edge[-] (rh01)
@@ -211,9 +212,7 @@ The intermediate leaves of the Justification Tree represent the evolution of the
   edge[] (rh02)
   edge[] (rh24);
  %
- \node[draw, fill=gray!5] at (5,1) (root) {\texttt{JustificationRootHash}};
- \node[right = 2mm of root] (jrh) {$\jrh$} 
-   edge[-] (root);
+ \node[draw, fill=gray!5] at (5,1) (root) {\texttt{JustificationRootHash} (\jrh)};
  \node[below = 1mm of root] (dummy) {\phantom{a}}
   (dummy.north west) edge[dashed] (dummy14)
   (dummy.north east) edge[dashed] (rhnn);
@@ -402,22 +401,10 @@ Miners who make a submission in a given reputation update cycle are entitled to 
 where $t_n$ is a number of blocks that the $n^{th}$ miner has staked their tokens for and $T$ %and $N$ are
 is a normalising constant, set to a number of blocks representing 3 months.%, and $N$ is set to twice the length of the list of submitters - in our case $N=24$.
 
-The weighting factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor apporaches 1 as the locking time approaches infinity.% The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.\\
+The weighting factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor approaches 1 as the locking time approaches infinity.% The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.\\
 
 \noindent (ii) The reward earned by each miner on the list is then given by
 \begin{equation}\label{eq:miner-payout}
  m_n = M \frac{w_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{10} w_n.
 \end{equation}
-Therefore the mining reward $M$ is devided among the miners exactly according to their relative weighting. 
-% \begin{equation}\label{eq:stakerweight}
-% \left(1-\exp\left(-\frac{t}{T}\right)\right) \times \frac{1}{n+S} \times B
-% \end{equation}
-% 
-% where $B$ is the total number of tokens they have staked, $n$ is their position in the list, $S$ and $T$ are normalising constants, and $t$ is the number of blocks they have staked their tokens for. 
-% 
-% The first factor in equation \eqref{eq:stakerweight} encourages users to stake their tokens for long periods of time. After $T$ blocks, this first factor is 0.63 of what it will eventually grow to given unlimited time. We expect $T$ to represent around a month.
-% 
-% The second factor in equation \eqref{eq:stakerweight} encourages users to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have approximately twice the weight of the last submission, all other factors being equal. This factor also means that users are not incentivised to split up their holdings, as some of the split up tokens will have lower weightings. $S$ should be a number on the order of the number of people that are staking in each round to ensure the discrepancy between the rewards for being first and last are not huge; it should be under the control of the \rc.
-% 
-% The last factor $B$ is the number of tokens the user has staked --- if they have staked more tokens, they get more of the payout than they would have done if they had staked less.
-% 
+Therefore the mining reward $M$ is divided among the miners according to their relative weighting. 
