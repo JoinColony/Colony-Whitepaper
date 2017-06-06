@@ -33,7 +33,7 @@ This is the end-of-life for an inactive colony; if no activity takes place in it
 
 We now consider the case of an active colony. If the colony is active and creates $A$ new reputation at every update cycle, how does the ratio between the figure taken to be the total reputation and the incorrectly missing reputation change over time?
 
-$R_{\rm m}$ remains the same in this situation, but the total the colony believes exists increases by $A$ each cycle. After $b$ iterations, we can show that the total reputation the colony believes exists is
+$R_{\rm m}$ remains the same in this situation, but the total reputation the colony believes exists increases by $A$ each cycle. After $b$ iterations, we can show that the total reputation the colony believes exists is
 
 $$R_{\rm 0}\exp\left(-bk\right) + A\frac{1-\exp\left(-bk\right)}{1-\exp\left(-k\right)}.$$
 
@@ -45,4 +45,4 @@ $$\frac{N}{2A}$$
 
 For calculating the exponential decay, we will use the first-order Taylor expansion of the exponential decay i.e. we approximate $\exp\left(-k\right)$ as $1-k$. Given that $k$ is small, this will be a good approximation --- the second order term is on the order of $10^{-7}$. This error will cause all reputations to decay slightly faster than an exponential, but will not cause the sum of the users' reputation to drift away from the notional sum of the users' reputations in the colony.
 
-When calculating the decay, in order to accommodate the fact that we are multiplying by a value close to one, we will premultiply the user's reputation by a large factor before multiplying it by $(1-k)$, and then dividing by the same large factor.
+When calculating the decay, in order to accommodate the fact that we are multiplying by a value close to one and only integers are available in Solidity, we will multiply the user's reputation by $K(1-k)$ (calculated off-chain), for some large value of $K$, and then divide by the same large factor.

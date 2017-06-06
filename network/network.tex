@@ -15,7 +15,7 @@ We want to ensure the future upgradability of the deployed system as we foresee 
 \subsection{Contract overviews}
 
 \subsubsection{ColonyNetworkResolver contract}
-A very simple, static contract that acts only as a pointer to the location of the ColonyNetwork Contract. The address of the \code{RootColonyResolver} contract will never change, nor will we want it to. The address to which it points can be changed, initially by the Colony team, but ultimately only under the direction of the \code{ColonyNetwork} contract itself.
+A very simple, static contract that acts only as a pointer to the location of the ColonyNetwork Contract. The address of the \code{ColonyNetworkResolver} contract will never change, nor will we want it to. The address to which it points can be changed, initially by the Colony team, but ultimately only under the direction of the \code{ColonyNetwork} contract itself.
 
 \subsubsection {ColonyNetwork contract}
 
@@ -23,62 +23,6 @@ The Colony Network hinges on the Colony Network Contract, which acts as the hub 
 
 \subsubsection {ColonyFactory contract}
 This contract is used to deploy new instances of the \code{Colony} contract. These can either be new colonies, or part of the process of upgrading a colony.
-
-\subsubsection {EternalStorage contract}
-
-When deployed, the  \code{ColonyNetwork} contract has an \code{EternalStorage} contract deployed alongside them. For each of the types \code{uint}, \code{int}, \code{string}, \code{address}, \code{bytes}, and \code{boolean}, the \code{EternalStorage} contract has a mapping and two functions:
-
-\begin{minipage}[c]{0.9\linewidth}
-\begin{lstlisting}[language=JavaScript]
-    mapping(bytes32 => TYPE) TYPEStorage;
-
-    function getTYPEValue(bytes32 record)
-    onlyOwner 
-    constant returns (TYPE){
-        return TYPEStorage[record];
-    }
-
-
-    function setTYPEValue(bytes32 record, TYPE value)
-    onlyOwner
-    {
-        TYPEStorage[record] = value;
-    }
-\end{lstlisting}
-\end{minipage}
-
-\noindent where \code{TYPE} is one of the six types. The functions to get and set the value in storage have the modifier \code{onlyOwner}; this ensures that values are able to be read and set only by the contract that this \code{EternalStorage} contract belongs to. The associated contract must define its own public getter if it wishes other contracts to have access to a variable. There is also an associated \code{changeOwner} function, only callable by the current owner, to change the owner of the contract. This allows the data contained within the contract to be moved to a new (upgraded) contract when necessary. 
-
-Using \code{EternalStorage} from within a contract is straightforward. Given a string variable called \code{someString}, use
-\[
-\code{EternalStorage.setStringValue(sha3("someString"), value)}
-\]
-to set it, and
-\[
-\code{EternalStorage.getStringValue(sha3("someString")}
-\]
-to get it. Given an array of strings \code{sha3("someStringArray",x)} is the reference, where \code{x} is the index you are accessing in your pseudo-array.
-
-Contracts not intended to be upgraded lack an \code{EternalStorage} contract deployed alongside them. We admit that there is a gas penalty for this system design. Using external function calls to set or access data, rather than using internal storage of the contract, is going to add a gas overhead. This makes some function calls slightly more expensive than they would be otherwise, but the huge benefit gained by this total separation of data and logic is the ability to upgrade the contracts involved as functionality is developed. This functionality was detailed in an earlier article on the Colony blog. \cite{UpgradingContracts}. 
-
-\subsubsection{EternalWallet Contract}
-Each colony has an associated \code{EternalWallet} contract. The intention is to have this separate contract handling all tokens on behalf of the colony for the colony's lifetime. The \code{EternalWallet} handles the colony's Ether, CLNY and other tokens whitelisted by the network. 
-
-If someone mistakenly sends tokens to the \code{Colony} contract rather than its \code{EternalWallet}, there will be a function on the \code{Colony} callable by anyone, that sends specified ERC20 compatible tokens from the colony's address to the \code{EternalWallet} address. However, if the colony were upgraded in between, and therefore the \code{Colony} contract moved to a new address, those tokens would be irrevocably lost. These tokens would not have been able to be assigned to any task, however, and so the colony would not have any (on-chain) obligations it would be unable to pay --- it would have `only' lost tokens that it was sent incorrectly. This is an unavoidable risk with the \code{EternalWallet} approach, the benefits of which hinge around the upgrade process.
-
-\subsection{The upgrade process}
-
-When the owner of a contract with an associated \code{EternalStorage} wishes to upgrade the contract, the following process occurs (in a single transaction):
-
-\begin{enumerate}
-\item The new version of the contract is deployed --- let's assume to the address \code{0xcafe}.
-\item The owner of the existing \code{EternalStorage} is set to \code{0xcafe}.
-\item The old contract is destroyed.
-\end{enumerate}
-
-All of the data in \code{EternalStorage} is now available to the new contract, as well as the ability to amend existing data or write new data to the store. By exclusively using \code{EternalStorage} for storage, the whole state of the contract being upgraded can be copied in constant gas. A na{\"i}ve implementation, directly copying across the data from the old contract to the new one, could get arbitrarily expensive.
-
-If the contract has an \code{EternalWallet}, its owner should also be changed in the same transaction so that the new contract has all the token assets of the original. An alternative implementation, sending each of these token balances to the new contract could get arbitrarily expensive. In addition, any tokens sent that the contract didn't know to transfer would be lost. These are the main motivations for us to use the \code{EternalWallet} contract.
 
 We stress that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
 

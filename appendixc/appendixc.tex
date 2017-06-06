@@ -1,0 +1,77 @@
+\clearpage
+\section{Upgradable contracts}
+
+While we know that we want the Colony Network of contracts to be upgradeable, we are currently in two minds about the approach that we should take. Fundamentally, there are two approaches:
+
+\begin{itemize}
+    \item Have the \ascode{ColonyContract} call a contract where data is stored in order to read or write variables. The contract where data is stored (\ascode{EternalStorage}) can be passed between new instances of \ascide{ColonyContract} as they are upgraded.
+    \item Have the \ascode{ColonyContract} be a proxy contract that stores the data, using \ascode{delegatecall} to run code from another contract in its own context. An example implementation has been released under the name \ascode{EtherRouter} \cite{EtherRouter}.
+\end{itemize}
+
+
+\subsection {EternalStorage contract}
+
+When deployed, the  \code{ColonyNetwork} contract would have an \code{EternalStorage} contract deployed alongside it. For each of the types \code{uint}, \code{int}, \code{string}, \code{address}, \code{bytes}, and \code{boolean}, the \code{EternalStorage} contract has a mapping and two functions:
+
+\begin{minipage}[c]{0.9\linewidth}
+\begin{lstlisting}[language=JavaScript]
+    mapping(bytes32 => TYPE) TYPEStorage;
+
+    function getTYPEValue(bytes32 record)
+    onlyOwner 
+    constant returns (TYPE){
+        return TYPEStorage[record];
+    }
+
+
+    function setTYPEValue(bytes32 record, TYPE value)
+    onlyOwner
+    {
+        TYPEStorage[record] = value;
+    }
+\end{lstlisting}
+\end{minipage}
+
+\noindent where \code{TYPE} is one of the six types. The functions to get and set the value in storage have the modifier \code{onlyOwner}; this ensures that values are able to be read and set only by the contract that this \code{EternalStorage} contract belongs to. The associated contract must define its own public getter if it wishes other contracts to have access to a variable. There is also an associated \code{changeOwner} function, only callable by the current owner, to change the owner of the contract. This allows the data contained within the contract to be moved to a new (upgraded) contract when necessary. 
+
+Using \code{EternalStorage} from within a contract is straightforward. Given a string variable called \code{someString}, use
+\[
+\code{EternalStorage.setStringValue(sha3("someString"), value)}
+\]
+to set it, and
+\[
+\code{EternalStorage.getStringValue(sha3("someString")}
+\]
+to get it. Given an array of strings \code{sha3("someStringArray",x)} is the reference, where \code{x} is the index you are accessing in your pseudo-array.
+
+When the owner of a contract with an associated \code{EternalStorage} wishes to upgrade the contract, the following process occurs (in a single transaction):
+
+\begin{enumerate}
+\item The new version of the contract is deployed --- let's assume to the address \code{0xcafe}.
+\item The owner of the existing \code{EternalStorage} is set to \code{0xcafe}.
+\item The old contract is destroyed.
+\end{enumerate}
+
+All of the data in \code{EternalStorage} is now available to the new contract, as well as the ability to amend existing data or write new data to the store. By exclusively using \code{EternalStorage} for storage, the whole state of the contract being upgraded can be copied in constant gas. A na{\"i}ve implementation, directly copying across the data from the old contract to the new one, could get arbitrarily expensive.
+
+If the contract has an \code{EternalWallet}, its owner should also be changed in the same transaction so that the new contract has all the token assets of the original. An alternative implementation, sending each of these token balances to the new contract could get arbitrarily expensive. In addition, any tokens sent that the contract didn't know to transfer would be lost. These are the main motivations for us to use the \code{EternalWallet} contract.
+
+ This functionality was also detailed in an article on the Colony blog. \cite{UpgradingContracts}. 
+
+
+
+\subsection{EtherRouter}
+
+The EtherRouter implementation uses two contracts in addition to the contract(s) providing the functionality. The first is the EtherRouter contract, which simply passes on transactions --- via \ascode{delegatecall} --- to the \ascode{Resolver} contract. The Resolver contract is the contract where the addresses of the contracts that actually implement the desired behaviour are defined. Upon receiving a \ascode{delegatecall} from the \ascode{EtherRouter} contract, the \ascode{Resolver} contract makes another \ascode{delegatecall} to the contract that has been defined as implementing the desired function.
+
+In order to upgrade, new contracts are deployed with new functionality, and the contracts that the \ascode{Resolver} contract points to are changed to point to these new contracts. In order to avoid a situation where the contract partially implements both old and new functionality, all updates to the contracts the \ascode{Resolver} points to should be done in a single transaction.
+
+\subsection{Comparison}
+
+We originally intended to use the \ascode{EternalStorage} approach for all of our contracts, and we believed the impact of the increased gas overhead would be of minimal impact for our users.  However, when the EIP 150 hardfork\cite{EIP150} increased the gas cost of the opcode \ascode{delegatecall} (among others) to 700 gas from 40, this no longer became true, and so we have decided to revisit the decision.
+
+From an ideological perspective, we believe the \ascode{EtherRouter} approach has a number of benefits. Arguably the biggest one is that to upgrade, a contract only has to be deployed once. Then, the \ascode{Resolver} can be individually pointed to the new instance of the contract. When using our \ascode{EternalStorage} approach, every colony would need a new instance of the upgraded contract to be deployed, costing a significant amount of gas for the network as a whole. In addition, the \ascode{EtherRouter} approach only uses two \ascode{delegatecall}s, whereas \ascode{EternalStorage} will use a \ascode{call} for every read and write of a variable. For a transaction where many variables are read and written, this could represent a serious overhead.
+
+Unfortunately, the EtherRouter approach has some practical issues, which led us originally to choose the  \ascode{EternalStorage} approach. One is the loss of type safety, which is a valuable safety net while developing the contracts. However, the continuing evolution of helpful tools in the Solidity ecosystem --- in particular \ascode{Solcover}`\footnote{Though the authors admit a bias here!} --- means that this becomes less of a concern going forward. One also has to take care not to delete or reorder the storage slots when developing an upgraded version of a contract; this is trivial to achieve from a source-code perspective (simply do not change the order in which variables are declared, or delete any declarations), but there is no guarantee that a new version of the Solidity compiler would not have such an affect at the EVM level. There is currently no way to mitigate this risk.
+
+Obviously, as development of the contracts that make up the Colony Network begin in earnest, rather than just those being used for our internal beta, a decision will have to be made on the implementation to be used. For now, however, we remain undecided.
