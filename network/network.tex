@@ -4,13 +4,11 @@ The Colony Network consists of a collection of contracts on the Ethereum blockch
 
 \begin{itemize}
 \item The \code{ColonyNetworkResolver}
+\item The \code{ColonyNetwork} contract
 \item The \code{ColonyFactory}
-\item The \code{ColonyNetwork} contract (and associated \code{EternalStorage} contract, described later)
 \end{itemize}
 
-The \code{ColonyFactory} contract deploys instances of the \code{Colony} contract, alongside associated \code{EternalStorage} and \code{EternalWallet} contracts.
-
-We want to ensure the future upgradability of the deployed system as we foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves using new features as they are added to the Network. This motivates the existence of the \code{Eternal} contracts, which can be passed from old to new instances of their associated contracts with no loss of data.
+The \code{ColonyFactory} contract deploys instances of the \code{Colony} contract and the ERC20 compliant contract that represents the colony's own token.
 
 \subsection{Contract overviews}
 
@@ -24,15 +22,22 @@ The Colony Network hinges on the Colony Network Contract, which acts as the hub 
 \subsubsection {ColonyFactory contract}
 This contract is used to deploy new instances of the \code{Colony} contract. These can either be new colonies, or part of the process of upgrading a colony.
 
-We stress that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony.
+\subsection{Contract upgradability}
 
+We want to ensure the future upgradability of the deployed system as we foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves using new features as they are added to the Network.
+
+While we had originally decided on one approach to provide this upgradability, using a storage contract we termed \ascode{EternalStorage}, the EIP150 hard fork increased the gas costs for the \ascode{call} opcode which this approach relied on heavily. As a result, we are reconsidering this decision. An explanation of the \ascode{EternalStorage} approach and of the alternative approach being currently considered can be found in Appendix \ref{appendix:upgradability}.
+
+Regardless of the implementation used, we will ensure that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony, and the colony itself must decide that it wants to upgrade to a new version.
 
 \subsection{Contract security}\label{sec:escape-hatches}
 While we aspire to bug free contracts, the adoption of a `defensive programming' mentality endeavours to limit the impact of any issues that manifest in the deployed contracts.
 
 At launch, colonies will be able to be put into a `recovery mode'. In this state, whitelisted addresses are able to access functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions in the \ascode{StorageContract} to allow setting of variables, as well as the upgrade function. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a rational state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
 
-In general, the contract may enter `recovery mode' due to:
+It is conceivable that colonies will be able to deactivate the recovery mode feature in the future, once the network and contracts have matured sufficiently.
+
+In general, the contract may enter recovery mode due to:
 \begin{itemize}
  \item A transaction from a whitelisted address signalling that the contract should enter recovery mode.
  \item Something that should always be true of the colony not being true --- for example, after a task payout checking that the amount of funds promised to tasks and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
@@ -41,4 +46,4 @@ In general, the contract may enter `recovery mode' due to:
 
 Any approvals from whitelisted addresses to leave recovery mode must be reset whenever a variable is edited. A whitelisted address agreeing to leave recovery mode records the timestamp at which the agreement occurred, and any change of variables also update a timestamp indicating the last edit. When attempting to leave recovery mode, only agreements made after the last edit are counted towards meeting the threshold.\footnote{We note that this is a loop only limited by the number of whitelisted addresses. An alternative implementation or a hard cap on the number of whitelisted addresses in each colony will therefore be required to ensure recovery mode can always be left.}
 
-The first whitelisted address is added at colony creation and is the creator of the colony. Whitelisted addresses can be added or removed by a simple majority vote of existing whitelisted addresses. We recommend that the Colony Foundation be added as one of these whitelisted addresses as a `trusted party'.
+The first whitelisted address is added at colony creation and is the creator of the colony. Whitelisted addresses can be added or removed by a simple majority vote of existing whitelisted addresses. The Colony Foundation may be added as one of these whitelisted addresses as a `trusted party' if desired.

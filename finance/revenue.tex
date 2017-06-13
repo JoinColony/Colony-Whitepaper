@@ -17,18 +17,7 @@ Revenue accumulates in a dedicated revenue pot. In order to be processed, a user
 When a colony earns back some of its \emph{own} tokens as revenue, the revenue distribution process transfers them directly to the working capital, where they become part of the general fund allocation system of regular and priority funding proposals (Section \ref{sec:pots-and-fp}).
 
 \subsubsection*{Revenue earned in other currencies}
-When a colony earns Ether or other currencies as revenue, the revenue distribution system allocates some of them to be claimed as rewards. In particular, the special triggering transaction takes any such revenue that has accumulated since the last such transaction, and makes 90\% available to the colony as working capital, while the remaining 10\% is used to pay out rewards to users that hold both colony tokens and reputation in the colony. This split can be changed by the colony --- see Section \ref{subsec:chaning-the-reward-split}.
-
-\begin{center}
-\begin{tikzpicture}
- 
- \node[draw] at (-2,-3) (rewards) {Rewards};
- \node[draw] at (2,-3) (workingcapital) {Working Capital};
- \node[draw] at (0,0) (revenue) {Revenue}
-    (revenue.-140) edge[bend right=35, ->] node[left]{10{\%}} (rewards)
-    (revenue.-40) edge[bend left=35, ->] node[auto]{90{\%}} (workingcapital);
-\end{tikzpicture}
-\end{center}
+When a colony earns Ether or other currencies as revenue, the revenue distribution system allocates some of them to be claimed as rewards. In particular, the special triggering transaction takes any such revenue that has accumulated since the last such transaction, and makes 90\% available to the colony as working capital, while the remaining 10\% is used to pay out rewards to users that hold both colony tokens and reputation in the colony. This split can be changed by the colony based on a colony-wide vote of tokens and reputation, requiring a majority of both tokens and reputation.
 
 \subsection{Claiming Rewards from the Reward Pot}\label{sec:claimrewards}
 Rewards accumulate in the rewards pot. To trigger an actual payout to users (i.e. to make rewards claimable) a special type of proposal is made, proposing that all users should receive a payout based on the reward pot's holdings. 
@@ -52,16 +41,11 @@ This is a (normalised) geometric average of the user's token holdings and reputa
 
 After some sufficiently long period of time (500000 blocks), all unclaimed tokens can be reclaimed by the colony and the payout closed. Any users that have not claimed their payout by that point will still have their tokens locked, and they will remain locked until they issue a transaction waiving their claim to the payout (indeed, they already passively did this by not claiming it in a timely fashion). Unclaimed tokens are returned to the reward pot and become part of the next reward cycle.
 
-
-\subsubsection{Changing the split}\label{subsec:chaning-the-reward-split}
-
-The 10\%/90\% split between rewards and capital can be altered based on a colony-wide vote of tokens and reputation. It requires a majority of both tokens and reputation in order to pass.
-
 \subsection{The Revenue Model of the Colony Network}\label{sec:networkrevenue}
 The Colony Network must be able to sustain itself. In particular, the \rc\ (which ultimately is in control of the Colony Network) maintains the contracts that underpin the network and develops new functionality for the network, the development of which needs to be paid for. Long term, the development and maintenance of the network (including the reputation system) needs to be financed by the network itself. 
 
 \subsubsection{The Network Fee}\label{sec:networkfee}
-We propose a fee that is levied on task payments made. When a user claims payment for a task they have done (Section \ref{sec:claiming-bounty}), some small fraction is paid to the network. A cartoon showing the revenue split is show in Figure \ref{fig:revenueSplit}. 
+We propose a fee that is levied on task payments made. When a user claims payment for a task they have done, and the funds leave the control of the Colony, some small fraction is paid to the network. A cartoon showing the revenue split is show in Figure \ref{fig:revenueSplit}. 
 
 \begin{figure}[htp]
 \centering

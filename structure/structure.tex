@@ -22,9 +22,11 @@ The manager (usually the creator of the task) is responsible for selecting the e
 \item A specification, or brief: to be used by the worker to guide the work, and by the evaluator for assessing the satisfactory completion of the task.
 \end{itemize}
 
-In order to create a task, the manager must stake some number of Colony Tokens. This (small) stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour. 
+In order to create a task, the manager must possess sufficient reputation and must stake some number of Colony Tokens. This (small) stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour. 
 
-Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so.
+Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so. Payouts do not have to all be in the same currency, and a single payout can be made up of two or three different currencies.
+
+If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. 
 
 Assigning the worker can only occur after the funds to satisfy the proposed payout have been received by the task, and both the manager and proposed worker have indicated they are happy with the assignment. After that point, the terms of the assignment may be altered either by mutual consent, or via the dispute process.
 
@@ -63,3 +65,7 @@ Of course, without structure, a large colony could quickly become difficult to n
 This compartmentalisation of activity provides a tangible benefit to the colony as a whole. When objections are raised, they can be raised to a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be targeted for their opinion, and that when a dispute occurs, the whole colony is not required to vote in the dispute. Rather, only members with the relevant experience are asked for their opinion.
 
 It is ultimately up to individual colonies to decide how they wish to use domains --- some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar tasks together, or even multiple tasks that other colonies would consider a single task. We aim to provide a general framework that colonies may use however they see fit, and to only be prescriptive where necessary.
+
+In order to create a domain, the creating user must have sufficient reputation in the domain that will become a parent, and must stake a small amount of colony tokens. These thresholds will be larger than for task creation, as the creation of a domain is more significant than the creation of a task. The token stake for creating a domain will be able to be claimed by the creator once a task has been successfully paid out inside the domain --- this indicates the domain is legitimate.
+
+In the event of a dispute being raised over the creation of the domain, if the domain is determined to be spurious, the stake is lost and the creator loses reputation.

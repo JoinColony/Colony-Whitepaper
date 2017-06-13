@@ -7,9 +7,9 @@ The \textbf{Dispute System} is there to resolve disagreements within the group a
 
 
 \subsubsection*{What are Objections?}
-When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable --- stored in the \ascode{EternalStorage} contract --- should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
+When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable, in the contract should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
 
-The user raising the objection must also put up a stake to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the counterside and thereby elevates the objection to a \emph{dispute}.
+The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the counterside and thereby elevates the objection to a \emph{dispute}.
 
 \subsubsection*{What are Disputes?}
 We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting. 
@@ -23,7 +23,7 @@ The user raising an objection submits the following data:
  \item proof that these reputations should be allowed to make the change in question. 
 \end{itemize}
 
-The first point identifies the subject of the objection, and what the initiator believes the state should be. The second and third points concern \emph{escalation}. 
+The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradeability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern \emph{escalation}. 
 
 \begin{center}
  \textbf{In Colony you cannot escalate a decision to higher management, you can only escalate to bigger groups of your peers.}
@@ -37,9 +37,9 @@ Whenever an escalation occurs, we need to ensure that the reputation we are esca
 
 \subsection{Costs and Rewards}\label{sec:costs-of-disputes}
 \subsubsection{Cost of raising an objection}
-To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. How much reputation they need and how much they have to pay depends on the level they are escalating to; the `higher up' the decision goes, the higher the cost. To be considered a valid objection, the full requirement is for 1\% of the reputation queried and 1\% of the corresponding fraction of tokens to be staked. Thus, if an objection appeals to 13\% of total colony reputation, then the objection must be backed by 0.13\% (1\% of 13\%) of reputation and the required stake is 0.13\% of all colony tokens.
+To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. How much reputation they need and how much they have to pay depends on the level they are escalating to; the `higher up' the decision goes, the higher the cost. To be considered a valid objection, the full requirement is for the user to have 0.1\% of the reputation queried and to stake 0.1\% of the corresponding fraction of tokens. Thus, if an objection appeals to 13\% of total colony reputation, then the objection must be backed by 0.013\% (0.1\% of 13\%) of reputation and the required stake is 0.013\% of all colony tokens.
 
-If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the reputation and tokens required.\footnote{This minimum amount required to even propose a change prevents users from spamming objections --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be processed until other users add their support to it, taking it over the 1\% threshold. The precise amounts of tokens and reputation required for a particular objection are recorded at the time when it is created.
+If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the tokens required, and having a correspondingly smaller amount of reputation.\footnote{This minimum amount required to even propose a change prevents users from spamming objections --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be `live' until other users add their support to it, taking it over the 0.1\% threshold. The precise amounts of tokens and reputation required for a particular objection are recorded at the time when it is created. Users can only stake tokens in proportion to the reputation they have. For example, if they wanted to stake 40\% of the tokens required, they must have at least 40\% of the reputation that would be required to create the objection outright.
 
 \subsubsection{Cost of defending against a raised objection}
 Once an objection has received sufficient backing it becomes active and, barring any further user actions for three days, the suggested change will take place when the objection is `pinged' by a user. However, if there are users who oppose the suggested `change', they may add their support to the `keep' side. If the keep side receives sufficient support, a dispute is raised. 
@@ -47,15 +47,15 @@ Once an objection has received sufficient backing it becomes active and, barring
 If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'. 
 
 \subsubsection{Voting on Disputes}
-If both sides stake the required number of tokens and reputation within their three days time limit, then the proposal goes to a vote.
+If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
 
-The exact mechanisms of the vote are described in section \ref{sec:voting} (see also \cite{ColonyVoting}). The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
+Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak256(secret, option\_id)}, where \ascode{option\_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, option\_id} and the contract calculates \ascode{keccak256(secret, option\_id)} to verify it is what they originally submitted.
 
-10\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest\cite{KeynesianBeauty}. Any tokens that would have been awarded to users who abstained from voting are sent to the top-level colony pot.
+As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. We suggest a (hash) of the consequence field of the poll signed with their private key. This is easily reproducible by a client at a later date with no local storage required.
 
+10\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest\cite{KeynesianBeauty}. Any tokens that would have been awarded to users who abstained from voting, or are not revealed in the reveal window, are sent to the top-level colony pot once the poll closes.
 
-\subsubsection{Time to vote and quorum requirements}
-The length of the voting period scales with the size of the reputation pool queried. We define quorum to be more than 10\% of the reputation eligible to vote has done so. A vote lasts between two days and seven days, where a vote would last two days if no reputation in the colony was being queried, and seven days in the case of the full colony being queried. At the end of this time frame, if quorum is not reached, the change side is deemed to have lost. No changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
+Once a vote has been in the reveal phase for 48 hours, a transaction may be made to finalise the vote. Any subsequent reveals of votes do not contribute to the decision being made, but serve only to unlock the user's tokens if it was a token-weighted or hybrid vote (see below). We define quorum to be more than 10\% of the reputation eligible to vote has done so. If quorum is not reached, no changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
 
 \subsubsection{Consequences of the vote}
 If quorum has been reached, if the `change' side won then the variable in question is changed, assuming that the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes} below). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
@@ -102,3 +102,27 @@ If you staked on the losing side of a dispute
 In order to reduce the number of repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in any future vote in order to change the variable again. We reiterate that this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
 
 To ensure that the variable can always be changed if necessary, this threshold for changing the variable is ignored if the dispute was raised to the top-level domain of the colony.
+
+\subsection{Types of vote}
+Depending on the context and potential consequences of the vote, we intend for a Colony to support three types of voting
+
+\subsubsection{Reputation weighted voting}
+Most votes in a colony will be due to disputes related to tasks. In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents unwanted behaviours that might otherwise be encouraged (for example, delaying submission of a task until closer to voting so that the reputation earned has not decayed as much).
+
+When revealing their vote, the user also supplies a Merkle proof of their relevant reputation contained within the reputation state that was saved at the start of the vote. The total vote for the option they demonstrated they voted for is then incremented appropriately.
+
+\subsubsection{Token weighted voting}
+Unlike with reputation, we do not have the ability to `freeze' the token distribution when a vote starts. While this is effectively possible with something like the MiniMe token \cite{minime}, we envision token-weighted votes will still be regular enough within a Colony that we do not wish to burden users with the gas costs of deploying a new contract every time.
+
+When conducting a token weighted vote, steps must be taken to ensure that tokens cannot be used to vote multiple times. In the case of ``The DAO'', once a user had voted their tokens were locked until the vote completed. This introduced peculiar incentives to delay voting until as late as possible to avoid locking tokens unnecessarily.  Our locking scheme avoids such skewed incentives.
+
+Instead, once a vote enters the reveal phase, any user who has voted on that vote will find themselves unable to see tokens sent to them, or be able to send tokens themselves --- their token balance has become locked. To unlock their token balance, users only have to reveal the vote they cast for any polls that have entered the reveal phase --- something they can do at any time. Once their tokens are unlocked, any tokens they have notionally received since their tokens became locked are added to their balance.
+
+It is possible to achieve this locking in constant gas by storing all submitted secrets for votes in a sorted linked list indexed by \ascode{close\_time}. If the first key in this linked list is earlier than \ascode{now} when a user sends or would receive funds, then they find their tokens locked. Revealing a vote causes the key to be deleted (if the user has no other votes submitted for polls that closed at the same time). This will unlock the tokens so long as the next key in the list is a timestamp in the future. A more detailed description of our implementation can be found on the Colony blog \cite{ColonyVoting}.
+
+Insertion into this structure can also be done in constant gas if the client supplies the correct insertion location, which can be checked efficiently on-chain, rather than searching for the correct location to insert new items.
+
+\subsubsection{Hybrid voting}
+A hybrid vote would allow both reputation holders and token holders to vote on a decision. We envision such a vote being used when the action being voted on would potentially have a sizeable impact on both reputation holders and token holders. This would include altering the supply of the colony tokens beyond the parameters already agreed (see Section \ref{sec:colony-token-management}) or when deciding whether to execute an arbitrary transaction (see Section \ref{sec:arbitrary-transaction}).
+
+In order for a proposal to successfully pass through a hybrid vote, both the reputation holders and the token holders must have reached quorum, and a majority of both reputation and token holders who vote must agree that the change should be enacted.

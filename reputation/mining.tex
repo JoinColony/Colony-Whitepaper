@@ -6,7 +6,7 @@ The reputation system is a core component of any decentralised colony. By carefu
 Due to the combined complexity of reputation scores across multiple colonies, domains, and skills,
 \textbf{reputation scores cannot be stored or calculated on-chain}. Instead, the calculations will all take place off-chain, the results of which will be reported to the blockchain by participating CLNY holders --- in a process resembling a proof-of-stake blockchain consensus protocol. We call this procedure \textbf{`Reputation Mining'}.
 
-The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong.}
+The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong}.
 
 
 \subsection{Merkle Trees and Proofs}\label{sec:Merkle-summary}
@@ -98,9 +98,7 @@ All individual reputations are assembled into the \textbf{``Reputation Tree''} w
   edge[-] (r01)
   edge[-] (r23);
  %
- \node[draw, fill=gray!5] at (4,0) (root) {\texttt{ReputationRootHash}};
- \node[right = 2mm of root] (rh) {$\mathcal{RH}$} 
-   edge[-] (root);
+ \node[draw, fill=gray!5] at (4,0) (root) {\texttt{ReputationRootHash}  ($\mathcal{RH}$)};
  \node[below = 1mm of root] (dummy) {\phantom{a}}
   (dummy.north west) edge[dashed] (r14)
   (dummy.north east) edge[dashed] (rnn);
@@ -133,6 +131,8 @@ It is however undesirable to have too many submissions for every update. We prop
 At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 12.
 
 The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}). 
+
+Miners will also be required to have staked their tokens for a few update cycles before they are eligible to submit or support a hash.
 %
 \subsubsection*{Verifying a submission}
 If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurrence.
@@ -387,24 +387,22 @@ Suppose that the reputation earned in the \rc\ every hour due to all activity (m
 
 The \emph{actual} mining rewards are calculated based on the above model and we \emph{define} the total reputation to be earned by miners in a given hour to be given by equation \eqref{eq:mining-reward}.
 
-Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. The reward is calculated when a submission is received. Specifically, when a miner makes their submission, two things happen:
-\begin{itemize}
- \item[(i)] the weighting for that submission is calculated and recorded,
- \item[(ii)] the rewards of all miners having submitted the same hash is (re-)calculated based on their relative weighting.
-\end{itemize}
-\noindent The details of these calculations are:\\
-
-\noindent (i) The weight for the $n^{th}$ miner on the list of submitters is given by
+Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that submission is calculated and recorded, and this is added to the total weights of all submitters for this hash so far. The $n^{th}$ submitter has a weight of
 \begin{equation}\label{eq:miner-weighting}
- w_n = \left(1 - e^{\frac{t_n}{T}}\right) %\left( 1 - \frac{n-1}{N} \right)
+ w_n = \left(1 - \exp\left(\frac{t_n}{T}\right)\right) \times \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
-where $t_n$ is a number of blocks that the $n^{th}$ miner has staked their tokens for and $T$ %and $N$ are
-is a normalising constant, set to a number of blocks representing 3 months.%, and $N$ is set to twice the length of the list of submitters - in our case $N=24$.
+where $t_n$ is a number of blocks that the $n^{th}$ miner has staked their tokens for and $T$ and $N$ are normalising constants. $T$ is set to a number of blocks representing 3 months, and $N$ is set to twice the length of the list of submitters --- in our case $N=24$.
 
-The weighting factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor approaches 1 as the locking time approaches infinity.% The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.\\
+The first factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor approaches 1 as the locking time approaches infinity. The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.
 
-\noindent (ii) The reward earned by each miner on the list is then given by
+Once the submission window has expired, and either there was only one submitted hash, or all but one submitted hash has been proved to be wrong, any user can make a transaction to make this submitted hash the canonical reputation state used by the network until the end of the next update cycle. This transaction also adds the reputation changes for the miners to the start of the reputation change log, and will be included in the next update cycle. This transaction also makes the miners eligible to claim their CLNY token reward.
+
+The reward earned by each miner on the list is given by
 \begin{equation}\label{eq:miner-payout}
- m_n = M \frac{w_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{10} w_n.
+ m_n = M \frac{w_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{12} w_n
 \end{equation}
-Therefore the mining reward $M$ is divided among the miners according to their relative weighting. 
+i.e. the mining reward $M$ is divided among the miners according to their relative weighting. 
+
+
+\subsection{Emergency Shutdown}\label{sec:big-red-button}
+Section \ref{sec:escape-hatches} described a transaction from a whitelisted address can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be made. Similarly, the reputation mining process will also have an emergency stop-and-repair mechanism (to begin with). This will allow the whitelisted addresses to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved (which will likely involve a contract upgrade). The colonies will be able to continue operations as usual using the reputations of the last valid state, which will be temporarily frozen and not decay.

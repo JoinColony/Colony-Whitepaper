@@ -10,7 +10,7 @@
 \title{COLONY: An Ethereum Based Protocol\\ 
 for Decentralised Collaboration \\
     \large v0.1\\}
-\author{Dr Alex Rea, Dr Aron Fischer, Jack du Rose}
+\author{ Alex Rea, Aron Fischer, Jack du Rose}
 \date{}
 \def\code#1{\texttt{#1}}
 %Define the listing package
@@ -160,8 +160,8 @@ captionpos=b
 \newpage
 \input{./reputation/reputation.tex}
 \newpage
-\input{./voting/voting.tex}
-\newpage
+% \input{./voting/voting.tex}
+% \newpage
 \input{./reputation/mining.tex}
 \newpage
 \input{./finance/finance.tex}
@@ -172,6 +172,12 @@ captionpos=b
 \newpage
 \input{./specialactions/special.tex}
 \newpage
+
+% {Bibliography}
+\bibliographystyle{./bibliography/custom.bst}
+\bibliography{./bibliography/biblio}
+% \input{bibliography/biblio.tex}
+
 \appendix
 \newpage
 \input{./appendixa/appendixa.tex}
@@ -180,10 +186,5 @@ captionpos=b
 \newpage
 \input{./appendixc/appendixc.tex}
 
-
-% {Bibliography}
-\bibliographystyle{./bibliography/custom.bst}
-\bibliography{./bibliography/biblio}
-% \input{bibliography/biblio.tex}
 
 \end{document}
