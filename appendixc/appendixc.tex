@@ -76,7 +76,7 @@ Unfortunately, the \ascode{EtherRouter} approach has some practical issues, whic
 
 Obviously, as development of the contracts that make up the Colony Network begin in earnest, rather than just those being used for our internal beta, a decision will have to be made on the implementation to be used. For now, however, we remain undecided.
 
-\subsection{CLNY Token contract}\label{app:clnyupagrade}
+\subsection{CLNY Token contract}\label{app:clnyupgrade}
 Regardless of the choice used to allow the Colony contract to be upgraded, we intend to use the \ascode{EtherRouter} approach for the CLNY token contract (and likely all other colony tokens). This is so that our tokensale can be conducted with a basic contract, without having to implement any of the advanced features the token will require in the future, such as the locking mechanism that interacts with token-weighted voting, or the control over creation of new tokens.
 
 An alternative approach, of using a non-upgradeable contract, and allowing the tokens in it to be burned for CLNY tokens after deployment of the network, was discounted for being confusing to users who would have to understand the difference between the two tokens. Multiple upgrades might have caused many such `obsolete' tokens to exist, and educating users on how to upgrade their tokens would prove confusing. By using the \ascode{EtherRouter} approach, the burden is placed on the contract developers and those in control of the upgrade, rather than the users (though, arguably, the risks are higher). By using an \ascode{EtherRouter}, the contract's address will not change when upgraded, which means that personal wallets and those on exchanges will continue to function with no action on their part.
