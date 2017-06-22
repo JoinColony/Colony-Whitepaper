@@ -6,9 +6,31 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT}
+\SetWatermarkScale{5}
+\SetWatermarkLightness{0.95}
 
-\title{COLONY: An Ethereum Based Protocol\\ 
-for Decentralised Collaboration \\
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\newcommand\watermark[1]{%
+    #1%
+    \sbox0{#1}%
+    \llap{%
+    \makebox[\wd0][c]{%  hor. centering
+    \raisebox{.5\ht0}{%  approx. vert. centering
+    \csname Gin@isotrue\endcsname% = "keepaspectratio"
+    \resizebox*{.8\ht0}{.8\ht0}{% Scale down (the height is also used for the width to avoid the surrounding spaces)
+    \parbox{10em}{% Allow line breaks
+            \color{black!90}%  
+            This PDF was created for Jane Doe.
+        }%
+    }}}}%
+}
+
+
+\title{COLONY: A Protocol for Decentralised Organisations  \\
     \large v0.1\\}
 \author{ Alex Rea, Aron Fischer, Jack du Rose}
 \date{}
@@ -172,7 +194,8 @@ captionpos=b
 \newpage
 \input{./specialactions/special.tex}
 \newpage
-
+\input{./conclusion/conclusion.tex}
+% \newpage
 % {Bibliography}
 \bibliographystyle{./bibliography/custom.bst}
 \bibliography{./bibliography/biblio}

@@ -2,17 +2,17 @@
 
 
 % \subsection{Example Configurations}\label{sec:example-configs}
-The Colony Governance Protocol described in this document is concerned with what happens `on chain', i.e. those actions that directly affect the Ethereum blockchain. Users of the network however are not expected to ever interact with the contracts manually; instead they will be using some front-end application that makes all of the network's functionality intuitive and simple.
+The protocol described in this document is concerned with what happens on the Ethereum blockchain. Users of the network however are not expected to ever interact with the contracts manually; instead they will be using front-end applications that make the network's functionality easy to use.
 
 In any colony application we expect a certain amount of \textbf{front-end abstraction} in which complex tools and concepts are presented for the users' convenience, and translated in the background into a sequence of contract interactions on the colony network.
 
-Front-end abstraction lets us realise certain functionality that doesn't \emph{seem} to be part of our protocol but can actually be coded into the governance system and made usable by a well designed application. The remainder of this section describes some such cases.
+Front-end abstraction lets us realise certain functionality that doesn't \emph{seem} to be part of our protocol by combining the simple elements we have designed in inventive ways. The remainder of this section describes some such cases.
 
 \subsection{Salaried Positions}\label{sec:salary}
 
 The work-for-payment model in the colony network is based around tasks, and on the surface this implies colony-worker relationships that are purely transactional. However the system is flexible enough to accommodate a wider range of employment models. One such example is a \emph{salaried position}.
 
-A salaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a priority funding proposal. The employee would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good frontend could hide these implementation details from the users and render salaried positions differently from regular domains.
+A salaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a priority funding proposal. The employee would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's pot. A good user interface could hide these implementation details from the users and render salaried positions differently from regular domains.
 
 \subsection{Awarding reputation bonuses}
 
@@ -31,6 +31,6 @@ Having reputation is a prerequisite for creating an objection and triggering the
 This is analogous to a member staking only 10\% of the required amount and waiting for further support from their peers (Section \ref{sec:costs-of-disputes}), with the difference being that without any third party support, this `objection' would never be processed on-chain.
 
 \subsection{Proposing an arbitrary transaction by the \ascode{Colony} contract}\label{sec:arbitrary-transaction}
-Of course, it is possible that a colony will want to engage in some behaviour that we haven't forseen, that could be implemented in a contract outside the control of the Colony Network. To that end, we wish to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens without requiring the network to explicitly support them. As they are powerful, such transactions should be rare occurrences with high threshold requirements.
+Of course, it is possible that a colony will want to engage in some behaviour that we haven't foreseen, that could be implemented in a contract outside the control of the Colony Network. To that end, we wish to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens without requiring the network to explicitly support them. As they are powerful, such transactions should be rare occurrences requiring high support thresholds.
 
 Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; however the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction. Such a proposal requires the entire colony to be able to vote (both token holders and reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction --- able to be made by anyone --- is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.

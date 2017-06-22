@@ -3,14 +3,13 @@
 The reputation system is a core component of any decentralised colony. By carefully balancing the rewards and penalties we aim to keep every users' incentives aligned with the colony and the colony network. Since reputation can only be \emph{earned} and not bought, the system fosters a more meritocratic from of decision making than pure token-weighted voting can hope to achieve. The continuous decay of reputation ensures that the influence conveyed by reputation is recently earned and up-to-date. As such, it prevents a reputation aristocracy and allows for a fluid passing of control from one set of contributors to another over time.
 
 
-Due to the combined complexity of reputation scores across multiple colonies, domains, and skills,
-\textbf{reputation scores cannot be stored or calculated on-chain}. Instead, the calculations will all take place off-chain, the results of which will be reported to the blockchain by participating CLNY holders --- in a process resembling a proof-of-stake blockchain consensus protocol. We call this procedure \textbf{`Reputation Mining'}.
+Due to the combined complexity of reputation scores across multiple colonies, domains, and skills, reputation scores cannot be stored or calculated on-chain. Instead, the calculations will all take place off-chain, the results of which will be reported to the blockchain by participating CLNY holders --- in a process resembling a proof-of-stake blockchain consensus protocol. We call this procedure \textbf{`Reputation Mining'}.
 
-The reputation calculation whose result the miners are submitting, is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong}.
+The reputation calculation whose result the miners are submitting is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong}.
 
 
 \subsection{Merkle Trees and Proofs}\label{sec:Merkle-summary}
-This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \cite{MerkleInEthereum}) and proofs to establish some terminology, and can be skipped if already familiar with them.
+This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \cite{MerkleInEthereum}) and Merkle proofs in order to establish some terminology, and can be skipped if already familiar with them.
 
 Consider the tree shown in Figure \ref{fig:Merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself. 
 
@@ -105,7 +104,7 @@ All individual reputations are assembled into the \textbf{``Reputation Tree''} w
  %
  %
 \end{tikzpicture}
-\caption{The Merkle tree of users' reputations with \ascode{ReputationRootHash} as the root. We use $\mathcal{H}$ to indicate the \ascode{keccak} hash function. Above the second row, each element is the hash of the concatenation of its two children.}
+\caption{The Merkle tree of users' reputations with \ascode{ReputationRootHash} as the root. We use $\mathcal{H}$ to indicate the \ascode{keccak256} hash function. Above the second row, each element is the hash of the concatenation of its two children.}
 \end{figure}
 
 
@@ -126,7 +125,7 @@ All CLNY token holders are eligible to become miners and participate in the repu
 
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if 
 \begin{equation*}\label{eq:mining-difficulty}
-\ascode{SHA3(address, N, hash)} < \ascode{target}. 
+\ascode{keccak256(address, N, hash)} < \ascode{target}. 
 \end{equation*}
 At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 12.
 
@@ -157,15 +156,15 @@ We now consider the more complicated case where two different hashes have been s
 
 \subsubsection*{1. The Justification Tree}
   \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
-The first step is for both parties to upload a justification of their submitted hash. This justification consists of second Merkle root and two Merkle proofs.
+The first step is for both parties to upload a justification of their submitted hash. This justification consists of a second Merkle root and two Merkle proofs.
 
 The Merkle root in questions is the \ascode{JustificationRootHash} (\jrh); it is the root of the `Justification Tree' -- a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}. 
 
 The left-most leaf of the Justification Tree ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. Both parties must submit a proof that their tree does indeed start at $\mathcal{RH}_0$. Note that in a Merkle proof for a left-most leaf, all siblings are hashed on the right.
 
-The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hased with itself, we can determine the index of the last leaf. This index is required to be $n$ -- the number of reputation updates in the log.
+The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hased with itself, we can determine the index of the last leaf. This index is required to be $n$ --- the number of reputation updates in the log.
 
-The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputations state after the first $i$ reputation updates in this cycle have been applied. 
+The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. 
 
  %
 \begin{figure}
@@ -224,7 +223,7 @@ The intermediate leaves of the Justification Tree represent the evolution of the
 \end{figure}
 An example of such a tree is shown in Figure \ref{fig:justification-tree}. Note that in the first stage of the tree, every neighbouring pair of data leaves is hashed, and so any pair has a shared Merkle proof to the root. We do this so that each element in the first row of hashes (indicated by $h_{0,1}, h_{0,2} \ldots h_{n-1,n}$ in Figure \ref{fig:justification-tree}) represents a transition between two states. It is these transitions that are the subject of the mining dispute resolution process.
 
-Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (which is the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$ (the hash they submitted), there must be a hash ($h_{i,i+1}$) that represents the transition from $\mathcal{RH}_i$ to $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update (the $i^{th}$)\footnote{We start counting at zero, i.e. the transition from $\mathcal{RH}_{0}$ to $\mathcal{RH}_{1}$ is the `zeroeth'.}, and this is the reputation update we will calculate on-chain to establish which submission is incorrect.\\
+Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (which is the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining process), and disagree on the last leaf $\mathcal{RH}_n$ (the hash they submitted), there must be a hash ($h_{i,i+1}$) that represents the transition from $\mathcal{RH}_i$ to $\mathcal{RH}_{i+1}$) where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update (the $i^{th}$)\footnote{We start counting at zero, i.e. the transition from $\mathcal{RH}_{0}$ to $\mathcal{RH}_{1}$ is the `zeroth'.}, and this is the reputation update we will calculate on-chain to establish which submission is incorrect.\\
 
 \noindent First, however, we must establish where the two submissions first differ.
 
@@ -245,7 +244,7 @@ where $k$ is the largest integer such that $2^k$ is smaller than $n$.
 
 When the first miner (say $A$) submits their proof the contract saves the values of $h_{0,2^k}^A$ and $\overline{h_{0,2^k}}^A$. When the second miner submits their proof the contract compares $h_{0,2^k}^A$ to $h_{0,2^k}^B$. If they are not equal, the contract saves both of these values (and forgets $\overline{h_{0,2^k}}^A$). If they are equal, the contract retains the values of $\overline{h_{0,2^k}}^A$ and $\overline{h_{0,2^k}}^B$ (forgetting $h_{0,2^k}^A$).
 
-The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k}^B$ then the two justification trees are equal between $\mathcal{RH}_0$ and $\mathcal{RH}_{2^k-1}$ and the first discrepancy must lie in the right-hand subtree whose root is $\overline{h_{0,2^k}}^A$ for miner $A$ and $\overline{h_{0,2^k}}^B$ for miner $B$. If on the other hand $h_{0,2^k}^A \neq h_{0,2^k}^B$, then the first discrepancy must lie in the left-hand subtrees given by $h_{0,2^k}^A$ and $h_{0,2^k}^B$. The situation is summarised by
+The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k}^B$ then the two justification trees are equal between $\mathcal{RH}_0$ and $\mathcal{RH}_{2^{k-1}}$ and the first discrepancy must lie in the right-hand subtree whose root is $\overline{h_{0,2^k}}^A$ for miner $A$ and $\overline{h_{0,2^k}}^B$ for miner $B$. If on the other hand $h_{0,2^k}^A \neq h_{0,2^k}^B$, then the first discrepancy must lie in the left-hand subtrees given by $h_{0,2^k}^A$ and $h_{0,2^k}^B$. The situation is summarised by
 \begin{eqnarray*}
  h_{0,2^k}^A \neq h_{0,2^k}^B & \Longrightarrow & \textnormal{First discrepancy occurs at some } \mathcal{RH}_i \textnormal{ with } 0 \leqslant i < 2^k\\
  h_{0,2^k}^A = h_{0,2^k}^B & \Longrightarrow & \textnormal{First discrepancy occurs at some } \mathcal{RH}_i \textnormal{ with } 2^k \leqslant i < n
@@ -293,7 +292,7 @@ When either party submits valid Merkle proofs, showing that the before and after
 
 The process does not terminate until \emph{both} parties have submitted their proofs, or the timeout is reached. There is an edge case in which it appears as if the first to submit has done the calculation correctly, but in actual fact has erroneously added a new leaf in the reputation tree (see Section \ref{sec:earning-rep-for-first-time}) even though no new leaf was required. This error can be identified when the other party submits a correct proof.
 
-If there are more than two submissions for the new \ascode{ReputationRootHash}, this process is conducted in parallel between multiple pairs of submitted hashes as they are submitted, and then repeated, until only one submission remains.
+If there are more than two submissions for the new \ascode{ReputationRootHash}, this process is conducted in parallel between multiple pairs of submitted hashes, and then repeated, until only one submission remains.
 
 If less than an hour elapses from submissions opening to only one submission remaining, the next submission window only opens when an hour has passed from the start of this window. If more than an hour has passed, the next submission window opens immediately.
 
@@ -311,13 +310,13 @@ Fundamentally, there are two types of reputation update that occur:
  \item Addition or removal of reputation as a reward or punishment.
 \end{itemize}
 
-When a user earns reputation in a skill or domain, they also earn reputation in all parents, which corresponds to $2\times\left(\ascode{n\_parents}+1\right)$ reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of $2\times\left(\ascode{n\_parents} + \ascode{n\_children} + 1\right)$. The factors of two here come from also updating the relevant colony-wide totals.
+When a user earns reputation in a skill or domain, they also earn reputation in all parent domains, which corresponds to $2\times\left(\ascode{n\_parents}+1\right)$ reputation updates. Alternately, when a user loses reputation, they also lose reputation in all parents and all children representing a total number of updates of $2\times\left(\ascode{n\_parents} + \ascode{n\_children} + 1\right)$. The factors of two here come from also updating the relevant colony-wide totals.
 
-In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n\_parents} and \ascode{n\_children} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent reputations. After verifying that both submitted justification trees contain this exact number of leaves it can proceed to the binary search.
+In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n\_parents} and \ascode{n\_children} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent and child reputations. After verifying that both submitted justification trees contain this exact number of leaves it can proceed to the binary search.
 
-When the discrepant state transition is found, the users supply the index of the event in the on-chain log that corresponds to that reputation update.  This means that the contract does not have to iterate over the whole list expensively, but the contract can easily check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. In order to do this, we assert that children are always updated in order, then parents, and then the reputation in question itself. In addition, colony-wide totals of reputation are always updated before the user-specific reputation.
+When the discrepant state transition is found, the users supply the index of the event in the on-chain log that corresponds to that reputation update.  This means that the contract does not have to iterate over the whole list expensively, but the contract can simply check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. To do this, we assert that children are always updated in order, then parents, and then the reputation in question itself. In addition, all colony-wide totals of reputation are always updated in this order before any user-specific reputation.
 
-In the event that the discrepant transition is a decay transition, which is easily determined by the Merkle path corresponding to an index in the justification tree smaller than the number of leaves in the reputation tree at the end of the last successful update, they must also supply a Merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle.
+If the discrepant transition is a decay transition they must also supply a Merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle. A decay transition is identified by the Merkle path corresponding to an index in the justification tree smaller than the number of leaves in the reputation tree at the end of the last successful update.
 
 Recording the number of leaves in the reputation tree is required % to allow the binary search to occur, as well as
 to accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decay (see Section \ref{sec:repdecay}). There is a decay calculation for every leaf in the previously accepted reputation tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
@@ -335,7 +334,7 @@ The most important quality of reputation that distinguishes it from a token is t
 
 If an entry in the reputation update log indicates that a dispute has occurred and been resolved, then there will be a number of transfers of reputation between users represented by a single entry. Each such transfer will have to accommodate the updates of all the parents of the reputation being gained by one user, and updates of all the parents and children of the reputation being lost by the other. However, we have to ensure that the user who is losing reputation still has the reputation to lose if another user is gaining it.
 
-To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user's reputation, prior to them losing it in this update, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
+To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user's reputation, prior to them losing it in this update cycle, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
 
 Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used as the voting weight should be done last i.e. all the children and parents should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the child reputations. %If any of these calculations need to be proved correct during the resolution protocol, 
 
@@ -395,7 +394,7 @@ where $t_n$ is a number of blocks that the $n^{th}$ miner has staked their token
 
 The first factor in equation \eqref{eq:miner-weighting} encourages users to stake their tokens for long periods of time when they register as miners. When locking tokens for $T$ blocks, this first factor grows to 0.63, when locking for $2T$ it grows to 0.86, and the factor approaches 1 as the locking time approaches infinity. The second factor in equation \eqref{eq:miner-weighting} encourages miners to submit the hash as soon as possible, with this factor becoming smaller the later users submit; the first submission will have twice the weight of the last submission, all other factors being equal.
 
-Once the submission window has expired, and either there was only one submitted hash, or all but one submitted hash has been proved to be wrong, any user can make a transaction to make this submitted hash the canonical reputation state used by the network until the end of the next update cycle. This transaction also adds the reputation changes for the miners to the start of the reputation change log, and will be included in the next update cycle. This transaction also makes the miners eligible to claim their CLNY token reward.
+Once the submission window has expired, and either there was only one submitted hash, or all but one submitted hash has been proved to be wrong, any user can make a transaction to make this submitted hash the canonical reputation state used by the network until the end of the next update cycle. This transaction also adds the reputation changes for the miners to the start of the reputation change log, and will be included in the next update cycle. Finally, this transaction also makes the miners eligible to claim their CLNY token reward.
 
 The reward earned by each miner on the list is given by
 \begin{equation}\label{eq:miner-payout}

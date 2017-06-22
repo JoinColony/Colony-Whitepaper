@@ -1,10 +1,11 @@
 \section{Objections and Disputes}\label{sec:objections-and-disputes}\label{sec:disputes}
-Bureaucracies are slow and voting is cumbersome and takes time. Colony aims to be usable, efficient and fluid. The emphasis should be on `getting stuff done' and not about `applying for permission'. For this reason, Colony is designed to be \emph{permissive}. Explicitly, this means that task creation does not need explicit approval (Section \ref{sec:tasks}), neither does the process of getting funding for a task using a basic funding proposal (Section \ref{sec:finance}) nor any number of administrative actions throughout the Colony system.
+The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. These are trust problems, which have traditionally been solved by management hierarchies. But colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable. 
 
-The assumption is that well aligned teams tend to be in agreement on most day-to-day goings on in their group. It is expected that members keep an eye out on what their colleagues are doing, but seldom feel the need to intervene. 
+The solution to collective decision making is usually voting, but colony is designed for day to day operation of an organisation. Voting on every decision is wholly impractical.
 
-The \textbf{Dispute System} is there to resolve disagreements within the group and to punish bad behaviour and fraud. The dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
+The emphasis should be on `getting stuff done' and not about `applying for permission'. Therefore, Colony is designed to be permissive. Task creation does not require explicit approval (Section \ref{sec:tasks}), nor do basic funding proposals (Section \ref{sec:finance}) or any number of administrative actions throughout the Colony system.
 
+The \textbf{Dispute System} provides a self regulating mechanism to provide a balanced set of incentives for users to keep their colony running harmoniously. It is there to resolve disagreements and to punish bad behaviour and fraud. The dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
 
 \subsubsection*{What are Objections?}
 When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable, in the contract should be changed to another value. For this reason we call supporters of the objection `the change side' and opponents `the keep side'.
@@ -87,16 +88,7 @@ Between these extremes of a landslide loss and a very slim loss, the loss of tok
 \subsubsection*{What happens to the tokens lost?}
 Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).
 
-The motivation behind this scheme is again one of efficiency. We aim to discourage spurious objections and disputes. We regard a close vote as a sign that the decision was indeed not a simple one and that forcing a vote on the issue may have been wise and so those that started it shouldn't be harshly punished. On the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible long before the dispute process is invoked.
-
-\subsubsection*{Summary}
-If you staked on the losing side of a dispute
-\begin{itemize}
- \item 10\% of your stake is used to compensate voters for voting (unclaimed funds go to colony)
- \item Of the remaining 90\%, $\Delta$ is split between the opposing stakers and the colony, the rest are returned to you.
- \item You lose $(1-\Delta)$ of your staked reputation, with half of it going to opposing stakers (Section \ref{sec:reptransfer} and Appendix \ref{appendix:rep-transfer}).
-\end{itemize}
-
+The motivation here is efficiency --- it aims to discourage spurious objections and disputes. A close vote is a sign that the decision was not a simple one and forcing a vote may have been wise. Therefore, the instigators of the dispute should not be harshly punished. On the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible before disputes are invoked.
 
 \subsubsection{Repeated Disputes}\label{sec:repeated-disputes}
 In order to reduce the number of repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in any future vote in order to change the variable again. We reiterate that this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
@@ -104,7 +96,7 @@ In order to reduce the number of repeated objections and disputes over the same 
 To ensure that the variable can always be changed if necessary, this threshold for changing the variable is ignored if the dispute was raised to the top-level domain of the colony.
 
 \subsection{Types of vote}
-Depending on the context and potential consequences of the vote, we intend for a Colony to support three types of voting
+Depending on the context and potential consequences of the vote, Colony supports three types of voting:
 
 \subsubsection{Reputation weighted voting}
 Most votes in a colony will be due to disputes related to tasks. In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents unwanted behaviours that might otherwise be encouraged (for example, delaying submission of a task until closer to voting so that the reputation earned has not decayed as much).
