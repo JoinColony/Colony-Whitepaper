@@ -1,40 +1,35 @@
 \section{CLNY Tokens and the Common Colony}\label{sec:clny}
 
 \subsection{Creation of CLNY Tokens}
-CLNY are generated during the Colony crowdsale period. Since the Colony Network will not yet be deployed at that time and thus not able to conduct a token sale internally; the crowdsale contract and token contract will therefore be standalone contracts, deployed before the Colony Network exists.
+CLNY are initially generated during the Colony crowdsale period. Since the Colony Network will not yet be deployed at that time and thus not able to conduct a token sale internally; the crowdsale contract and token contract will therefore be standalone contracts, deployed before the Colony Network exists.
  
-After the Colony Network Contract is deployed, the first colony created will be the \rc, and rather than deploying a token contract alongside, it will use the existing token contract. Tokens in this Colony will be CLNY. Functionality will be added to this contract as required, through the mechanism described in Appendix \ref{app:clnyupgrade}. The ability to add functionality will never lie with the developers, but a multisignature contract made up of members of the community, and then subsequently the \rc\ itself.
+After the Colony Network Contract is deployed, the first colony created will be the \rc, and rather than deploying a token contract alongside, it will use the existing token contract. Tokens in this Colony will be CLNY. Functionality will be added to this contract as required, through the \code{EtherRouter} mechanism described in Appendix \ref{app:clnyupgrade}. The ability to add functionality is extremely powerful, and theoretically could allow the inclusion of additional functions to arbitrarily set balances or create additional tokens. This would destroy trust in CLNY, and thereby its underlying utility. For this reason, the ability to add new functionality to the CLNY token will never lie with the developers of Colony, but with a multisignature contract initially made up of members of the wider Ethereum community, and then subsequently the \rc\ itself.
 
 \subsection{Role of CLNY Holders and the \rc}
 CLNY holders have two primary roles. The first is the process termed \textbf{Reputation Mining}, described in Section \ref{sec:reputationmining}.
 
 The second is management of the Colony Network itself. There will be permissioned functions on the Network Contract to allow fundamental parameters of the network to be set, which can only be called by the \rc.
 
-For these permissioned functions to be called by the \rc, a vote open to all CLNY and reputation holders must be conducted  (see also Section \ref{sec:arbitrary-transaction}).
+For these permissioned functions to be called by the \rc, a vote open to all CLNY and reputation holders must be conducted  (see Section \ref{sec:arbitrary-transaction}).
 
 Management of the Colony Network also includes making updates to Colony contracts available to colonies. CLNY holders are not necessarily responsible for the development of these updates, but are required to vote to deploy them. They are therefore responsible for at least ensuring due diligence is done, either by themselves or by service providers, to avoid introducing security weaknesses or other undesirable behaviour.
-
-Once the \rc\ and associated token are deployed, the CLNY token becomes the token of the \rc. Like any other colony, the \rc\ has both tokens and reputation and its decision making is affected by both.
 
 In return for the responsibility of the development and maintenance of the Colony Network, the \rc\ is the beneficiary of the network fee (see Section \ref{sec:networkrevenue}).
 
 Reputation in the \rc\ can be acquired by earning CLNY tokens completing tasks, and administrative and evaluative duties just as in any other colony (see Section \ref{sec:earning-losing-rep}). Reputation in the \rc\ can also be earned by participating in the reputation mining process (defined in Section \ref{subsec:mining-costs-and-rewards}), which is unique to the \rc.
 
-\subsection{The Colony Foundation}
-The Colony Foundation is a non-profit organisation, registered in Estonia. Its purpose is to develop, promote, and support the Colony Protocol and Network, as well as to engage in education and advocacy of decentralised organisational technologies and systems.
-
 \subsection{Handing off decision-making power to the \rc}\label{subsec:ceding-control-to-rc}
-\rct\ holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by the controllers of a multisignature contract, controlled by members of the Colony Foundation. As the network develops and is proved to be effective, control over these decisions will cede to the \rc.
+\rct\ holders are responsible for Reputation Mining from the start, but decisions about the underlying properties of the network will initially be made by a multisignature contract controlled by the Colony team. As the network develops and is proved to be effective, control over these decisions will cede to the \rc. 
 
-\subsubsection*{Stage 1: Foundation Multisig in control}
- Initially, the Network Contract's functions will be permissioned to only allow transactions from the multisig address under the control of the Colony Foundation to change these properties of the network. 
+\subsubsection*{Stage 1: Colony Team Multisig in control}
+ Initially, the Network Contract's functions will be permissioned to only allow transactions from the multisig address under the control of the Colony team to change these properties of the network. 
 
-\subsubsection*{Stage 2: Foundation Mutisig approval required}
-At a later date, an intermediate contract will be set up, to receive these permissions. This contract will allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Network Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony Foundation. In other words, the \rc\ will be able to propose changes, but the foundation must sign off on them.
+\subsubsection*{Stage 2: Colony Team Multisig approval required}
+At a later date, an intermediate contract will be set up, to receive these permissions. This contract will allow the \rc\ (as a whole, via the governance mechanisms provided to all colonies) to propose changes to be made to the Colony Network Contract. The intermediate contract will have functionality such that all changes will have to be explicitly allowed by the address under the control of the Colony team. In other words, the \rc\ will be able to propose changes, but the team must sign them off.
 
-\subsubsection*{Stage 3: Foundation Multisig retains veto}
-The next stage will be a second intermediate contract operating similarly to the first, but after a timeout --- with no interaction from the Colony Foundation's address --- the change will be able to be forwarded to the Colony Network Contract by anyone. The Colony Foundation's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the foundation retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
+\subsubsection*{Stage 3: Colony Team Multisig retains veto}
+The next stage will be a second intermediate contract operating similarly to the first, but after a timeout --- with no interaction from the Colony Team's address --- the change will be able to be forwarded to the Colony Network Contract by anyone. The Colony Team's role will be to block changes if necessary. Thus at this stage the \rc\ will be able to make changes autonomously, but the Colony Team retains a veto.  The proposal to move to this contract will have to come from the \rc\ itself. 
 
 \subsubsection*{Stage 4: \rc\ fully controls the network}
-Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Network Contract with no control imbued to the Colony Foundation other than that provided by any CLNY held by the Foundation. 
+Finally, the intermediate contract will be removed, and the \rc\ will have direct control over the Colony Network Contract with no control imbued to the Colony Team other than that provided by any CLNY held. 
 

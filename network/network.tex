@@ -10,7 +10,7 @@ We want to ensure the future upgradability of the deployed system as we foresee 
 
 While we had originally decided on one approach to provide this upgradability, using a storage contract we termed \ascode{EternalStorage}, the EIP150 hard fork increased the gas costs for the \ascode{call} opcode which this approach relied on heavily. As a result, we are reconsidering this decision. An explanation of the \ascode{EternalStorage} approach and of the alternative approach being currently considered can be found in Appendix \ref{appendix:upgradability}.
 
-Regardless of the implementation used, we will ensure that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force an update upon a colony, and the colony itself must decide that it wants to upgrade to a new version.
+Regardless of the implementation used, we will ensure that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force any colony to upgrade the underlying contracts. The colony itself must decide that it wants to upgrade to a new version.
 
 \subsection{Contract security}\label{sec:escape-hatches}
 While we aspire to bug free contracts, the adoption of a `defensive programming' mentality endeavours to limit the impact of any issues that manifest in the deployed contracts.
