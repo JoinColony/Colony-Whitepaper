@@ -10,7 +10,7 @@ The \textbf{Dispute System} provides a self regulating mechanism to provide a ba
 \subsubsection*{What are Objections?}
 When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable, in the contract should be changed to another value. For this reason we call supporters of the objection the `change' side and opponents the `keep' side.
 
-The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the counterside and thereby elevates the objection to a \emph{dispute}.
+The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \emph{dispute}.
 
 \subsubsection*{What are Disputes?}
 We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting. 
@@ -48,7 +48,9 @@ Once enough tokens have been staked against an objection it becomes active and, 
 If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'. 
 
 \subsubsection{Voting on Disputes}
-If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
+If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
+
+The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved. 
 
 Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak256(secret, option\_id)}, where \ascode{option\_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, option\_id} and the contract calculates \ascode{keccak256(secret, option\_id)} to verify it is what they originally submitted.
 
@@ -59,7 +61,7 @@ As the secret is revealed it cannot be sensitive. It must also change with each 
 Once a vote has been in the reveal phase for 48 hours, a transaction may be made to finalise the vote. Any subsequent reveals of votes do not contribute to the decision being made, but serve only to unlock the user's tokens if it was a token-weighted or hybrid vote (see below). We define quorum to be more than 10\% of the reputation eligible to vote has done so. If quorum is not reached, no changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
 
 \subsubsection{Consequences of the vote}
-If quorum has been reached in a dispute vote, and the `change' side won, then assuming that the reputation that voted for this outcome is more than previous votes on the same variable, the variable in question is changed. (see Section \ref{sec:repeated-disputes} below). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
+If quorum has been reached in a dispute vote, and the `change' side won, then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes}). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
 
 At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens back and they lose the  complementary percentage of the reputation that was required to stake. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
 

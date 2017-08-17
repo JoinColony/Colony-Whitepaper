@@ -66,7 +66,7 @@ Active Funding Proposals that share the same \ascode{From} pot are ordered in a 
 %
 
 \subsubsection{Basic Funding Proposals}\label{subsubsec:BFPs}
-A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism.
+A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism. In either case, the stake is only able to be reclaimed if \ascode{PunishCreator} has not been set to true via a dispute by the end of a timeout period.
 
 \subsubsection{Ordering of BFPs}
 Basic funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by `amount of reputation backing the proposal'.
@@ -124,12 +124,12 @@ A Regular Funding Proposal may receive funds when pinged if it is active and at 
 A Priority Funding Proposal may receive funds when pinged if it is active and all PFP ahead of it in the funding queue have been updated less than 24 hours ago.\footnote{In order to avoid hitting the gas limit due to unbounded loops, it will be necessary to maintain two orderings for the PFPs, one by priority and one by \ascode{LastUpdated}. }
 
 \subsubsection{Editing Funding Proposals}
-The creator of a funding proposal may edit the \code{TotalRequested} property of a funding proposal at any time, but doing so resets the reputational support that the proposal has in the funding queue to zero. The intention here is for changes to funding to be potentially quick to achieve with the agreement of others in the colony if the requirements for the recipient pot change (e.g. the requirements for a task increase).
+The creator of a funding proposal may edit the \code{TotalRequested} property of a funding proposal at any time, but doing so resets the reputational support that the proposal has in the funding queue to zero. The intention here is for changes to funding to be potentially quick to achieve with the agreement of others in the colony if the requirements for the recipient pot change (e.g. the scope of a domain increases).
 
 \subsubsection{Cancelling Funding Proposals}
 The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to \ascode{cancelled}. This is analogous to the creator of a task being able to cancel the task if it has not yet been assigned a worker (see Section \ref{sec:tasks}). Beyond this it must be possible for a colony to cancel a funding proposal without the creator's involvement. This is done through the objection mechanism described in Section \ref{sec:objections-and-disputes}.
 
-When a task is cancelled, and funding proposals that have that task's pot as their target (\ascode{To}) also enter the \ascode{Cancelled} their \ascode{CurrentState} when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it will require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
+When a task is cancelled, funding proposals that have that task's pot as their target (\ascode{To}) also enter the \ascode{Cancelled} state when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it will require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
 
 \subsection{Paying out a Task Bounty}\label{sec:claiming-bounty}
 Ultimately, via the mechanism described above, some tokens have found their way into a pot associated with a task. Upon completion of the specified work and approval by the evaluator, the worker has earned the contents of the pot. However, even once the work has been approved, there remains a period of time before the funds can be requested to be paid out by the receiving address. This is enforced to allow a period where a user of the colony can object to the payout, accusing it of fraudulence or similar.
