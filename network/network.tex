@@ -4,13 +4,15 @@ The Colony Network consists of a collection of contracts on the Ethereum blockch
 
 The instances of the \code{Colony} contract represent the individual projects being worked on in the Colony Network. These are originally deployed by the \code{ColonyNetwork} contract. These \code{Colony} contracts will also have an ERC20 compliant contract that represents the colony's own token deployed alongside them.
 
-\subsection{Contract upgradability}
+\subsection{Contract upgradability}\label{subsec:upgradability}
 
 We want to ensure the future upgradability of the deployed system as we foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves using new features as they are added to the Network.
 
-While we had originally decided on one approach to provide this upgradability, using a storage contract we termed \ascode{EternalStorage}, the EIP150 hard fork increased the gas costs for the \ascode{call} opcode which this approach relied on heavily. As a result, we are reconsidering this decision. An explanation of the \ascode{EternalStorage} approach and of the alternative approach being currently considered can be found in Appendix \ref{appendix:upgradability}.
+We intend to allow colonies and tokens to be upgraded by using the pattern made available under the name EtherRouter\cite{EtherRouter}. This implementation uses two contracts in addition to the contract(s) providing the functionality implemented. The first additional contract is the \ascode{EtherRouter} contract, which passes on transactions --- via \ascode{delegatecall} --- to the contract that implements that function. The second additional contract is the \ascode{Resolver} contract, where the addresses of the contracts that implement the desired behaviour are defined. Whenever a transaction is received by the \ascode{EtherRouter} contract, it looks up the contract that implements that function (if any) in the \ascode{Resolver}, and then \ascode{delegatecall}s that contract.
 
-Regardless of the implementation used, we will ensure that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force any colony to upgrade the underlying contracts. The colony itself must decide that it wants to upgrade to a new version.
+In order to upgrade, new contracts are deployed with new functionality, and then contracts that the \ascode{Resolver} contract points to must be changed to point to these new contracts. In order to avoid a situation where the contract partially implements both old and new functionality,  a new instance of \ascode{Resolver} will be deployed for each upgrade, and then a single transaction can point \ascode{EtherRouter} at the new \ascode{Resolver}.
+
+We will ensure that in the case of a colony, the choice of upgrading the underlying \code{Colony} contract will never lie with the Colony Network. While the network is in control of what upgrades are available, they are not able to force any colony to upgrade the underlying contracts. The colony itself must decide that it wants to upgrade to a new version.
 
 \subsection{Contract security}\label{sec:escape-hatches}
 While we aspire to bug free contracts, the adoption of a `defensive programming' mentality endeavours to limit the impact of any issues that manifest in the deployed contracts.
