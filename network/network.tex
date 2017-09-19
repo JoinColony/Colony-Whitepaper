@@ -1,6 +1,6 @@
 \section{The Colony Network on Ethereum}\label{sec:colonynetwork}
 
-The Colony Network consists of a collection of contracts on the Ethereum blockchain. The exact configuration of contracts depends on how we ultimately decide to implement contract upgradability (see below). However, at the core of the network will be a \code{ColonyNetwork} contract. This contract is primarily responsible for managing the reputation mining process (described in Section \ref{sec:reputationmining}), but also for general control of the network --- for example, setting the fees associated with using the network, or deploying new versions of the \code{Colony} contract.
+The Colony Network consists of a collection of contracts on the Ethereum blockchain. At the core of the network will be a \code{ColonyNetwork} contract. This contract is primarily responsible for managing the reputation mining process (described in Section \ref{sec:reputationmining}), but also for general control of the network --- for example, setting the fees associated with using the network, or deploying new versions of the \code{Colony} contract.
 
 The instances of the \code{Colony} contract represent the individual projects being worked on in the Colony Network. These are originally deployed by the \code{ColonyNetwork} contract. These \code{Colony} contracts will also have an ERC20 compliant contract that represents the colony's own token deployed alongside them.
 
