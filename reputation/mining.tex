@@ -164,7 +164,7 @@ The Merkle root in questions is the \ascode{JustificationRootHash} (\jrh); it is
 
 The left-most leaf of the Justification Tree ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. Both parties must submit a proof that their tree does indeed start at $\mathcal{RH}_0$. Note that in a Merkle proof for a left-most leaf, all siblings are hashed on the right.
 
-The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hased with itself, we can determine the index of the last leaf. This index is required to be $n$ --- the number of reputation updates in the log.
+The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hashed with itself, we can determine the index of the last leaf. This index is required to be $n$ --- the number of reputation updates in the log.
 
 The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. 
 
