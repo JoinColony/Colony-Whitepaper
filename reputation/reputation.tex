@@ -100,6 +100,7 @@ Whenever an event that causes one or more users to have their reputation updated
 \begin{itemize}
 \item The user suffering the reputation loss or gain.
 \item The amount of reputation to be lost or gained.
+\item The type of reputation to be lost or gained.
 \item The colony the update has occurred in.
 \item How many reputation entries will need to be updated (including parent, child and colony-wide total reputations). This is the motivation for storing \ascode{n\_parents} and \ascode{n\_children} for each skill and domain, as described in Section \ref{subsec:on-chain-representation-of-skills}.
 \item How many total updates to reputations have occurred before this one in this cycle, including decays and updates to parents and children.
