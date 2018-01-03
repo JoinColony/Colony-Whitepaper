@@ -18,11 +18,8 @@ jobs:
           name: Copy deploy script to workspace
           command: cp ./deploy.sh /tmp/workspace/deploy.sh
       - run:
-          name: Get latexdiff
-          command: git clone https://github.com/ftilmann/latexdiff && echo | cpan && cpan Algorithm::Diff && ./latexdiff/latexdiff-vc --git -r master main.tex
-      - run:
-          name: Build whitepaper diff
-          command: pdflatex main-diffmaster.tex && bibtex main-diffmaster && pdflatex main-diffmaster.tex && pdflatex main-diffmaster.tex
+          name: Run latexdiff
+          command: bash ./latexdiff-wrapper.sh main.tex master
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -32,7 +29,7 @@ jobs:
           path: ./main.pdf
           destination: whitepaper.pdf
       - store_artifacts:
-          path: ./main-diffmaster.pdf
+          path: ./diff/main.pdf
           destination: whitepaper-diff.pdf
 
   deploy-job:
