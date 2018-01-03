@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Build paper
-          command: pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+          command: bash ./gitinfo.sh && pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
       - run:
           name: Make workspace
           command: mkdir -p /tmp/workspace
