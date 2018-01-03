@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+      - image: blang/latex
     steps:
       - checkout
       - run:
-          name: Greeting
-          command: echo Hello, world.
-      - run:
-          name: Print the Current Time
-          command: date
+          name: Build paper
+          command: pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+      # - run:
+          # name: Print the Current Time
+          # command: date
