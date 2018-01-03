@@ -15,6 +15,9 @@ jobs:
           name: Copy whitepaper to workspace
           command: cp ./main.pdf /tmp/workspace/whitepaper.pdf
       - run:
+          name: Copy whitepaper to artifacts
+          command: mkdir $CIRCLE_ARTIFACTS/whitepaper/ cp ./main.pdf $CIRCLE_ARTIFACTS/whitepaper/whitepaper.pdf
+      - run:
           name: Copy deploy script to workspace
           command: cp ./deploy.sh /tmp/workspace/deploy.sh
       - persist_to_workspace:
