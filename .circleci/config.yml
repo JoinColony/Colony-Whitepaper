@@ -15,16 +15,25 @@ jobs:
           name: Copy whitepaper to workspace
           command: cp ./main.pdf /tmp/workspace/whitepaper.pdf
       - run:
-          name: Copy whitepaper to artifacts
-          command: mkdir $CIRCLE_ARTIFACTS/whitepaper/ cp ./main.pdf $CIRCLE_ARTIFACTS/whitepaper/whitepaper.pdf
-      - run:
           name: Copy deploy script to workspace
           command: cp ./deploy.sh /tmp/workspace/deploy.sh
+      - run:
+          name: Get latexdiff
+          command: git clone https://github.com/ftilmann/latexdiff && echo | cpan && cpan Algorithm::Diff && ./latexdiff/latexdiff-vc --git -r master main.tex
+      - run:
+          name: Build whitepaper diff
+          command: pdflatex main-diffmaster.tex && bibtex main-diffmaster && pdflatex main-diffmaster.tex && pdflatex main-diffmaster.tex
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
             - whitepaper.pdf
             - deploy.sh
+      - store_artifacts:
+          path: ./main.pdf
+          destination: whitepaper.pdf
+      - store_artifacts:
+          path: ./main-diffmaster.pdf
+          destination: whitepaper-diff.pdf
 
   deploy-job:
     docker:
