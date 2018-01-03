@@ -19,7 +19,7 @@ jobs:
           command: cp ./deploy.sh /tmp/workspace/deploy.sh
       - run:
           name: Run latexdiff
-          command: bash ./latexdiff-wrapper.sh main.tex master
+          command: bash ./latexdiff-wrapper.sh main.tex origin/master
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
