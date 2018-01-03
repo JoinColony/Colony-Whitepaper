@@ -8,5 +8,5 @@ gcloud --quiet container clusters get-credentials $CLUSTER_NAME
 chown -R root:root /root/.kube
 export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
 
-kubectl create secret generic whitepaper --from-file /tmp/workspace/main.pdf --dry-run -o yaml | kubectl replace -f -
+kubectl create secret generic whitepaper --from-file /tmp/workspace/whitepaper.pdf --dry-run -o yaml | kubectl replace -f -
 

@@ -13,14 +13,14 @@ jobs:
           command: mkdir -p /tmp/workspace
       - run:
           name: Copy whitepaper to workspace
-          command: cp ./main.pdf /tmp/workspace/main.pdf
+          command: cp ./main.pdf /tmp/workspace/whitepaper.pdf
       - run:
           name: Copy deploy script to workspace
           command: cp ./deploy.sh /tmp/workspace/deploy.sh
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
-            - main.pdf
+            - whitepaper.pdf
             - deploy.sh
 
   deploy-job:
@@ -54,5 +54,5 @@ workflows:
           requires:
             - build-job
           # filters:
-            # branches:
-              # only: master
+          #   branches:
+          #     only: master
