@@ -38,7 +38,7 @@ Each task requires three roles to be assigned: the manager, the worker and the e
 
 The performance of the user who has completed the work is established when the work is submitted and then evaluated. At this point, the evaluator grades the work submitted by the worker, and the worker rates the manager's ability to coordinate delivery of the task\footnote{These scores should be submitted using a pre-commit and reveal scheme to ensure secrecy during the rating process and avoid retaliatory grading in the event that the manager and evaluator are the same person, which we expect to be a reasonably common occurrence. In the event of a user not committing or revealing within a reasonable time, their rating of their counterpart is assumed to be the highest possible and they receive a mild reputation penalty. } on a scale of one to three points.
 
-In the case of the evaluator, a rating of 1 point counts as them rejecting the work and a score of 2-3 points counts as accepting the work. Therefore ratings and the reputation lost or gained follow these rules:
+In the case of the evaluator, a rating of 1 point counts as them rejecting the work and a score of 2-3 points counts as accepting the work. The rating received defines the reputation change the user will experience:
 \begin{itemize}
  \item[]1 point:\phantom{s} User was unable to complete the task. Reputation penalty equal to the token payout.
  \item[]2 points: User completed the task acceptably. Reputation gain equal to the token payout.
