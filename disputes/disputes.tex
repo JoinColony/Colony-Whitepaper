@@ -1,5 +1,5 @@
 \section{Objections and Disputes}\label{sec:objections-and-disputes}\label{sec:disputes}
-The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. These are trust problems, which have traditionally been solved by management hierarchies. But colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable. 
+The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. These are trust problems, which have traditionally been solved by management hierarchies. But colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable.
 
 The solution to collective decision making is usually voting, but Colony is designed for day to day operation of an organisation. Voting on every decision is wholly impractical.
 
@@ -13,7 +13,7 @@ When a member of a colony feels that something is amiss, they can \emph{raise an
 The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \emph{dispute}.
 
 \subsubsection*{What are Disputes?}
-We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting. 
+We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting.
 
 \subsection{Raising Objections}\label{subsec:raising-objections}
 
@@ -21,10 +21,10 @@ The user raising an objection submits the following data:
 \begin{itemize}
  \item the data that should be changed
  \item the reputation(s) that should vote on this issue (a maximum of one from each of the domain and skill hierarchies)
- \item proof that these reputations should be allowed to make the change in question. 
+ \item proof that these reputations should be allowed to make the change in question.
 \end{itemize}
 
-The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern \emph{escalation}. 
+The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern \emph{escalation}.
 
 \begin{center}
  \textbf{In Colony you cannot escalate a decision to higher management, you can only escalate to bigger groups of your peers.}
@@ -43,14 +43,14 @@ To create an objection, a user must possess enough reputation and must also stak
 If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the tokens required, which requires them to have a correspondingly smaller amount of reputation.\footnote{This minimum amount required to even propose a change prevents users from spamming objections --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be `live' until other users stake tokens, and take it over the 0.1\% threshold. The  amount of tokens required to be staked for a particular objection is recorded at the time when it is created. Users can only stake tokens in proportion to the reputation they have. For example, if they wanted to stake 40\% of the tokens required, they must have at least 40\% of the reputation that would be required to create the objection outright.
 
 \subsubsection{Cost of defending against a raised objection}
-Once enough tokens have been staked against an objection it becomes active and, barring any further user actions for three days, the suggested change will take place when the objection is `pinged' by a user. However, if there are users who oppose the suggested `change', they may stake tokens in support of the `keep' side. If the keep side receives sufficient support, a dispute is raised. 
+Once enough tokens have been staked against an objection it becomes active and, barring any further user actions for three days, the suggested change will take place when the objection is `pinged' by a user. However, if there are users who oppose the suggested `change', they may stake tokens in support of the `keep' side. If the keep side receives sufficient support, a dispute is raised.
 
-If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'. 
+If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'.
 
 \subsubsection{Voting on Disputes}
 If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
 
-The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved. 
+The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved.
 
 Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak256(secret, option\_id)}, where \ascode{option\_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, option\_id} and the contract calculates \ascode{keccak256(secret, option\_id)} to verify it is what they originally submitted.
 
@@ -61,7 +61,7 @@ As the secret is revealed it cannot be sensitive. It must also change with each 
 Once a vote has been in the reveal phase for 48 hours, a transaction may be made to finalise the vote. Any subsequent reveals of votes do not contribute to the decision being made, but serve only to unlock the user's tokens if it was a token-weighted or hybrid vote (see below). We define quorum to be more than 10\% of the reputation eligible to vote has done so. If quorum is not reached, no changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
 
 \subsubsection{Consequences of the vote}
-If quorum has been reached in a dispute vote, and the `change' side won, then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes}). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted. 
+If quorum has been reached in a dispute vote, and the `change' side won, then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes}). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted.
 
 At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens back and they lose the  complementary percentage of the reputation that was required to stake. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
 
@@ -82,7 +82,7 @@ So for a small vote with little reputation in the colony being allowed to vote, 
 Between these extremes of a landslide loss and a very slim loss, the loss of tokens and reputation suffered by the losing side beyond the 0.1 minimum ($\Delta$) varies linearly:
 
 \begin{equation}
- \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace    
+ \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace
 \end{equation}
 
 \noindent and so the total loss ($0.1 + \Delta$) varies between $0.1$ and $1$.

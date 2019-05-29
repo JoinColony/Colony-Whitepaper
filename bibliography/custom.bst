@@ -7,7 +7,7 @@
 %% merlin.mbs  (with options: `seq-no,ed-au,atit-u,num-xser,isbn,issn,doi,xedn,url,url-blk,nfss,')
 %% ----------------------------------------
 %% *** Colony Whitepaper ***
-%% 
+%%
 %% Copyright 1994-2011 Patrick W Daly
  % ===============================================================
  % IMPORTANT NOTICE:

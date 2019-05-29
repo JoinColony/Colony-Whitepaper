@@ -11,7 +11,7 @@ The reputation calculation whose result the miners are submitting is determined 
 \subsection{Merkle Trees and Proofs}\label{sec:Merkle-summary}
 This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \cite{MerkleInEthereum}) and Merkle proofs in order to establish some terminology, and can be skipped if already familiar with them.
 
-Consider the tree shown in Figure \ref{fig:Merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself. 
+Consider the tree shown in Figure \ref{fig:Merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself.
 
 The resulting structure is known as a Merkle tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{1, [B,F], [l,l]}. The first argument is the element whose existence is to be proved. The second argument is the list of hashes that the hash of the first element should be hashed with in succession. The last argument is an array of \ascode{l}'s and \ascode{r}'s that indicates whether the hash calculated so far should be hashed on the left or the right of next element in question. So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{3, [D,E], [l,r]}.
 \begin{figure}
@@ -52,7 +52,7 @@ Note also that the array of \ascode{l}'s and \ascode{r}'s nothing more than a bi
 \subsection{The Reputation Tree and the ReputationRootHash}\label{sec:reptree}
 The data leaves in the reputation tree are the reputations all users have in all skills, as well as the colony-wide totals. Such a leaf consists of the following data:
 \[
-R = 
+R =
 \begin{cases}
  \ascode{rep\_id} & \textnormal{the id of a skill or domain identifying the type of reputation},\\
  \ascode{colony\_id} & \textnormal{the colony the reputation is held in},\\
@@ -88,7 +88,7 @@ All individual reputations are assembled into the \textbf{``Reputation Tree''} w
   edge[-] (r1hash);
  \node at (3.75,-2.5) (r23) {$\mathcal{H}_{2,3}$}
   edge[-] (r2hash)
-  edge[-] (r3hash);  
+  edge[-] (r3hash);
  \node at (7,-2.5) (rnn) {$\mathcal{H}_{N-1,N}$}
   edge[-] (rnhash)
   edge[dashed] (6.5,-4);
@@ -123,13 +123,13 @@ The final \ascode{ReputationRootHash} is submitted to the contract by the miner 
 \subsubsection*{Who can submit a new root hash?}
 All CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} miner to submit the hash to the contract.
 
-It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if 
+It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if
 \begin{equation*}\label{eq:mining-difficulty}
-\ascode{keccak256(address, N, hash)} < \ascode{target}. 
+\ascode{keccak256(address, N, hash)} < \ascode{target}.
 \end{equation*}
 At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after 150 blocks. We limit the total number of miners allowed to submit a specific hash to 12.
 
-The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}). 
+The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by $10^{15}$, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of $10^{15}$ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}).
 
 Miners will also be required to have staked their tokens for a few update cycles before they are eligible to submit or support a hash.
 %
@@ -150,7 +150,7 @@ We assume that the correct hash is one of the  submitted hashes. This is a reaso
 
 We must prove all but one submission incorrect by having each submission navigate a series of \emph{challenges}. These challenges refer to events that happened in the colony network within the last update cycle that have an effect on reputation. The \emph{responses} to the challenges are Merkle proofs that the corresponding reputation update was properly handled. Anyone is able to respond to a challenge, regardless of who submitted the original hash; this should ensure that the correct state is always defended.
 
-We begin with the scenario where only two submissions are made, and one is correct. 
+We begin with the scenario where only two submissions are made, and one is correct.
 
 First we consider the case in which the same hash has been submitted twice, but with a disagreement about the number of leaves it contained. In this situation, the users are required to submit a Merkle proof for the last leaf in their tree. We are able to tell if a submitted proof corresponds to the last leaf in the tree, as all sibling hashes must be hashed on the left. Noting the positions in the Merkle proof in which a hash is hashed with itself also allows us to tell the index of this last leaf; if it corresponds to either of the submitted states, that one is correct.
 
@@ -160,13 +160,13 @@ We now consider the more complicated case where two different hashes have been s
   \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
 The first step is for both parties to upload a justification of their submitted hash. This justification consists of a second Merkle root and two Merkle proofs.
 
-The Merkle root in questions is the \ascode{JustificationRootHash} (\jrh); it is the root of the `Justification Tree' -- a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}. 
+The Merkle root in questions is the \ascode{JustificationRootHash} (\jrh); it is the root of the `Justification Tree' -- a tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash}.
 
 The left-most leaf of the Justification Tree ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. Both parties must submit a proof that their tree does indeed start at $\mathcal{RH}_0$. Note that in a Merkle proof for a left-most leaf, all siblings are hashed on the right.
 
 The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash. Note that in a Merkle proof for a right-most leaf, all siblings are hashes on the left; furthermore, by noting the steps at which a hash is hashed with itself, we can determine the index of the last leaf. This index is required to be $n$ --- the number of reputation updates in the log.
 
-The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. 
+The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied.
 
  %
 \begin{figure}
@@ -191,11 +191,11 @@ The intermediate leaves of the Justification Tree represent the evolution of the
  %
  \node at (3.75,-2.5) (rh23) {$h_{2,3}$}
   edge[-] (rh2)
-  edge[-] (rh3);  
+  edge[-] (rh3);
  %
  \node at (5.25,-2.5) (rh34) {$h_{3,4}$}
   edge[-] (rh3)
-  edge[-] (rh4);  
+  edge[-] (rh4);
  %
  \node at (8.5,-2.5) (rhnn) {$h_{n-1,n}$}
   edge[-] (rhn)
@@ -230,17 +230,17 @@ Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0
 \noindent First, however, we must establish where the two submissions first differ.
 
 \subsubsection*{2. Searching for the discrepancy}
-The contract requires both parties to submit repeated Merkle proofs that specific reputation updates were handled correctly until the first discrepancy between the two submissions is found. 
+The contract requires both parties to submit repeated Merkle proofs that specific reputation updates were handled correctly until the first discrepancy between the two submissions is found.
 
 We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree. Recall that if $h$ does not have an immediate sibling, $\overline{h}$ is taken to be equal to $h$ as per our rule of hashing these elements with themselves.
 
 Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. These proofs have the simplified\footnote{Since we know that the proofs concern the first and last leaf of the tree, no array of left-right information is needed.} form:
 \[
- \overline{\mathcal{RH}_0}^A, \overline{h_{0,1}}^A, \overline{h_{0,2}}^A, \ldots \overline{h_{0,2^k}}^A \qquad \textnormal{ terminating at } \jrh^A 
+ \overline{\mathcal{RH}_0}^A, \overline{h_{0,1}}^A, \overline{h_{0,2}}^A, \ldots \overline{h_{0,2^k}}^A \qquad \textnormal{ terminating at } \jrh^A
 \]
 and
 \[
- \overline{\mathcal{RH}_0}^B, \overline{h_{0,1}}^B, \overline{h_{0,2}}^B, \ldots \overline{h_{0,2^k}}^B \qquad \textnormal{ terminating at } \jrh^B 
+ \overline{\mathcal{RH}_0}^B, \overline{h_{0,1}}^B, \overline{h_{0,2}}^B, \ldots \overline{h_{0,2^k}}^B \qquad \textnormal{ terminating at } \jrh^B
 \]
 where $k$ is the largest integer such that $2^k$ is smaller than $n$.
 
@@ -253,7 +253,7 @@ The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k
 \end{eqnarray*}
 
 The contract begins its search by %pseudorandomly%\footnote{This pseudorandomness is to help mitigate an attack described in Section \ref{sec:mining-possible-attacks}.}
-%picking an index $j$ from within the range the first discrepancy in known to lie in. It then 
+%picking an index $j$ from within the range the first discrepancy in known to lie in. It then
 %
 picking an index $j$ from within the range the first discrepancy in known to lie in (say always the smallest), and requiring both parties to provide a Merkle proof showing how the $j^{th}$ reputation update from all updates to be applied this cycle (Section \ref{subsec:reputation-update-log}) was included in their justification tree. The required target of this proof is no longer the $\jrh$ itself, but rather the retained value for $h_{0,2^k}$ or $\overline{h_{0,2^k}}$. Specifically this proof consists of
 
@@ -271,13 +271,13 @@ The same process as before of comparing hashes and retaining the roots of either
 %  \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_i$).
 %  \item[(iii)] A Merkle proof showing that the pair ($\mathcal{RH}_{i-1}, \mathcal{RH}_i$) is correctly included in the justification tree.
 % \end{itemize}
-% 
+%
 % When either party submits, first their Merkle proof is checked. It must use the correct sequence of \ascode{l} and \ascode{r} during the hashing process, which is defined by the $i$ that has been selected. If the Merkle proof is correct, then if this is the first party to submit, their $\mathcal{RH}^A_{i-1}$ and $\mathcal{RH}^A_{i}$ are stored. We label these with a superscript `A' to denote they have come from the first party to submit.
-% 
+%
 % When the second party submits and their Merkle proof is found valid, then the contract compares the submitted $\mathcal{RH}^B_{i-1}$ and $\mathcal{RH}^B_{i}$ to $\mathcal{RH}^A_{i-1}$ and $\mathcal{RH}^A_{i}$ stored from the first party's submission.
-% 
+%
 % If the pairs of submitted root hashes are identical, the (first) discrepancy between the two calculations occurs must occur later in the tree. The lower bound for the search for the first discrepancy can be set to $i+1$. If the submitted root root hashes are such that $\mathcal{RH}^A_{i-1}\neq\mathcal{RH}^B_{i-1}$ and $\mathcal{RH}^A_{i}\neq\mathcal{RH}^B_{i}$, then the first discrepancy must occur later in the tree. The upper bound for the search can be set to $i-2$.
-% 
+%
 % This process repeats, pseudorandomly selecting a new $i$ within the still-valid bounds of the search for the new challenge. Each newly submitted proof further reduces the size of the search space by a factor of two on average.\footnote{By examining precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it is more gas efficient to do the na\"{i}ve binary search for all but the very smallest of trees.}
 
 There are two ways this process can terminate. The first way the process terminates is when one party does not respond to a challenge. In this case the party not responding is deemed to be incorrect.
@@ -340,7 +340,7 @@ If an entry in the reputation update log indicates that a dispute has occurred a
 
 To achieve this, all the transactions that correspond to updating the reputations of the user gaining the reputation are done first. In the event such a transaction must be proved to be correct in the resolution protocol, the users can provide a proof of the losing user's reputation, prior to them losing it in this event in update cycle, and this can be compared to the amount of reputation intended to be gained. Whichever is smaller is used as the amount of reputation the user is gaining during the calculations.
 
-Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used as the voting weight should be done last i.e. all the children and parents should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the child reputations. %If any of these calculations need to be proved correct during the resolution protocol, 
+Then, when calculating the reputation deduction to be applied to the losing user, the reputation that was used as the voting weight should be done last i.e. all the children and parents should be considered first, as it is the amount of the reputation that was eligible to vote that will determine the fraction lost of each of the child reputations. %If any of these calculations need to be proved correct during the resolution protocol,
 
 For further details about reputation transfers and disputes, see Appendix \ref{appendix:rep-transfer}.
 
@@ -353,7 +353,7 @@ In the event of multiple submissions, finding the correct one takes time --- the
 
 The denial of service attack (to delay a proper reputation update) can only be sustained when the false submissions are incorrect only in some leaves, and the majority of the justification tree is correct. In this scenario, the attacker successfully defends each of their submissions for as long as possible to delay the resolution of the reputation mining protocol as much as possible.
 
-Any such attack is capped by the first round of pairings of submissions against each other. Even if the attacker made millions of submissions, only a finite number of those would be able to be successfully defended due to the block size --- currently, no more than 4500 submissions would be able to be defended, even if the attacker used up all block space during the timeout.\footnote{These figures assume $1.5\pi\times10^6$ gas in a block, and that each transaction is only 21000 gas for a worst-case-scenario calculation.} With only 4500 submissions able to make it to the second round, the length of time the DoS attack would be sustained for is given by 
+Any such attack is capped by the first round of pairings of submissions against each other. Even if the attacker made millions of submissions, only a finite number of those would be able to be successfully defended due to the block size --- currently, no more than 4500 submissions would be able to be defended, even if the attacker used up all block space during the timeout.\footnote{These figures assume $1.5\pi\times10^6$ gas in a block, and that each transaction is only 21000 gas for a worst-case-scenario calculation.} With only 4500 submissions able to make it to the second round, the length of time the DoS attack would be sustained for is given by
 
 $$t \times \left\lceil\log_2\left(4500\right)\right\rceil\times \left\lceil\log_2\left(N_{\rm updates}\right)\right\rceil$$
 
@@ -363,7 +363,7 @@ Long term, $N_{\rm updates}$ will be dominated by the decay transactions rather 
 
 There would be little effect on the rest of the Colony Network in this time. Users would still be able to exercise their reputation from the previous reputation update, and continue to influence decisions with that reputation. Indeed, this shows what perhaps the main motivation for such an attack would be --- if a user knew that they had been `caught' behaving badly, and was due to lose all their reputation, they might try such an attack to eke out the last bits of influence they possibly could. However, decisions in the Colony network do not resolve quickly, and in a well-developed colony we would not expect any one person to have a large amount of reputation when compared to the rest of the colony. It therefore seems unlikely any one user would be able to unduly influence decisions significantly while conducting such an attack.
 
-Assuming this attack continued, then the reputation mining protocol would effectively only update every 36 hours. Users staking would become more susceptible to variance in terms of the rewards, but otherwise little would change in the day-to-day functioning of any individual colony. 
+Assuming this attack continued, then the reputation mining protocol would effectively only update every 36 hours. Users staking would become more susceptible to variance in terms of the rewards, but otherwise little would change in the day-to-day functioning of any individual colony.
 
 However, the attacker would lose \emph{all} the \rct\ that they had staked (which would be around 4500 times the expected minimum stake) in order to perform the attack, and so would have to buy more to attack again making this attack exceedingly expensive.
 
@@ -375,7 +375,7 @@ In order to be involved in the reputation mining process, \rcths\ must stake the
 
 If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash. The system allows for a maximum of 12 miners to be added to the list in each round. The same miner is allowed to appear on the list multiple times, but using different values of $N$ in the inequality \eqref{eq:mining-difficulty} on page \pageref{eq:mining-difficulty}.
 
-If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is deemed correct, however, the miners who submitted it gain \rcts\ and reputation. 
+If a hash is found to be incorrect, all those who submitted it lose their stake. If a hash is deemed correct, however, the miners who submitted it gain \rcts\ and reputation.
 
 The total amount of reputation earned by miners is not fixed, but varies along with activity in the \rc. The system tries to ensure that on average, 25\% of \rc\ reputation comes from mining. %In times of growing activity, more reputation will go to tasks and in times of declining activity more reputation will go to the miners.
 
@@ -404,7 +404,7 @@ The reward earned by each miner on the list is given by
 \begin{equation}\label{eq:miner-payout}
  m_n = M \frac{w_n}{W} \quad \textnormal{where} \quad W = \sum_{n=1}^{12} w_n
 \end{equation}
-i.e. the mining reward $M$ is divided among the miners according to their relative weighting. 
+i.e. the mining reward $M$ is divided among the miners according to their relative weighting.
 
 
 \subsection{Emergency Shutdown}\label{sec:big-red-button}

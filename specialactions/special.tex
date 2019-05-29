@@ -16,9 +16,9 @@ A salaried position could be realised by creating a special domain representing 
 
 \subsection{Awarding reputation for work not captured by tasks}
 
-All reputation decays over time, as described in Section \ref{sec:reputation}. This prevents an eternal `reputation aristocracy' and allows reputation to be meaningful even after major changes in the colony token's value. 
+All reputation decays over time, as described in Section \ref{sec:reputation}. This prevents an eternal `reputation aristocracy' and allows reputation to be meaningful even after major changes in the colony token's value.
 
-Reputation is awarded when a user receives payment of colony tokens --- most commonly as payout from a task, but sometimes from dispute resolution and, in the case of the \rc, from the reputation mining process. We can use the task payout mechanism to award users extra reputation provided there is consensus to do so. 
+Reputation is awarded when a user receives payment of colony tokens --- most commonly as payout from a task, but sometimes from dispute resolution and, in the case of the \rc, from the reputation mining process. We can use the task payout mechanism to award users extra reputation provided there is consensus to do so.
 
 Consider the scenario in which a founder, or an important early contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate was sub-optimally high for the particular colony.\footnote{Finding an optimal decay rate for reputation in the network will depend on empirical data collected from early colonies.} Or perhaps the founder was doing a lot of intangible work to get the colony off the ground in the first place and so was never compensated properly through the task system. To get around the limitations of the reputation system and to re-integrate the founder (and make them eligible to receive their rewards), the colony can create a special task that is solely designed to award reputation they are due. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
 
@@ -26,7 +26,7 @@ The important point is that any limitations imposed by the system can be weakene
 
 \subsection{Objections by non-members}
 
-Having reputation is a prerequisite for creating an objection and triggering the dispute process. Therefore, if an outsider is hired by a colony to perform a task, they will not, on their own, be able to object to the evaluation of their work. However, a good colony frontend may allow them to create the template for an objection, effectively calling for members of the colony to support it and submit the objection to the colony network on-chain on their behalf.  
+Having reputation is a prerequisite for creating an objection and triggering the dispute process. Therefore, if an outsider is hired by a colony to perform a task, they will not, on their own, be able to object to the evaluation of their work. However, a good colony frontend may allow them to create the template for an objection, effectively calling for members of the colony to support it and submit the objection to the colony network on-chain on their behalf.
 
 This is analogous to a member staking only 10\% of the required amount and waiting for further support from their peers (Section \ref{sec:costs-of-disputes}), with the difference being that without any third party support, this `objection' would never be processed on-chain.
 

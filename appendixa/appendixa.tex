@@ -9,7 +9,7 @@ Given that users are able stake small amounts on each objection, an arbitrarily 
 
 As noted in Section \ref{sec:costs-of-disputes}, an objection requires ``0.1\% of the reputation queried and 0.1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
 
-Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate. User A initiates the objections and puts up a stake of 100 tokens. In order to do this, A must have at least 200 relevant reputation points at the time. Assume that users B and C support the objection, staking 200 and 300 tokens (and having 400 and 600 reputation points) respectively.  
+Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate. User A initiates the objections and puts up a stake of 100 tokens. In order to do this, A must have at least 200 relevant reputation points at the time. Assume that users B and C support the objection, staking 200 and 300 tokens (and having 400 and 600 reputation points) respectively.
 
 \begin{table}[ht]
 \centering
@@ -104,9 +104,9 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To \\ \hline
 These dummy insertions occur whenever the remainder is 0 --- i.e. when the new stake has exactly matched the first unmatched stakes. This ensures that this log always describes as many transactions as there are people (the last entry is always a dummy transaction as the final transaction will always make two users whole). This means that regardless of how the users have matched up against each other, the event that is recorded in the reputation update log will have a known number of transactions equal to the number of staking users, even if some of those are `null' transactions.
 
 % \subsection{Generalisation}
-% 
+%
 % This procedure can also be extended to account for stakes being made in arbitrary orders (i.e. not all of one side followed by all of the other). This can be achieved by making the indices in the `Match From' and `Match To' columns only refer to stakes on one side or the other, and keeping matching lists that map those indices onto the stakes. Altering our first example slightly, we might end up with the stakes in table \ref{appa:modifiedexample} and the log entries in table \ref{appa:modifiedexamplelog}. The list of positive stakes would be [1, 3, 4] and the list of negative stakes would be [2, 5]. The `Match From' and `Match To' indices then refer to the list corresponding to the opposite sign of the stake currently being considered.
-% 
+%
 % \begin{table}[ht]
 % \centering
 % \caption{Generalised case of staking where stakes from each side occur in an arbitrary order.}
@@ -121,7 +121,7 @@ These dummy insertions occur whenever the remainder is 0 --- i.e. when the new s
 % E & -450          & 600                      & -600                                                                    \\ \hline
 % \end{tabular}
 % \end{table}
-% 
+%
 % \begin{table}[ht]
 % \centering
 % \caption{Equivalent of Table \ref{tab:matchFromTo} in the case where stakes can be made on either side in any order. The `Match From' and `Match To' indices now refer to lists of stakes for each side, which are recorded separately.}
@@ -134,7 +134,7 @@ These dummy insertions occur whenever the remainder is 0 --- i.e. when the new s
 % -450  & 2          & 3        & 0       &  3 & 4 \\ \hline
 % 0  & 0         & 0        & 0 & 5 & 5            \\ \hline
 % \end{tabular}
-% 
+%
 % \end{table}
-% 
+%
 % So for example, in Table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.

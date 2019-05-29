@@ -22,11 +22,11 @@ The manager (usually the creator of the task) is responsible for selecting the e
 \item A specification, or brief: to be used by the worker to guide the work, and by the evaluator for assessing the satisfactory completion of the task.
 \end{itemize}
 
-In order to create a task, the manager must possess sufficient reputation and must stake a number of Colony Tokens proportional to the amount of reputation within the domain. This stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour. 
+In order to create a task, the manager must possess sufficient reputation and must stake a number of Colony Tokens proportional to the amount of reputation within the domain. This stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour.
 
 Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so. Payouts do not have to all be in the same currency, and a task's payout can be made up of two or three different currencies.
 
-If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals are assigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in. The manager's stake is still only returned after a timeout period in order to ensure they can be punished if necessary. 
+If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals are assigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in. The manager's stake is still only returned after a timeout period in order to ensure they can be punished if necessary.
 
 Assigning the worker can only occur after the funds to satisfy the proposed payout have been received by the task, and both the manager and proposed worker have agreed to the assignment. The manager and the evaluator must also mutually agree to the assignment of the evaluator before the evaluator is assigned to the task. The brief and due date may be changed, the assigned worker removed, or the task cancelled, either by mutual consent, or via the dispute process.
 
@@ -38,7 +38,7 @@ If the evaluator's rating for the work is changed as a result of a dispute, they
 
 \subsection{Domains}\label{sec:domains}
 
-Of course, without structure, a large colony could quickly become difficult to navigate due to the sheer number of tasks —-- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain sub-domains and tasks. This simple modularity enables great flexibility as to how an organisation may be structured. A toy example is shown in in Figure \ref{fig:domainhierarchysample}. 
+Of course, without structure, a large colony could quickly become difficult to navigate due to the sheer number of tasks —-- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain sub-domains and tasks. This simple modularity enables great flexibility as to how an organisation may be structured. A toy example is shown in in Figure \ref{fig:domainhierarchysample}.
 
 \begin{figure}[h]
     \centering

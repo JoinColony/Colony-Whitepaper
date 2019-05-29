@@ -13,7 +13,7 @@ The hierarchical structure of a colony was described in Section \ref{sec:domains
 
 An example makes this clearer. Suppose a colony has a `development' domain which contains a `backend' domain and a `frontend' domain, as in Figure \ref{fig:domainhierarchysample} on page \pageref{fig:domainhierarchysample}. Any time a member of the colony earns reputation for work completed in the backend domain, it will increase their backend reputation, their development reputation and their reputation in the all-encompassing top-level domain of the colony. Reputation earned in the development domain will only increase the development and top-level domain reputation scores of the user.
 
-Later, the user behaves badly in the `development' domain, and they lose 100 reputation out of the 2000 they have in that domain. They also lose 100 reputation in the parent domains, and 5\% $\left(\frac{100}{2000}\right)$ of their reputation in each of the child domains of the `development' domain (which in this example, includes all of the Frontend, Backend, Node.js and Ruby domains). 
+Later, the user behaves badly in the `development' domain, and they lose 100 reputation out of the 2000 they have in that domain. They also lose 100 reputation in the parent domains, and 5\% $\left(\frac{100}{2000}\right)$ of their reputation in each of the child domains of the `development' domain (which in this example, includes all of the Frontend, Backend, Node.js and Ruby domains).
 
 \subsubsection{Reputation by Skill}\label{sec:rep-by-skill}
 
@@ -29,7 +29,7 @@ A user's total reputation in a colony is the sum of their reputation in the top-
 \subsection{Earning and losing reputation}\label{sec:earning-losing-rep}
 There are three ways to earn reputation in a colony.\footnote{The \rc\ is a special case in which reputation may also be earned by Reputation Mining --- see Section \ref{sec:reputationmining}.} The first is being involved with a successfully completed task. The second is through the dispute process. In both of these cases, the user has contributed usefully to the colony and is rewarded accordingly. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process (see Section \ref{sec:bootstrapping-rep}).
 
-Reputation losses can arise from a user being found responsible for a badly executed task, or being involved in the dispute process and the dispute being resolved against them. In addition, all reputation earned by users is exposed to a continual decay over time. 
+Reputation losses can arise from a user being found responsible for a badly executed task, or being involved in the dispute process and the dispute being resolved against them. In addition, all reputation earned by users is exposed to a continual decay over time.
 
 The rest of this section outlines each of these mechanisms, with references to the more detailed descriptions given elsewhere where appropriate.
 
@@ -57,12 +57,12 @@ We note here that, unlike tokens, reputation is never staked during this process
 \subsubsection{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 Since a colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
-To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them in the colony-wide domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the colony-wide domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated task being paid out. Users receiving reputation are presumably the colony creator and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team. 
+To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them in the colony-wide domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the colony-wide domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated task being paid out. Users receiving reputation are presumably the colony creator and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
 
 We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation of new reputation here, as this would devalue reputation already earned elsewhere in the colony. This bootstrapping issue is resolved by instead using reputation within the parent domain, when a child domain contains less than 10\% of the reputation of its parent domain. A domain below this threshold cannot have domains created under it.
 
 \subsubsection{Reputation Decay}
-All reputation decays over time. Every 600000 blocks, a user's reputation in every domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain. 
+All reputation decays over time. Every 600000 blocks, a user's reputation in every domain or skill decays by a factor of 2. This decay occurs every hour, rather than being a step change every three months to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain.
 
 The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per task) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time.
 
@@ -71,7 +71,7 @@ In the context of reputation, domains and skills are the same, differing only in
 
 Each skill that reputation can be earned in is assigned a \ascode{rep\_id} that is unique across the whole network. When a skill is created, additional properties are recorded and initialised.
 \begin{equation*}
-  \ascode{skill\_id} \rightarrow 
+  \ascode{skill\_id} \rightarrow
   \begin{cases}
     \ascode{n\_parents} &	\textnormal{total number of parents}\\
     \ascode{parent\_n\_id} &	\parbox[t]{.6\linewidth}{\textnormal{the \ascode{rep\_id} of the $n^{\rm th}$ parent, where $n$ is an integer power of two larger than or equal to 1. }}\\
