@@ -152,7 +152,14 @@ captionpos=b
 \newcommand{\rcth}{Colony Network Token holder}
 \newcommand{\rcths}{Colony Network Token holders}
 
-
+%defining time-related constants
+\usepackage{fp}
+\newcommand{\rewardclaimduration}{60} % days
+\newcommand{\miningstakeduration}{90} % days
+\newcommand{\repdecayduration}{90} % days
+\newcommand{\miningcycleduration}{24} % hours
+\FPeval{decayfactor}{round((\repdecayduration * 24) / \miningcycleduration, 0)}
+\FPeval{timetofail}{round((38011 * \miningcycleduration) / (365 * 24), 0)}
 
 %for diagrams of trees etc:
 \usepackage{tikz}
