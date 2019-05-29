@@ -392,7 +392,7 @@ The \emph{actual} mining rewards are calculated based on the above model and we 
 
 Miners who make a submission in a given reputation update cycle are entitled to a share of this reward. When a miner makes their submission, their weighting for that submission is calculated and recorded, and this is added to the total weights of all submitters for this hash so far. The $n^{\rm th}$ submitter has a weight of
 \begin{equation}\label{eq:miner-weighting}
- w_n = \left(1 - \exp\left(\frac{t_n}{T}\right)\right) \times \left( 1 - \frac{n-1}{N} \right)
+ w_n = \left(1 - \exp\left(\frac{-t_n}{T}\right)\right) \times \left( 1 - \frac{n-1}{N} \right)
 \end{equation}
 where $t_n$ is a number of blocks that the $n^{th}$ miner has staked their tokens for and $T$ and $N$ are normalising constants. $T$ is set to a number of blocks representing 3 months, and $N$ is set to twice the length of the list of submitters --- in our case $N=24$.
 
