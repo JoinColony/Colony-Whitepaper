@@ -127,7 +127,7 @@ It is however undesirable to have too many submissions for every update. We prop
 \begin{equation*}\label{eq:mining-difficulty}
 \ascode{uint256(keccak256(address, N, hash))} < \ascode{target}.\footnote{Note that internally the arguments are encoded using \ascode{abi.encodePacked} before being hashed.}
 \end{equation*}
-At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after \miningcycleduration\ hours. We limit the total number of miners allowed to submit a specific hash to 12.
+At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after \miningcycleduration\ hours. We limit the total number of miners allowed to submit a specific hash to 12. In the unlikely event that no submissions are received before the \miningcycleduration-hour window has elapsed, exactly one submission will be accepted, whenever it is received.
 
 The variable $N$ that goes into the hash is some integer greater than 0 and less than the number of tokens the \rcth\ address has staked divided by \minstake\, meaning that users with a large stake have a higher chance of qualifying to submit a hash sooner than smaller stake holders. The factor of \minstake\ is introduced to ensure that all hashes a user is eligible to submit can be calculated in a few seconds by the client. It also effectively creates a minimum number of tokens that must be staked to submit a hash. This puts a tangible cost on any attacks revolving around spamming known false submissions (see Section \ref{sec:mining-possible-attacks}).
 
