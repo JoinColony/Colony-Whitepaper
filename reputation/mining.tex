@@ -125,7 +125,7 @@ All CLNY token holders are eligible to become miners and participate in the repu
 
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if
 \begin{equation*}\label{eq:mining-difficulty}
-\ascode{keccak256(address, N, hash)} < \ascode{target}.
+\ascode{uint256(keccak256(address, N, hash))} < \ascode{target}.\footnote{Note that internally the arguments are encoded using \ascode{abi.encodePacked} before being hashed.}
 \end{equation*}
 At the beginning of the submission window, the target is set to 0 and slowly increases to $2^{256}-1$ after \miningcycleduration\ hours. We limit the total number of miners allowed to submit a specific hash to 12.
 
