@@ -161,6 +161,9 @@ captionpos=b
 \FPeval{decayfactor}{round((\repdecayduration * 24) / \miningcycleduration, 0)}
 \FPeval{timetofail}{round((38011 * \miningcycleduration) / (365 * 24), 0)}
 
+%defining other constants
+\newcommand{\minstake}{$2000 \cdot 10^{18}$}
+
 %for diagrams of trees etc:
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning}
