@@ -69,14 +69,14 @@ The decay serves multiple purposes. It ensures that reputation scores represent 
 \subsection{On-chain representation of skills and domains}\label{subsec:on-chain-representation-of-skills}
 In the context of reputation, domains and skills are the same, differing only in that domains are colony-specific categorisation and skills are universal categorisation. In this subsection, each instance of `skill' should be taken to mean `skill or domain'.
 
-Each skill that reputation can be earned in is assigned a \ascode{rep\_id} that is unique across the whole network. When a skill is created, additional properties are recorded and initialised.
+Each skill that reputation can be earned in is assigned a \ascode{skill\_id} that is unique across the whole network. When a skill is created, additional properties are recorded and initialised.
 \begin{equation*}
   \ascode{skill\_id} \rightarrow
   \begin{cases}
     \ascode{n\_parents} &	\textnormal{total number of parent skills}\\
     \ascode{n\_children} &	\textnormal{total number of child skills}\\
-    \ascode{parents}\left[\cdots\right] &	\parbox[t]{.6\linewidth}{\textnormal{array of \ascode{rep\_id}s of a \textit{logarithmic subset} of parent skills, where \ascode{parents[i]} gives the $2^i$-th parent}}\\
-    \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all child skills}
+    \ascode{parents}\left[\cdots\right] &	\parbox[t]{.6\linewidth}{\textnormal{array of \ascode{skill\_id}s of a \textit{logarithmic subset} of parent skills, where \ascode{parents[i]} gives the $2^i$-th parent}}\\
+    \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{skill\_id}s of all child skills}
   \end{cases}
 \end{equation*}
 Upon creation, \ascode{n\_children} is 0 and \ascode{children[]} is empty\watermark. These two attributes in all parents are updated with the \ascode{skill\_id} of the new child skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Back-of-the-envelope calculations suggest this corresponds to a depth of around 80, which we don't believe our users will be limited by.}
