@@ -1,10 +1,9 @@
 \clearpage
 \section{Reputation decay calculation details}\label{appendix:rep-decay}
 
-Reputation in any skill decays by a factor of two every 300000 blocks (roughly every three months). At each update (i.e. after every 300 blocks), the new decayed value ($u_{\rm new}$) is calculated by
+Reputation in any skill decays by a factor of two every \repdecayduration\ days. At each update (i.e. after every \miningcycleduration\ hours), the new decayed value ($u_{\rm new}$) is calculated by
 
-$$u_{\rm new} = u_{\rm old} \times \exp\left(-\frac{\ln 2}{1000}\right) = u_{\rm old} \times \exp\left(-k\right).$$
-
+$$u_{\rm new} = u_{\rm old} \times \exp\left(-\frac{\ln 2}{\decayfactor}\right) = u_{\rm old} \times \exp\left(-k\right).$$
 
 This calculation is applied separately to each user's skill, as well as the number that represents the total of all of those skills in the colony. Due to rounding error with the integer representation on the blockchain, these numbers will drift away from each other. However, we can show the accumulated error will be negligible. The amount of reputation that will be incorrectly missing after the first iteration will be, on average. $0.5N$ reputation wei, where $N$ is the number of users that have this skill.\footnote{This ignores the incorrectly lost reputation from rounding error introduced when decaying the colony-wide sum of the relevant reputation, but as there is only one total and many more users, ignoring it does not change our conclusions. We also note that there is an implicit assumption here that all users have the same amount of reputation; this is a worst-case assumption, as if it is not true then once some users have lost all their reputation the reputation incorrectly lost on each cycle will drop below $0.5N$.} The 0.5 is the average fractional part lost during each calculation.
 
@@ -27,9 +26,9 @@ This ratio becomes 1 when
 $$ b = \frac{1}{k}\ln\left(\frac{2R_{\rm 0}}{N}\left(1-\exp\left(-k\right)\right) +1   \right)$$
 
 
-\noindent which, for conservative values of $R_0 = 200\times10^{18}$ and $N=1000000$ occurs after 38011 iterations, or over 5 years for 15 second blocks. At this point, even though the colony believes some amount of reputation exists, no users have it, and no users can make decisions related to this type of reputation.
+\noindent which, for conservative values of $R_0 = 200\times10^{18}$ and $N=1000000$ occurs after 38011 iterations, or over \timetofail\ years for a \miningcycleduration\ hour mining cycle. At this point, even though the colony believes some amount of reputation exists, no users have it, and no users can make decisions related to this type of reputation.
 
-This is the end-of-life for an inactive colony; if no activity takes place in it for five years that is worthy of earning reputation, then the colony will be irrecoverable --- no-one will be able to create tasks to earn further reputation. This seems like a reasonable failure mode for an inactive colony, and it would take longer to reach for smaller colonies (with fewer rounding errors).
+This is the end-of-life for an inactive colony; if no activity takes place in it for \timetofail\ years that is worthy of earning reputation, then the colony will be irrecoverable --- no-one will be able to create tasks to earn further reputation. This seems like a reasonable failure mode for an inactive colony, and it would take longer to reach for smaller colonies (with fewer rounding errors).
 
 We now consider the case of an active colony. If the colony is active and creates $A$ new reputation at every update cycle, how does the ratio between the figure taken to be the total reputation and the incorrectly missing reputation change over time?
 
