@@ -73,13 +73,13 @@ Each skill that reputation can be earned in is assigned a \ascode{rep\_id} that 
 \begin{equation*}
   \ascode{skill\_id} \rightarrow
   \begin{cases}
-    \ascode{n\_parents} &	\textnormal{total number of parents}\\
-    \ascode{parent\_n\_id} &	\parbox[t]{.6\linewidth}{\textnormal{the \ascode{rep\_id} of the $n^{\rm th}$ parent, where $n$ is an integer power of two larger than or equal to 1. }}\\
-    \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all child skills}\\
-    \ascode{n\_children} &	\textnormal{total number of child skills}
+    \ascode{n\_parents} &	\textnormal{total number of parent skills}\\
+    \ascode{n\_children} &	\textnormal{total number of child skills}\\
+    \ascode{parents}\left[\cdots\right] &	\parbox[t]{.6\linewidth}{\textnormal{array of \ascode{rep\_id}s of a \textit{logarithmic subset} of parent skills, where \ascode{parents[i]} gives the $2^i$-th parent}}\\
+    \ascode{children}\left[\cdots\right] &	\textnormal{array of \ascode{rep\_id}s of all child skills}
   \end{cases}
 \end{equation*}
-Upon creation, \ascode{children[]} and \ascode{n\_children} are empty\watermark. These two fields in all parents are updated with the \ascode{skill\_id} of the new skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Back-of-the-envelope calculations suggest this corresponds to a depth of around 80, which we don't believe our users will be limited by.}
+Upon creation, \ascode{n\_children} is 0 and \ascode{children[]} is empty\watermark. These two attributes in all parents are updated with the \ascode{skill\_id} of the new child skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Back-of-the-envelope calculations suggest this corresponds to a depth of around 80, which we don't believe our users will be limited by.}
 
 Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol (see next section) and the procedures for escalating disputes (see Section \ref{sec:objections-and-disputes}). They are stored under the control of the \ascode{ColonyNetwork} contract.
 
