@@ -44,18 +44,16 @@ Of course, without structure, a large colony could quickly become difficult to n
     \centering
  \begin{tikzpicture}
    \node[ellipse,draw, dashed] at (0,0) (tld) {Colony Domain};
-   \node[ellipse,draw, dashed] at (-2,-2) (design) {Design};
-   \node[ellipse,draw, dashed] at (2,-2) (development) {Development};
-   \node[ellipse,draw, dashed] at (0.5,-4) (frontend) {Frontend};
-   \node[ellipse,draw, dashed] at (4,-4) (backend) {Backend};
-   \node[ellipse,draw, dashed] at (3,-6) (nodejs) {Node.js};
-   \node[ellipse,draw, dashed] at (5,-6) (ruby) {Ruby}
+   \node[ellipse,draw, dashed] at (-3,-2) (design) {Design};
+   \node[ellipse,draw, dashed] at (0,-2) (engineering) {Engineering};
+   \node[ellipse,draw, dashed] at (3,-2) (product) {Product};
+   \node[ellipse,draw, dashed] at (-1.5,-4) (frontend) {Frontend};
+   \node[ellipse,draw, dashed] at (1.5,-4) (backend) {Backend}
     (tld.-120) edge[->, bend left=45, in=-120] (design.north)
-    (tld.-60) edge[->, bend left=45, out=-60, in=120] (development.north)
-    (development.-120) edge[->, bend left=45, in=-120] (frontend.north)
-    (development.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north)
-    (backend.-120) edge[->, bend left=45, in=-120] (nodejs.north)
-    (backend.-60)  edge[->, bend left=45, out=-60, in=120] (ruby.north);
+    (tld.-90) edge[->, out=-60, in=120] (engineering.north)
+    (tld.-60) edge[->, bend left=45, out=-60, in=120] (product.north)
+    (engineering.-120) edge[->, bend left=45, in=-120] (frontend.north)
+    (engineering.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north);
  \end{tikzpicture}
  \caption{Parts of a possible domain hierarchy for a colony developing a web service.}
  \label{fig:domainhierarchysample}
