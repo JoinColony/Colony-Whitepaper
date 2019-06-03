@@ -7,7 +7,7 @@ Given that users are able stake small amounts on each objection, an arbitrarily 
 
 \subsection{Staking}
 
-As noted in Section \ref{sec:costs-of-disputes}, an objection requires ``0.1\% of the reputation queried and 0.1\% of the corresponding fraction of tokens to be staked'' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
+As noted in Section \ref{sec:costs-of-disputes}, an objection requires `0.1\% of the reputation queried and 0.1\% of the corresponding fraction of tokens to be staked' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
 
 Let us consider a situation where an objection requires 600 tokens and 1200 reputation points to activate. User A initiates the objections and puts up a stake of 100 tokens. In order to do this, A must have at least 200 relevant reputation points at the time. Assume that users B and C support the objection, staking 200 and 300 tokens (and having 400 and 600 reputation points) respectively.
 
@@ -51,7 +51,7 @@ We will assume that all users have the appropriate amount reputation to lose (i.
 \item User C loses 300 reputation to User E
 \end{enumerate}
 
-Indeed, in a group of $m$ people where some owe the others a debt, the maximum number of transfers required to make everyone whole is equal to $m-1$. If the reputation being lost has $p$ parents and $c$ children, there are up to $(p+c+1)$ domain-totals to be updated (as some reputation is destroyed), $(p+c+1)$ reputations for the losing user, and $(p+1)$ totals for the gaining user (who does not receive any reputation in any child domains). Thus there are up to $3 + 3p + 2c$ reputation updates that must occur at each of these steps. There are therefore $\left(m-1\right)\times\left(3+3p+2c\right)$ reputation updates in total. In the event of a disagreement regarding the reputation state, we must be able to access the $n$th update directly when calculating an update on-chain. This is made possible by additional logging of data when stakes are made.
+Indeed, in a group of $m$ people where some owe the others a debt, the maximum number of transfers required to make everyone whole is equal to $m-1$. If the reputation being lost has $p$ parents and $c$ children, there are up to $p+c+1$ domain-totals to be updated (as some reputation is destroyed), $p+c+1$ reputations for the losing user, and $p+1$ totals for the gaining user (who does not receive any reputation in any child domains). Thus there are up to $3+3p+2c$ reputation updates that must occur at each of these steps. There are therefore $(m-1)\times(3+3p+2c)$ reputation updates in total. In the event of a disagreement regarding the reputation state, we must be able to access the $n^{th}$ update directly when calculating an update on-chain. This is made possible by additional logging of data when stakes are made.
 
 When a user stakes and opposes some existing stake that does not yet have a counterpart, we record the stakes that it is matching against as well as any remainder.
 
@@ -70,7 +70,7 @@ When staking, the user supplies the `Match From' and `Match To' arguments. These
 
 \subsection{Exact matching}\label{sec:exactMatching}
 
-For the `reputation update log' to work correctly, we must know exactly how many reputation updates we have to consider. In the above example, it was $4\times (3+3p+2c)$, which could be calculated and recorded easily in the update log. However, consider an example where the staked amounts were
+For the `reputation update log' to work correctly, we must know exactly how many reputation updates we have to consider. In the above example, it was $4\times(3+3p+2c)$, which could be calculated and recorded easily in the update log. However, consider an example where the staked amounts were
 
 \begin{table}[ht]
 \centering
