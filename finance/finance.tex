@@ -11,19 +11,19 @@ Every colony has its own ERC20-compatible token. These tokens are under the cont
 To pay out tasks, in addition to local tokens, a colony may also use Ether, CLNY and other ERC20 tokens that have been explicitly whitelisted by the Colony Network.
 
 
-\subsection{Pots and Funding Proposals}\label{sec:pots-and-fp}
+\subsection{Funding Pots and Funding Proposals}\label{sec:pots-and-fp}
 All tokens and currencies are administered by the colony contract; it is responsible for all the bookkeeping and allocations.
 
-\textbf{Each domain and each task in a colony has an associated \emph{pot}.} A pot can be thought of as acting like a wallet specific to a particular domain or task. To each pot, the colony contract may associate any number of unassigned tokens it holds. Depending on context, the funds in a pot may be referred to as the bounty, the budget, the salary or working capital.
+\textbf{Each domain and each task in a colony has an associated \emph{funding pot}.} A funding pot can be thought of as acting like a wallet specific to a particular domain or task. To each funding pot, the colony contract may associate any number of unassigned tokens it holds. Depending on context, the funds in a funding pot may be referred to as the bounty, the budget, the salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
 
 \textbf{Funds are transferred between pots through \emph{funding proposals}.}
 \begin{description}
- \item A Funding Proposal consists of the following data
+ \item A Funding Proposal consists of the following data:
  \begin{itemize}
   \item \ascode{\textbf{Creator}}	--	The person that created the proposal.
-  \item \ascode{\textbf{From}}	--	Pot funds are coming from.
-  \item \ascode{\textbf{To}}	--	Pot funds are going to.
-  \item \ascode{\textbf{TokenType}}	--	The token contract address (0x0 for ether).
+  \item \ascode{\textbf{From}}	--	Funding pot funds are coming from.
+  \item \ascode{\textbf{To}}	--	Pot funds are going to (may be the rewards pot).
+  \item \ascode{\textbf{TokenType}}	--	The token contract address (0x0 for Ether).
   \item \ascode{\textbf{CurrentState}}	--	The state of the proposal (i.e. inactive, active, completed, cancelled).
   \item \ascode{\textbf{TotalPaid}}	--	How much has been transferred along this funding proposal so far.
   \item \ascode{\textbf{TotalRequested}}	--	The maximum amount to transfer after which this funding proposal is considered `completed'.
@@ -37,7 +37,7 @@ We distinguish between two types of funding proposals: Basic Funding Proposals (
 
 Priority funding proposals should be used when funds need to be directed somewhere that is not a direct descendant of the source, when the funding rate needs to be very high (including immediate payment), or when the funding rate should be otherwise controlled (e.g. in the case of paying a salary).
 
-For either funding proposal, the assignment to pots associated with domains or tasks is purely a bookkeeping mechanism. From the perspective of the blockchain, ether and tokens are held by the colony contract until they are paid out when a task is completed.
+For either funding proposal, the assignment to funding pots associated with domains or tasks is purely a bookkeeping mechanism. From the perspective of the blockchain, Ether and tokens are held by the colony contract until they are paid out when a task is completed.
 
 \subsubsection{Creating a Funding Proposal}
 Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots. They must stake an equivalent fraction of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour.
@@ -45,7 +45,7 @@ Any member of the colony may create a funding proposal. The proposer must have 0
 \subsubsection{From, To and TokenType}
 The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}.
 
-The \ascode{TokenType} may be any ERC20 token whitelisted for use in the network, Ether, CLNY or the Colony's own Token. The \ascode{From} and \ascode{To} fields must be pots associated with a domain or a task in the colony. If the funds are to move `downstream' from a domain to one of its children, a basic funding proposal is often sufficient.
+The \ascode{TokenType} may be any ERC20 token whitelisted for use in the network, Ether, CLNY or the Colony's own Token. The \ascode{From} field must be a funding pot associated with a domain or a task in the colony, while the \ascode{To} field must be either a funding pot or the special rewards pot. If the funds are to move `downstream' from a domain to one of its children, a basic funding proposal is often sufficient.
 
 \subsubsection{CurrentState}
 The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to channel funds. A basic funding proposal begins in active state while a priority one begins inactive (i.e. it must be activated by a vote). A funding proposal is completed when its \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism (see Section \ref{sec:objections-and-disputes}).
@@ -66,12 +66,12 @@ Active Funding Proposals that share the same \ascode{From} pot are ordered in a 
 %
 
 \subsubsection{Basic Funding Proposals}\label{subsubsec:BFPs}
-A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism. In either case, the stake is only able to be reclaimed if \ascode{PunishCreator} has not been set to true via a dispute by the end of a timeout period.
+A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's funding pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism. In either case, the stake is only able to be reclaimed if \ascode{PunishCreator} has not been set to true via a dispute by the end of a timeout period.
 
 \subsubsection{Ordering of BFPs}
-Basic funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by `amount of reputation backing the proposal'.
+Basic funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by the amount of reputation backing the proposal.
 
-When created, a basic funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of a BFP is the domain of the pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them putting their earned reputation at risk, nor any tokens --- it merely helps the proposal achieve funding in a more timely fashion.
+When created, a basic funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of a BFP is the domain of the funding pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them putting their earned reputation at risk, nor any tokens --- it merely helps the proposal achieve funding in a more timely fashion.
 
 The more reputation backs a proposal, the higher up the queue it is placed. Every transaction that adds backing to a proposal (or otherwise updates the backing level) inserts the proposal in the correct place in the queue. Only the funding proposal at the top of the queue accrues funds.
 
@@ -129,10 +129,10 @@ The creator of a funding proposal may edit the \code{TotalRequested} property of
 \subsubsection{Cancelling Funding Proposals}
 The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to \ascode{cancelled}. This is analogous to the creator of a task being able to cancel the task if it has not yet been assigned a worker (see Section \ref{sec:tasks}). Beyond this it must be possible for a colony to cancel a funding proposal without the creator's involvement. This is done through the objection mechanism described in Section \ref{sec:objections-and-disputes}.
 
-When a task is cancelled, funding proposals that have that task's pot as their target (\ascode{To}) also enter the \ascode{Cancelled} state when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it will require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
+When a task is cancelled, funding proposals that have that task's funding pot as their target (\ascode{To}) also enter the \ascode{Cancelled} state when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it will require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
 
 \subsection{Paying out a Task Bounty}\label{sec:claiming-bounty}
-Ultimately, via the mechanism described above, some tokens have found their way into a pot associated with a task. Upon completion of the specified work and approval by the evaluator, the worker has earned the contents of the pot. However, even once the work has been approved, there remains a period of time before the funds can be requested to be paid out by the receiving address. This is enforced to allow a period where a user of the colony can object to the payout, accusing it of fraudulence or similar.
+Ultimately, via the mechanism described above, some tokens have found their way into a funding pot associated with a task. Upon completion of the specified work and approval by the evaluator, the worker has earned the contents of the funding pot. However, even once the work has been approved, there remains a period of time before the funds can be requested to be paid out by the receiving address. This is enforced to allow a period where a user of the colony can object to the payout, accusing it of fraudulence or similar.
 
 If a user objects to the payout, they can raise an objection to void the task payout. The objection may be raised to a parent domain of the task in question --- or even escalated to the colony domain itself. The choice of domain lies with the user making the objection. Users vote to resolve any resulting disputes with votes weighted by their reputation in the domain the objection was raised to. In the event that their dispute is upheld, the funds can be returned to the domain that contained the task. If the voters approve of the payout, no changes are made and the user will be able to claim their payout after all.
 

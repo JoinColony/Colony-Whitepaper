@@ -24,13 +24,13 @@ The manager (usually the creator of the task) is responsible for selecting the e
 
 In order to create a task, the manager must possess sufficient reputation and must stake a number of Colony Tokens proportional to the amount of reputation within the domain. This stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour.
 
-Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so. Payouts do not have to all be in the same currency, and a task's payout can be made up of two or three different currencies.
+Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so. Payouts do not have to all be in the same currency, and a task's payout can be made up of an arbitrary number of currencies.
 
-If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals are assigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in. The manager's stake is still only returned after a timeout period in order to ensure they can be punished if necessary.
+If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals may be reassigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in. The manager's stake is still only returned after a timeout period in order to ensure they can be punished if necessary.
 
-Assigning the worker can only occur after the funds to satisfy the proposed payout have been received by the task, and both the manager and proposed worker have agreed to the assignment. The manager and the evaluator must also mutually agree to the assignment of the evaluator before the evaluator is assigned to the task. The brief and due date may be changed, the assigned worker removed, or the task cancelled, either by mutual consent, or via the dispute process.
+Assigning either the worker or the evaluator requires the mutual agreement of the manager and the assignee. Once assigned, changes which involve either the worker or evaluator (such as changing the task brief or due date, cancelling the task, or changing assignments or payouts) require mutual consent, or can be triggered via the dispute process.
 
-After the task has been assigned, the worker may make a `final submission', which includes some evidence that the work has been completed.
+After the task has been assigned, the worker has until the due date to make a `final submission', which includes some evidence that the work has been completed.
 
 Once the due date has passed or the worker has made their submission, the evaluator may rate the work. Regardless of whether the rating is positive or not, the task enters a state in which \textbf{objections} to the final state of the task can be made and \textbf{disputes} can be initiated (see Section \ref{sec:objections-and-disputes}). Once three days have elapsed, no more objections or disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
 
@@ -43,24 +43,24 @@ Of course, without structure, a large colony could quickly become difficult to n
 \begin{figure}[h]
     \centering
  \begin{tikzpicture}
-   \node[ellipse,draw, dashed] at (0,0) (tld) {Colony Domain};
+   \node[ellipse,draw, dashed] at (0,0) (tld) {Root Domain};
    \node[ellipse,draw, dashed] at (-3,-2) (design) {Design};
-   \node[ellipse,draw, dashed] at (0,-2) (engineering) {Engineering};
+   \node[ellipse,draw, dashed] at (0,-2) (development) {Development};
    \node[ellipse,draw, dashed] at (3,-2) (product) {Product};
    \node[ellipse,draw, dashed] at (-1.5,-4) (frontend) {Frontend};
    \node[ellipse,draw, dashed] at (1.5,-4) (backend) {Backend}
     (tld.-120) edge[->, bend left=45, in=-120] (design.north)
-    (tld.-90) edge[->, out=-60, in=120] (engineering.north)
+    (tld.-90) edge[->, out=-60, in=120] (development.north)
     (tld.-60) edge[->, bend left=45, out=-60, in=120] (product.north)
-    (engineering.-120) edge[->, bend left=45, in=-120] (frontend.north)
-    (engineering.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north);
+    (development.-120) edge[->, bend left=45, in=-120] (frontend.north)
+    (development.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north);
  \end{tikzpicture}
  \caption{Parts of a possible domain hierarchy for a colony developing a web service.}
  \label{fig:domainhierarchysample}
 
 \end{figure}
 
-This compartmentalisation of activity provides a tangible benefit to the colony as a whole. When objections are raised, they can be raised to a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be targeted for their opinion, and that when a dispute occurs, the whole colony is not required to vote in the dispute. Rather, only members with the relevant experience are asked for their opinion.
+This compartmentalisation of activity provides a tangible benefit to the colony as a whole by making reputation \textit{contextual}. When objections are raised, they are raised at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be targeted for their opinion, and that when a dispute occurs, the whole colony is not required to vote in the dispute. Rather, only members with the relevant experience can provide their opinion.
 
 It is ultimately up to individual colonies to decide how they wish to use domains --- some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar tasks together, or even multiple tasks that other colonies would consider a single task. We aim to provide a general framework that colonies may use however they see fit, and to only be prescriptive where necessary.
 
