@@ -1,19 +1,18 @@
 \section{The Reputation System}\label{sec:reputation}
-\subsection{What is Reputation?}\label{subsec:what-is-reputation}
+\subsection{What is reputation?}\label{subsec:what-is-reputation}
 
 Reputation is a number associated with an account which attempts to quantify the merit of a user's recent contributions to a colony. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed (see Section \ref{sec:claimrewards}). Because reputation is awarded to users by either direct or indirect peer approval of their actions, influence and rewards are distributed by merit.
 
-Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, %\footnote{If an address holding reputation is a contract, rather than an externally-owned account, then \emph{control} of that reputation may be passed between parties.}
-as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or malfeasance; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
+Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or malfeasance; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 
-\subsubsection{Reputation by Domain}\label{sec:rep-by-domain}
+\subsubsection{Reputation by domain}\label{sec:rep-by-domain}
 The hierarchical structure of a colony was described in Section \ref{sec:domains}. Reputation is earned in this hierarchy, and a user has a reputation in all domains that exist --- even if that reputation is zero. When a user earns or loses reputation in a domain, the reputation in all parent domains changes by the same amount. In the case of a user losing reputation, they also lose reputation in all child domains, but in this case the child domains lose the same \textit{fraction} of reputation that was lost in the original domain. If a reputation update would result in a user's reputation being less than zero, their reputation is set to zero instead.
 
 An example makes this clearer. Suppose a colony has a `development' domain which contains a `backend' domain and a `frontend' domain, as in Figure \ref{fig:domainhierarchysample} on page \pageref{fig:domainhierarchysample}. Any time a member of the colony earns reputation for work completed in the backend domain, it will increase their backend reputation, their development reputation and their reputation in the all-encompassing root domain of the colony. Reputation earned in the development domain will only increase the development and root domain reputation scores of the user.
 
 Later, the user behaves badly in the `development' domain, and they lose 100 reputation out of the 2000 they have in that domain. They also lose 100 reputation in the parent domains, and 5\% $\left(\frac{100}{2000}\right)$ of their reputation in each of the child domains of the `development' domain (which in this example, includes both frontend and backend domains).
 
-\subsubsection{Reputation by Skill}\label{sec:rep-by-skill}
+\subsubsection{Reputation by skill}\label{sec:rep-by-skill}
 
 We envision domains to mostly be used as an organisational hierarchy within a colony. However, this would not necessarily capture the \emph{type} of work that a user completed to earn their reputation. If the domain were a project, with tasks involving both design and development work, reputation earned by completing tasks related to these skills would not be distinguishable. To have a more granular account of the work a user completes to earn their reputation, a skill cloud is also maintained.
 
@@ -21,7 +20,7 @@ This global cloud of skill tags is available to all colonies, and is curated and
 
 Even though the skills cloud is universal, specific skills reputation is unique to each colony. Earning reputation in a skill in one colony has no effect on the user's reputation in that skill in any other colonies.
 
-\subsubsection{Reputation by Colony}\label{sec:rep-by-colony}
+\subsubsection{Reputation by colony}\label{sec:rep-by-colony}
 A user's total reputation in a colony is their reputation in the root domain. This is the reputation they will be voting with in any decisions that require input from everyone in the colony. Reputation in a colony has no effect outside the colony. In particular, reputations held in one colony have no bearing on reputations held by the same account in another colony.
 
 \subsection{Earning and losing reputation}\label{sec:earning-losing-rep}
@@ -46,7 +45,7 @@ The manager receives reputation following the same rules as the worker, however 
 
 Upon completion of a task, the evaluator also earns domain reputation based on their token reward (with an implicit rating of "2"). There is no explicit rating of the evaluator, but as with all other payments and rewards, an objection can be raised before a payout occurs; if the evaluation is changed by such an objection, the evaluator's reward is reduced or turns in to a loss of reputation. For all participants, reputation updates occur and payouts are made available only \emph{after} the objection window (described in Section \ref{sec:tasks}) has closed and all disputes  (described in Section \ref{sec:objections-and-disputes}) have been resolved at the end of the task. The reputation updates and payouts are based on the final state of the task and the difference, if any, between the initial gradings and final state of the task.
 
-\subsubsection{Reputation change as a result of Disputes}\label{sec:earning-rep-in-disputes}
+\subsubsection{Reputation change as a result of disputes}\label{sec:earning-rep-in-disputes}
 If a dispute occurs, causing a vote among some portion of the colony, each side will have had to stake some number of tokens. Those who staked on the side determined to be right gain their stake back, plus some tokens that have been lost by the losing side. There will also be a reputation change as a result --- those on the losing side will lose some reputation, and some of that will be gained by the winning side. Section \ref{sec:objections-and-disputes} provides a full description of the dispute mechanism and the amount of tokens and reputation each side loses and gains.
 
 We note here that, unlike tokens, reputation is never staked during this process. A user must hold greater than a minimum threshold of reputation in order to be eligible to stake tokens and take certain actions, and this threshold only applied at the time the action is taken. If their stake is lost, they will lose some reputation as a consequence for being on the losing side. It is possible that the user will not have enough reputation to lose by the time this reputation update occurs due to bad behaviour elsewhere. This is acceptable from a game-theoretic perspective; the user has still had to stake and lose tokens, and these cannot be `double-spent'.
@@ -58,7 +57,7 @@ To prevent this, when a colony is created, the creator can choose addresses to h
 
 We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation of new reputation here, as this would devalue reputation already earned elsewhere in the colony. This bootstrapping issue is resolved by instead using reputation within the parent domain, when a child domain contains less than 10\% of the reputation of its parent domain. A domain below this threshold cannot have domains created under it.
 
-\subsubsection{Reputation Decay}
+\subsubsection{Reputation decay}
 All reputation decays over time. Every \repdecayduration\ days, a user's reputation in every domain or skill decays by a factor of 2. This decay occurs every \miningcycleduration\ hours, rather than being a step change every \repdecayduration\ days to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain.
 
 The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per task) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time.

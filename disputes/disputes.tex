@@ -7,15 +7,15 @@ The emphasis should be on `getting stuff done' and not about `applying for permi
 
 The \textbf{Dispute System} provides a self regulating mechanism to provide a balanced set of incentives for users to keep their colony running harmoniously. It is there to resolve disagreements and to punish bad behaviour and fraud. The dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
 
-\subsubsection*{What are Objections?}
+\subsubsection*{What are objections?}
 When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable, in the contract should be changed to another value. For this reason we call supporters of the objection the `change' side and opponents the `keep' side.
 
 The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \emph{dispute}.
 
-\subsubsection*{What are Disputes?}
+\subsubsection*{What are disputes?}
 We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting.
 
-\subsection{Raising Objections}\label{subsec:raising-objections}
+\subsection{Raising objections}\label{subsec:raising-objections}
 
 The user raising an objection submits the following data:
 \begin{itemize}
@@ -34,7 +34,7 @@ For example, suppose that the objection concerns a task in the domain `developme
 
 Whenever an escalation occurs, we need to ensure that the reputation we are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the reputations (for domains) when they are created, which includes pointers to at least the direct parent.\footnote{Each reputation type includes the \ascode{parents} array, containing pointers to its `$n^{th}$ parents' for all $n$ that are powers of $2$ (see Section \ref{subsec:on-chain-representation-of-skills}).} When a user creates an objection, instead of directly specifying the domain they are escalating to, they provide the steps needed to get there from the domain associated with the variable that is to be changed. This ensures that the domain they escalate is a direct parent of that associated with the variable.
 
-\subsection{Costs and Rewards}\label{sec:costs-of-disputes}
+\subsection{Costs and rewards}\label{sec:costs-of-disputes}
 \subsubsection{Cost of raising an objection}
 To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. The reputation they need to be able to make the objection depends on the level they are escalating to; the `higher up' the decision goes, the higher the reputation requirement. To be able to create an objection, the user must have 0.1\% of the reputation queried and then must stake 0.1\% of the corresponding fraction of tokens. Thus, if an objection appeals to 13\% of total colony reputation, then objecting requires 0.013\% (0.1\% of 13\%) of reputation and the required stake is 0.013\% of all colony tokens.
 
@@ -45,7 +45,7 @@ Once enough tokens have been staked against an objection it becomes active and, 
 
 If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'.
 
-\subsubsection{Voting on Disputes}
+\subsubsection{Voting on disputes}
 If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
 
 The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved.
@@ -90,7 +90,7 @@ Any tokens lost beyond the initial 10\% are split between the colony and those w
 
 The motivation here is efficiency --- it aims to discourage spurious objections and disputes. A close vote is a sign that the decision was not a simple one and forcing a vote may have been wise. Therefore, the instigators of the dispute should not be harshly punished. On the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible before disputes are invoked.
 
-\subsubsection{Repeated Disputes}\label{sec:repeated-disputes}
+\subsubsection{Repeated disputes}\label{sec:repeated-disputes}
 In order to reduce the number of repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in any future vote in order to change the variable again. We reiterate that this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
 
 To ensure that the variable can always be changed if necessary, this threshold for changing the variable is ignored if the dispute was raised to the root domain of the colony.
