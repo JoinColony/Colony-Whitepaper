@@ -8,7 +8,7 @@ Due to the combined complexity of reputation scores across multiple colonies, do
 The reputation calculation whose result the miners are submitting is determined by the activities that have taken place in the colonies and can be fully deterministically derived from the Ethereum blockchain. Game-theoretically the system is protected similarly to the off-chain calculations of TrueBit (\cite{TruebitWhitepaper}) in that, \emph{while the calculation cannot be done on-chain and a correct submission can never be proved true, an incorrect calculation can always be proved to be wrong}.
 
 
-\subsection{Merkle Trees and Proofs}\label{sec:Merkle-summary}
+\subsection{Merkle trees and proofs}\label{sec:Merkle-summary}
 This subsection contains only a summary of Merkle trees (\cite{MerkleTrees}, \cite{MerkleInEthereum}) and Merkle proofs in order to establish some terminology, and can be skipped if already familiar with them.
 
 Consider the tree shown in Figure \ref{fig:Merkleexample}. The data leaves of the tree (1, 2, 3 and 4) are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. In the event of a starting or an intermediate array being an odd number (which will always happen for a starting array that is not a power of two), the hash contained in the last element is hashed with itself.
@@ -138,13 +138,13 @@ If only one state is submitted by the end of the submission period, then the new
 
 If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challengeresponse})
 
-\subsubsection*{Mining Rewards}
+\subsubsection*{Mining rewards}
 
 When a state is accepted, a number of (newly minted) \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
 
 \subsection{Dealing with false submissions}\label{sec:challengeresponse}
 %
-\subsubsection{The Challenge-Response Protocol}
+\subsubsection{The challenge-response protocol}
 
 We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (the reward defined in Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false one(s).
 
@@ -299,7 +299,7 @@ If there are more than two submissions for the new \ascode{ReputationRootHash}, 
 
 If the \miningcycleduration-hour mining cycle window has not elapsed by the time only one submission remains, the next window only opens when the current window has elapsed. If the \miningcycleduration-hour window has elapsed by the time the dispute process has finished, the next submission window opens immediately.
 
-\subsubsection*{Gas-cost Considerations and Alternative Implementations}
+\subsubsection*{Gas-cost considerations and alternative implementations}
 There is a trade-off between the number of transactions needed until the first discrepancy between two submissions is found and the size of the storage required by the contract. As written above, the contract stores only the last hashes of the Merkle proof, thereby reducing the range of possible values of $i$ by a factor of two at each step. If the contract stores more of the submitted hashes that constitute the Merkle proofs, the range can be reduced faster and fewer challenges will be required. Ultimately it will be a gas-cost analysis that determines the exact algorithm to use.
 
 We also note at this point that a malicious submission, performing the attack described in Section \ref{sec:mining-possible-attacks}, can carefully craft their false justification trees to require the maximum number of challenges to resolve. Such a worst-case submission can not be made in the alternative implementation in which the full\footnote{Or as much of the head and tail of the Merkle proofs as the gas limits will allow.} Merkle proofs are stored (and compared) on-chain, and in which challenges are issued for an index $j$ picked pseudorandomly from within the range of possible values.
@@ -344,7 +344,7 @@ Then, when calculating the reputation deduction to be applied to the losing user
 
 For further details about reputation transfers and disputes, see Appendix \ref{appendix:rep-transfer}.
 
-\subsubsection{The Reputation Decay Calculation}\label{sec:repdecay}
+\subsubsection{The reputation decay calculation}\label{sec:repdecay}
 The reputation decay process was described above as being continuous. In practise, it will decay by a small, discrete amount during each reputation update cycle following an exponential decay. However, such a calculation is not possible to do accurately on-chain during the resolution protocol, so we must use an approximation. The details of the approximation we use, and a proof that this approximation is accurate and will not affect the running of (active) colonies can be found in Appendix \ref{appendix:rep-decay}.
 
 \subsection{Denial of service attacks}\label{sec:mining-possible-attacks}
@@ -370,7 +370,7 @@ However, the attacker would lose \emph{all} the \rct\ that they had staked (whic
 
 Note: There is an edge case to consider in which the attacker is sending enough defending transactions to completely fill the blocks. In such a case however we assume that the defence of the legitimate state is always successfully included in block, as a one-off increase in gas costs will always be worthwhile to ensure the legitimate state is defended. Between now and the deployment of the Colony Protocol, we will carefully observe the Ethereum network to gather empirical data about the cost and practicability of such an attack and will adjust the timeout parameter $t$ accordingly. Longer timeout periods make this attack exceedingly difficult and expensive, but would also slow down the resolution protocol.
 
-\subsection{Costs and Rewards of Mining}\label{subsec:mining-costs-and-rewards}
+\subsection{Costs and rewards of mining}\label{subsec:mining-costs-and-rewards}
 In order to be involved in the reputation mining process, \rcths\ must stake their tokens with the Colony Network Contract. This allows them to submit a reputation hash as part of the reputation mining process described above.
 
 If they submit a new hash, this is recorded and they are noted as the first address to submit that hash. If they submit a hash that has already been submitted, they are appended to a list of users that have submitted that hash. The system allows for a maximum of 12 miners to be added to the list in each round. The same miner is allowed to appear on the list multiple times, but using different values of $N$ in the inequality \eqref{eq:mining-difficulty} on page \pageref{eq:mining-difficulty}.
@@ -407,5 +407,5 @@ The reward earned by each miner on the list is given by
 i.e. the mining reward $M$ is divided among the miners according to their relative weighting.
 
 
-\subsection{Emergency Shutdown}\label{sec:big-red-button}
+\subsection{Emergency shutdown}\label{sec:big-red-button}
 Section \ref{sec:escape-hatches} described a transaction from a whitelisted address can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be made. Similarly, the reputation mining process will also have an emergency stop-and-repair mechanism (to begin with). This will allow the whitelisted addresses to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved (which will likely involve a contract upgrade). The colonies will be able to continue operations as usual using the reputations of the last valid state, which will be temporarily frozen and not decay.
