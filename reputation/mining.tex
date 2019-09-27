@@ -111,7 +111,7 @@ All individual reputations are assembled into the \textbf{Reputation Tree} which
  %
  %
 \end{tikzpicture}
-\caption{The Merkle tree of users' reputations with \ascode{ReputationRootHash} as the root. We use $\mathcal{H}$ to indicate the \ascode{keccak256} hash function. Above the second row, each element is the hash of the concatenation of its two children.}
+\caption{The Merkle tree of users' reputations with \ascode{ReputationRootHash} as the root. We use $\mathcal{H}$ to indicate the \ascode{keccak256} hash function.}
 \end{figure}
 
 
@@ -125,7 +125,7 @@ While the calculation is too large to be done on-chain due to technical and econ
 \subsection{Submission of a new root hash}
 %
 \subsubsection*{What is submitted?}
-The final \ascode{ReputationRootHash} is submitted to the contract by the miner along with the number of leaves in the tree. Further, the miner also submits the IPFS or Swarm hash of a document containing the entire state tree, though this is only for convenience; any user can construct this locally based on the blockchain history.
+The final \ascode{ReputationRootHash} is submitted to the contract by the miner along with the number of leaves in the tree (\ascode{NReputationLeaves}). The miner also submits the root hash of the Justification Tree (see Section \ref{sec:justificationTree}), which will be used in the event of a dispute. These three properties uniquely identify a submission.
 %
 \subsubsection*{Who can submit a new root hash?}
 All CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} miner to submit the hash to the contract.
@@ -143,87 +143,119 @@ When a miner stakes, the timestamp of the stake is recorded.\footnote{If a miner
 \subsubsection*{Verifying a submission}
 If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurrence.
 
-If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challengeresponse})
+If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challengeresponse}).
 
 \subsubsection*{Mining rewards}
 
 When a state is accepted, a number of (newly minted) \rcts\ are made available for the users who submitted the correct state to claim as a reward. They also receive a corresponding amount of reputation in the \rc\ (in a special mining skill, which only users in the \rc\ can earn by performing this task). This reputation update is no different from any other, aside from the limitations of who is able to earn it, and will be included in the subsequent reputation update cycle. The size of the rewards and their distribution are described in Section \ref{subsec:mining-costs-and-rewards}.
 
 \subsection{Dealing with false submissions}\label{sec:challengeresponse}
-%
-\subsubsection{The challenge-response protocol}
 
 We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (the reward defined in Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false one(s).
 
-We must prove all but one submission incorrect by having each submission navigate a series of \emph{challenges}. These challenges refer to events that happened in the colony network within the last update cycle that have an effect on reputation. The \emph{responses} to the challenges are Merkle proofs that the corresponding reputation update was properly handled. Anyone is able to respond to a challenge (and be rewarded), regardless of who submitted the original hash; this should ensure that the correct state is always defended.
+We must prove all but one submission incorrect by having each submission prove that they calculated more correct reputation updates before getting one wrong (if any) than another submission they are being compared against. Anyone is able to respond to a challenge (and be rewarded), regardless of who submitted the original hash; this should ensure that the correct state is always defended.
 
-We begin with the scenario where only two submissions are made, and one is correct. First is the case in which the same hash has been submitted twice, but with a disagreement about the number of leaves it contained. In this situation, the users submit a Merkle proof for the last leaf in their tree. Since the keys are the indices of the updates, we simply verify that the key is $n$.
+We consider the scenario where only two submissions are made, and one is correct. In the event of more than two submissions, this same pair-wise comparison described below is repeatedly run (in parallel, where possible) among remaining submissions until only one remains.
 
-\subsubsection*{1. The Justification Tree}
-  \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
-Now for the more complicated case where two different hashes have been submitted. The first step is for both parties to upload a justification of their submitted hash. This justification consists of a second Merkle root and two Merkle proofs.
+\subsubsection{The Justification Tree}\label{sec:justificationTree}
+\newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
 
-The Merkle root in question is the \ascode{JustificationRootHash} (\jrh); it is the root of the `Justification Tree' -- a Merkle-Patricia tree where each leaf represents a complete reputation state i.e. each leaf is a \ascode{ReputationRootHash} (and each leaf is keyed simply by its index in the update sequence). The left-most leaf of the Justification Tree ($\mathcal{RH}_0$) is the final accepted reputation state from the last update. Both parties must submit a proof that their tree does indeed start at $\mathcal{RH}_0$. The right-most leaf of the Justification Tree ($\mathcal{RH}_n$) is the \ascode{ReputationRootHash} they originally submitted. Both parties must submit a Merkle proof that their tree does indeed end with this hash, and the key must be $n$ --- the number of reputation updates in the log. The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. An example of such a tree is shown in Figure \ref{fig:justification-tree}.
+As part of the process of submitting a proposed new root hash, a client also submits a \ascode{JustificationRootHash} (\jrh). This is the Merkle root of the `Justification Tree' -- a Merkle-Patricia tree where each leaf represents a complete reputation state. The left-most leaf of the Justification Tree is the final accepted reputation state from the last update ($\mathcal{RH}_0$) concatenated with the number of leaves ($\mathcal{L}_0$) in the reputation tree $\mathcal{RH}_0$ is the root of. The right-most leaf of the Justification Tree  is the \ascode{ReputationRootHash} they submitted ($\mathcal{RH}_n$) concatenated with the number of leaves it contains ($\mathcal{L}_n$). We denote these leaves as $\mathcal{RH}_0 \cdot \mathcal{L}_0$ and $\mathcal{RH}_n \cdot \mathcal{L}_n$.
+
+The intermediate leaves represent the global reputation state after applying a subset of the reputation updates required. Each state represented by a leaf differs from the reputation states in neighboring leaves in at most a single reputation.\footnote{It is possible for two adjacent leaves to be identical if the reputation update the transition between them represents does not result in a change in reputation -- e.g. a reputation loss in a reputation that is already zero.} In order to do this in a consistent way, we must order all the updates in a reputation cycle. The canonical ordering for reputation updates is:
+
+\begin{enumerate}
+\item All decays of existing reputations, in order of \ascode{nonce},
+\item The entries in the reputation update log, in order of appearance in the reputation update log. A single once of these entries corresponds to at least two reputation updates with an unbounded upper limit. These updates are themselves ordered:
+\begin{enumerate}
+  \item Colony-wide total of any impacted child reputations \label{lab:colonyWideChildren}
+  \item Colony-wide total of any impacted parent reputations \label{lab:colonyWideParents}
+  \item The colony-wide total of the origin reputation
+  \item User-specific child reputations \label{lab:userChildren}
+  \item User-specific parent reputations\label{lab:userParents}
+  \item User-specific origin reputation
+\end{enumerate}
+The origin reputation is defined to be the reputation specified in the reputation log where the reputation is to be lost or gained. Where multiple child reputations are required to be updated as part of \ref{lab:colonyWideChildren} or \ref{lab:userChildren}, they are done so in the order they appear in the \ascode{children} property of the origin skill. Where multiple parent reputations are required to be updated as part of \ref{lab:colonyWideParents} or \ref{lab:userParents}, the immediate parent is updated first, then the immediate parent of that skill, and so on until no parents remain.
+\end{enumerate}
+
+As a miner applies the reputation updates for a cycle in this order, they should take each intermediate \ascode{ReputationRootHash} values and build the Justification Tree by adding the intermediate \ascode{ReputationRootHash} values concantenated with \ascode{NReputationLeaves} to the tree, with key equal to the update number, starting from 0. Note that unlike the Reputation Tree, the keys should not be hashed. This will become important further on in the dispute process. The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. An example of such a tree is shown in Figure \ref{fig:justification-tree}.
 
  %
 \begin{figure}
 \centering
+
 \begin{tikzpicture}
- \node at (0.75,-4) (rh0) {$\mathcal{RH}_0$};
- \node at (2.25,-4) (rh1) {$\mathcal{RH}_1$};
- \node at (3.75,-4) (rh2) {$\mathcal{RH}_2$};
- \node at (5.25,-4) (rh3) {$\mathcal{RH}_3$};
- \node at (7,-4) (rdots) {$\cdots$};
- \node at (8.5,-4) (rhn) {$\mathcal{RH}_n$};
+ \node at (0,-5) (r0) {$RH_0\cdot \mathcal{L}_0$};
+ \node at (2.5,-5) (r1) {$RH_1\cdot \mathcal{L}_1$};
+ \node at (5,-5) (r2) {$RH_2\cdot \mathcal{L}_2$};
+ \node at (7.5,-5) (r3) {$RH_3\cdot \mathcal{L}_3$};
+ \node at (9,-5) (rdots) {$\cdots$};
+ \node at (11,-5) (rn) {$RH_N\cdot \mathcal{L}_N$};
  %
- \node at (0.75,-2.5) (rh01) {$h_{0}$}
-  edge[-] (rh0);
+ \node at (0,-4) (r0hash) {$\mathcal{H}(RH_0\cdot \mathcal{L}_0)$}
+  edge[-] (r0);
+ \node at (2.5,-4) (r1hash) {$\mathcal{H}(RH_1\cdot \mathcal{L}_1)$}
+  edge[-] (r1);
+ \node at (5,-4) (r2hash) {$\mathcal{H}(RH_2\cdot \mathcal{L}_2)$}
+  edge[-] (r2);
+ \node at (7.5,-4) (r3hash) {$\mathcal{H}(RH_3\cdot \mathcal{L}_3)$}
+  edge[-] (r3);
+ \node at (11,-4) (rnhash) {$\mathcal{H}(RH_N\cdot \mathcal{L}_N)$}
+  edge[-] (rn);
  %
- \node at (2.25,-2.5) (rh12) {$h_{1}$}
-  edge[-] (rh1);
+ \node at (1.25,-2.5) (r01) {}
+  edge[-] node[left] {0} (r0hash)
+  edge[-] node[right] {1} (r1hash);
+ \node at (6.25,-2.5) (r23) {}
+  edge[-] node[left] {0} (r2hash)
+  edge[-] node[right] {1} (r3hash);
+ \node at (10,-2.5) (rnn) {}
+  edge[-] (rnhash)
+  edge[dashed] (9,-4);
  %
- \node at (3.75,-2.5) (rh23) {$h_{2}$}
-  edge[-] (rh2);
+ \node at (3.75,-1) (r14) {}
+  edge[-] node[left] {0} (r01)
+  edge[-] node[right] {1} (r23);
  %
- \node at (5.25,-2.5) (rh34) {$h_{3}$}
-  edge[-] (rh3);
- %
- \node at (8.5,-2.5) (rhnn) {$h_{n}$}
-  edge[-] (rhn);
- %
- \node at (1.5,-1) (rh02) {$h_{0,1}$}
-  edge[-] (rh01)
-  edge[-] (rh12);
- %
- \node at (4.5,-1) (rh24) {$h_{2,3}$}
-  edge[-] (rh23)
-  edge[-] (rh34);
- %
- \node at (3,0) (dummy14) {$h_{0,3}$}
-  edge[] (rh02)
-  edge[] (rh24);
- %
- \node[draw, fill=gray!5] at (5,1) (root) {\texttt{JustificationRootHash} (\jrh)};
+ \node[draw, fill=gray!5] at (6.5,0) (root) {\texttt{Justification Root Hash}  (\jrh)};
  \node[below = 1mm of root] (dummy) {\phantom{a}}
-  (dummy.north west) edge[dashed] (dummy14)
-  (dummy.north east) edge[dashed] (rhnn);
+  (dummy.north west) edge[dashed] (r14)
+  (dummy.north east) edge[dashed] (rnn);
  %
  %
 \end{tikzpicture}
-\caption{The Justification Tree }
+\caption{The Justification Tree. The leaf containing $\mathcal{H}(RH_0\cdot \mathcal{L}_0)$ -- the last accepted reputation state -- is found at key \ascode{...00}. The leaf containing $\mathcal{H}(RH_1\cdot \mathcal{L}_1)$ -- the reputation state with the decay of the existing skill with nonce 0 applied -- is found at key \ascode{...01}. Every intermediate state is recorded in the tree up to $\mathcal{H}(RH_N\cdot \mathcal{L}_N)$, which is the proposed new reputation state with all reputation updates applied.}
 \label{fig:justification-tree}
 \end{figure}
 
-Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining cycle), and disagree on the last leaf $\mathcal{RH}_n$ (the hash they submitted), there must be a hash ($h_{i,i+1}$) that represents the transition from $\mathcal{RH}_i$ to $\mathcal{RH}_{i+1}$ where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update (the $i^{th}$)\footnote{We start counting at zero, i.e. the transition from $\mathcal{RH}_{0}$ to $\mathcal{RH}_{1}$ is the `zeroth'.}, and this is the reputation update we will calculate on-chain to establish which submission is incorrect.\\
+\subsubsection{Resolving a dispute}
 
-\noindent First, however, we must establish where the two submissions first differ.
+If a dispute occurs, the first step is for each submission to verify the Justification Tree they submitted alongside their proposed new root hash.
+
+\subsubsection*{1. Verifying the Justification Tree}
+
+For a justification tree to be deemed valid, it must:
+
+\begin{itemize}
+\item Have $\mathcal{H}(RH_0)$ at key 0,
+\item Have $\mathcal{H}(RH_N)$ at key $N$,
+\item Have a plausible structure.
+\end{itemize}
+
+The first two items are relatively straightforward to prove via Merkle proof. The last requirement requires slightly more explanation. A Justification Tree with two leaves could meet the first two requirements, but we would be able to tell this tree wasn't plausible as a Justification Tree because the Merkle proofs supplied to prove the first two requirements would not be of the expected length.\footnote{We know that every reputation cycle will at least have log entries for rewarding those who submitted the previous reputation state successfully.} This length is calculable because we know how many leaves are meant to be in the tree and what keys they are expected to be at (every key between 0 and $N$). We are also able to determine the branchmasks that these proofs should have (the binary representations of $2^{\lceil\log_2 (N+1) \rceil} - 1$, and $N$ respectively), which further constrains the shape of plausible tree.
+
+Unfortunately, based on these two proofs, we are unable to guarantee the Justification Tree contains a leaf at every key from 0 to $N$. This is because we do not know how many leaves the siblings used in the Merkle proofs contain, and it is not feasible to request a proof for every key between $1$ and $N-1$. This is why the constraint is limited to being `plausible'. With the approach we have taken, however, we are at least able to guarantee that key $N$ is the last in the Justification Tree, that key $0$ is the first (though this is a trivial consequence of it existing), and there are at least some number of other keys in the tree.\footnote{This number is $\lceil\log_2 (N+1) \rceil + \#_{1}(N) - 2$, where $\#_{1}(N)$ is the binary logarithm of the $N$th integer in Gould's sequence. To derive this expression, consider how many siblings each proof requires; each sibling corresponds to at least one other key. In our case, $\#_{1}(N)$ provides the number of set bits in the branchmask of the proof for key $N$ i.e. how many siblings that the Merkle proof of key $N$ has. The $-2$ accounts for the key-value pairs stored at 0 and $N$.}
+
+Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0$ (the \ascode{ReputationRootHash} accepted at the end of the previous iteration of the mining cycle), and disagree on the last leaf $\mathcal{RH}_N$ (the hash they submitted), there must be a hash $\mathcal{RH}_i$ that they agree on, and a hash that $\mathcal{RH}_{i+1}$ that they do not. This is a reputation update where they agree on the starting state but disagree on the result. This transition is meant to be the effect of a single reputation update (the $i^{th}$), and this is the reputation update we will calculate on-chain to establish which submission is incorrect.\\
+
+\noindent First, however, we must establish where the two submissions begin to differ.
 
 \subsubsection*{2. Searching for the discrepancy}
-The contract requires both parties to submit repeated Merkle proofs that specific reputation updates were handled correctly until the first discrepancy between the two submissions is found.
+The contract requires both parties to submit repeated Merkle proofs to locate $\mathcal{RH}_{i+1}$, the first disagreement hash.
 
-We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree. Recall that if $h$ does not have an immediate sibling, $\overline{h}$ is taken to be equal to $h$ as per our rule of hashing these elements with themselves.
+We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree.
 
-Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. These proofs have the simplified\footnote{Since we know that the proofs concern the first and last leaf of the tree, no array of left-right information is needed.} form:
+Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. Ignoring the branchmasks for simplicity, these proofs have the form:
 \[
  \overline{\mathcal{RH}_0}^A, \overline{h_{0,1}}^A, \overline{h_{0,2}}^A, \ldots \overline{h_{0,2^k}}^A \qquad \textnormal{ terminating at } \jrh^A
 \]
@@ -244,56 +276,42 @@ The rationale behind this behaviour is the following: If $h_{0,2^k}^A = h_{0,2^k
 The contract begins its search by %pseudorandomly%\footnote{This pseudorandomness is to help mitigate an attack described in Section \ref{sec:mining-possible-attacks}.}
 %picking an index $j$ from within the range the first discrepancy in known to lie in. It then
 %
-picking an index $j$ from within the range the first discrepancy in known to lie in (say always the smallest), and requiring both parties to provide a Merkle proof showing how the $j^{th}$ reputation update from all updates to be applied this cycle (Section \ref{subsec:reputation-update-log}) was included in their justification tree. The required target of this proof is no longer the $\jrh$ itself, but rather the retained value for $h_{0,2^k}$ or $\overline{h_{0,2^k}}$. Specifically this proof consists of
+picking an index $j$ from within the range the first discrepancy in known to lie in (say always the smallest), and requiring both parties to provide a Merkle proof showing value of \ascode{ReputationRootHash} and \ascode{NReputationLeaves} at that key in the Justification Tree. The required target of this proof is no longer the $\jrh$ itself, but rather the retained value for $h_{0,2^k}$ or $\overline{h_{0,2^k}}$.
+
+The process as before of comparing hashes and retaining the roots of either the left-side subtree or the right-side subtree is repeated. With each iteration, the range of possible values for the index of the first discrepancy is reduced by (on average) a factor of two and the length of the required Merkle proofs is reduced by at least one.
+
+There are two ways this process can terminate. The first way the process terminates is when one party does not respond to a challenge in adequate time, either because they could not or chose not to. In this case the party not responding is deemed to be incorrect.
+
+The other way the process terminates, is when it has reached the bottom of the tree and determined $i$.
+
+\subsubsection*{3. Confirming $i$ }
+
+Once the contract has found the index $i$ such that $\mathcal{RH}^A_{i}=\mathcal{RH}^B_{i}$ but $\mathcal{RH}^A_{i+1}\neq\mathcal{RH}^B_{i+1}$, the contract then requires each party to submit the value stored at the key $i+1$ in the Justification Tree to confirm that it is there. It is possible that this was already done during the binary search, but it is not guaranteed. The value of the \ascode{ReputationRootHash} and \ascode{NReputationLeaves} at this key are stored in the contract managing the dispute resolution. Again, if one party does not respond in time, they are assumed to be incorrect.
+
+\subsubsection*{4. Deciding which submission performed the correct calculation}
+
+In most cases, only one of the two submissions will be able to perform the transaction corresponding to this step. There are several types of calculation and checks that might need to take place, depending on which transition the two submissions first disagree on, and the values of \ascode{ReputationRootHash} and \ascode{NReputationLeaves} they placed in their Justification Trees. All of the following must be performed on chain to verify the calculation under dispute.
 
 \begin{itemize}
- \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{j}$).
- \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_{j+1}$).
- \item[(iii)] A Merkle proof showing the inclusion of $h_{j,j+1}$ in the relevant justification sub-tree.
+\item \textbf{Check the key} As part of the Merkle proofs submitted (see the next step), the \ascode{key} of the reputation under dispute is submitted. This is a concatenation of the colony address the reputation is in, the skill the reputation is in, and the address holding the reputation (which is possibly the zero address if the total reputation in the colony is under dispute). Based on the value of $i$, which has already been established during the binary search, and the known canonical ordering of reputation updates, the contract is able to check these values. In the case where the update under dispute is due to a log entry, the index of the log entry under dispute is supplied by the user and verified on-chain, to avoid iteration over the unbounded log.
+\item \textbf{Check the claimed before and after values} The values of the reputation at \ascode{key} in $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ for the submission in question are proved via Merkle proof. If it is claimed an existing reputation is being updated, then the proofs' siblings and branchmask are required to be the same to guarantee no other reputations have been changed. If a new reputation is claimed to be being added (indicated by $\mathcal{L}_{i+1} - \mathcal{L}_i = 1$), the proof for the reputation in $\mathcal{RH}_i$ is not required as the reputation should not be in the tree, but an additional check will be performed later to confirm this.
+\item \textbf{Perform the calculation} This has two elements. The first is to check that the \ascode{nonce} for the reputation has not changed in the leaf if an existing leaf is being updated. If a new leaf is being added, the value of the \ascode{nonce} is checked to be one larger than the \ascode{nonce} of another leaf in $\mathcal{RH}_{i}$ that they have provided. The second is to check that the value of the reputation is correct. It can be a decay, or an update due to an entry in the log, the potential consequences of which are described in section \ref{sec:calculating-reputation-updates}.
+\item \textbf{Additional checks} Depending on the type of update being disputed, additional checks may be required
+\begin{enumerate} \item Any additional reputation values needed for the calculation are proved to be in $\mathcal{RH}_{i}$ (which both parties agree on the value of) as required via Merkle proof. The canonical ordering of reputation updates ensures that any values required for the calculation under dispute are present in $\mathcal{RH}_{i}$ and have not yet been altered by the log entry under consideration.
+\item Similarly, if a new leaf is added, a Merkle proof for the reputation in $\mathcal{RH}_{i}$ with the previous \ascode{nonce} is checked to confirm the \ascode{nonce} assigned to the new node is plausible.
+\item If during the calculation, the user claims that a reputation they need for a calculation does not exist in $\mathcal{RH}_{i}$, and so they will use a value of 0, they must prove it does not exist in the tree.\footnote{They do this by providing a Merkle proof for an existing reputation in $\mathcal{RH}_{i}$ whose hashed key has the longest shared prefix with the hashed key of the reputation being added. By examining the branchmask of this proof, and the (hashed) keys of the proved reputation and the reputation being claimed to not exist, the contract is able to confirm the latter does not exist in $\mathcal{RH}_{i}$. If a key with a shorter shared prefix is used, the branchmask will already contain a branch point where they diverge and this proof will fail.} % I don't feel like I've explained this very well. Perhaps it warrants a subsection somewhere?
+\item If a new reputation value is being added to the tree, we also prove that the reputation that it ends up closest to in the tree exists in $\mathcal{RH}_{i}$. We are therefore able to deduce what the proof for that reputation in $\mathcal{RH}_{i+1}$ should be if only the new leaf is added. By checking this Merkle proof is valid, we ensure no other changes have been made to the reputation tree.
+\end{enumerate}
 \end{itemize}
 
-The same process as before of comparing hashes and retaining the roots of either the left-side subtree or the right-side subtree is repeated. With each iteration, the range of possible values for the index of the first discrepancy is reduced by (on average) a factor of two and the length of the required Merkle proofs is reduced by one.
+It is possible that both submissions will successfully submit the transaction that validates their submissions as described here. This can happen when a new leaf is being added, and the submissions have disagreed over the \ascode{nonce} the reputation should be given. Whichever has successfully awarded the highest \ascode{nonce} is deemed the correct submission.
 
-% and requires both parties to provide:
-% \begin{itemize}
-%  \item[(i)] The root hash before the update was applied ($\mathcal{RH}_{i-1}$).
-%  \item[(ii)] The root hash after the update was applied ($\mathcal{RH}_i$).
-%  \item[(iii)] A Merkle proof showing that the pair ($\mathcal{RH}_{i-1}, \mathcal{RH}_i$) is correctly included in the justification tree.
-% \end{itemize}
-%
-% When either party submits, first their Merkle proof is checked. It must use the correct sequence of \ascode{l} and \ascode{r} during the hashing process, which is defined by the $i$ that has been selected. If the Merkle proof is correct, then if this is the first party to submit, their $\mathcal{RH}^A_{i-1}$ and $\mathcal{RH}^A_{i}$ are stored. We label these with a superscript `A' to denote they have come from the first party to submit.
-%
-% When the second party submits and their Merkle proof is found valid, then the contract compares the submitted $\mathcal{RH}^B_{i-1}$ and $\mathcal{RH}^B_{i}$ to $\mathcal{RH}^A_{i-1}$ and $\mathcal{RH}^A_{i}$ stored from the first party's submission.
-%
-% If the pairs of submitted root hashes are identical, the (first) discrepancy between the two calculations occurs must occur later in the tree. The lower bound for the search for the first discrepancy can be set to $i+1$. If the submitted root root hashes are such that $\mathcal{RH}^A_{i-1}\neq\mathcal{RH}^B_{i-1}$ and $\mathcal{RH}^A_{i}\neq\mathcal{RH}^B_{i}$, then the first discrepancy must occur later in the tree. The upper bound for the search can be set to $i-2$.
-%
-% This process repeats, pseudorandomly selecting a new $i$ within the still-valid bounds of the search for the new challenge. Each newly submitted proof further reduces the size of the search space by a factor of two on average.\footnote{By examining precisely at which sibling the first discrepancy occurs, some stages of the binary search could be skipped. However, in order to accomplish this all the siblings of the proof that first completed the challenge would need to be stored on the blockchain, so it is more gas efficient to do the na\"{i}ve binary search for all but the very smallest of trees.}
-
-There are two ways this process can terminate. The first way the process terminates is when one party does not respond to a challenge. In this case the party not responding is deemed to be incorrect.
-
-The other way the process terminates, is when it has reached the bottom of the tree and found $h_{i-1,i}^A = h_{i-1,i}^B$ while $h_{i,i+1}^A \neq h_{i,i+1}^B$. The process has thus determined that it is the $i^{th}$ reputation update from the log where the two submissions differ (i.e. they agree on $\mathcal{RH}_{i}$ but not on $\mathcal{RH}_{i+1}$).
-
-Once the contract has found the index $i$ such that $\mathcal{RH}^A_{i}=\mathcal{RH}^B_{i}$ but $\mathcal{RH}^A_{i+1}\neq\mathcal{RH}^B_{i+1}$, the contract then requires each party to submit
-\begin{itemize}
- \item[(iv)] A Merkle proof for the reputation ($R_j$) affected by the $i^{th}$ update transaction.
-\end{itemize}
-
-The Merkle proof that proves the inclusion of $R_j$ (before the reputation update) in the reputation root hash $\mathcal{RH}_{i}$ and the Merkle proof of the inclusion of $R_j$ (after the reputation update) in $\mathcal{RH}_{i+1}$ must only differ in the state of the reputation $R_j$ itself. This is because the reputation trees with roots $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ differ in only a single leaf (that of $R_j$).\footnote{In the case of the addition of a new leaf, the proof for an $R_j$ before the update is replaced by a proof for the current last leaf in the tree. They also submit the merkle proof for the new $R_j$ after the update. These two proofs submitted will differ in more than just $R_j$, but if valid must converge at a predictable location in the Merkle proof, dependant on the number of leaves in the tree. }
-
-When either party submits valid Merkle proofs, showing that the before and after state they claim to be correct is included in the $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ in their justification tree, the reputation update is also calculated on-chain to determine whether the submitting party has done their calculation correctly. If the calculation was not done correctly, the submission is identified as false.
-
-The process does not terminate until \emph{both} parties have submitted their proofs, or the timeout is reached. There is an edge case in which it appears as if the first to submit has done the calculation correctly, but in actual fact has erroneously added a new leaf in the reputation tree (see Section \ref{sec:earning-rep-for-first-time}) even though no new leaf was required. This error can be identified when the other party submits a correct proof.
-
-If there are more than two submissions for the new \ascode{ReputationRootHash}, this process is conducted in parallel between multiple pairs of submitted hashes, and then repeated, until only one submission remains.
+If at neither party responds to a particular stage in this process in time, both are eliminated from consideration.
 
 If the \miningcycleduration-hour mining cycle window has not elapsed by the time only one submission remains, the next window only opens when the current window has elapsed. If the \miningcycleduration-hour window has elapsed by the time the dispute process has finished, the next submission window opens immediately.
 
-\subsubsection*{Gas-cost considerations and alternative implementations}
-There is a trade-off between the number of transactions needed until the first discrepancy between two submissions is found and the size of the storage required by the contract. As written above, the contract stores only the last hashes of the Merkle proof, thereby reducing the range of possible values of $i$ by a factor of two at each step. If the contract stores more of the submitted hashes that constitute the Merkle proofs, the range can be reduced faster and fewer challenges will be required. Ultimately it will be a gas-cost analysis that determines the exact algorithm to use.
-
-We also note at this point that a malicious submission, performing the attack described in Section \ref{sec:mining-possible-attacks}, can carefully craft their false justification trees to require the maximum number of challenges to resolve. Such a worst-case submission can not be made in the alternative implementation in which the full\footnote{Or as much of the head and tail of the Merkle proofs as the gas limits will allow.} Merkle proofs are stored (and compared) on-chain, and in which challenges are issued for an index $j$ picked pseudorandomly from within the range of possible values.
-
 \subsection{Calculating reputation updates}\label{sec:calculating-reputation-updates}
+% TODO: I think this needs to be moved to before 'Dealing with false submissions'.
 %
 \subsubsection{Keeping track of reputation changes}
 %
