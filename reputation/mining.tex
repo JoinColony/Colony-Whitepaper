@@ -13,7 +13,7 @@ This subsection contains only a summary of Merkle-Patricia trees (\cite{MerkleTr
 
 A Merkle-Patricia tree is a key-value store with two special properties: efficient insertion and lookup, and a compact cryptographic state signature. Put succinctly, it is Patricia in the branches, and Merkle in the nodes -- the branching of the tree is determined by the keys (in a way which avoids redundant tree traversal), while the values in the nodes are determined by recursively hashing the values inserted in the leaves.
 
-Consider the tree shown in Figure \ref{fig:Merkleexample}, in which every values has a 4-bit key. The data leaves of the tree (1, 2, 3 and 4), which correspond to the keys (0000, 0010, 00111, and 1011), are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise, following the branching structure determined by the keys, until only a single hash remains, indicated by G in Figure \ref{fig:Merkleexample}. The resulting structure is known as a Merkle-Patricia tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{(0000, 1, [E,D], [1010])}. The first pair of arguments is the key-value pair whose existence is to be proved. The third argument is the array of node hashes (`siblings') that the leaf hash should be recursively hashed with. The last argument, the `branch mask', is an array of \ascode{1}'s and \ascode{0}'s that indicate which bits of they key correspond to the branching points. So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{(3, 0011, [B,A,D], [1011])}.
+Consider the tree shown in Figure \ref{fig:Merkleexample}, in which every values has a 4-bit key. The data leaves of the tree (1, 2, 3 and 4), which correspond to the keys (0000, 0010, 00111, and 1011), are each hashed individually to give A, B, C and D. These are then repeatedly hashed pairwise, following the branching structure determined by the keys, until only a single hash remains, indicated by G. The resulting structure is known as a Merkle-Patricia tree. In order to prove that the element \ascode{1} is in the tree with root \ascode{G}, one submits a Merkle proof containing the information \ascode{(0000, 1, [E,D], [1010])}. The first pair of arguments are the key-value pair whose existence is to be proved. The third argument is the array of node hashes (`siblings') that the leaf hash should be recursively hashed with. The last argument, the `branch mask', is an array of \ascode{1}'s and \ascode{0}'s that indicate which bits of they key correspond to the branching points (in this case, the first and third most-significant bits). So to show that \ascode{3} was in the tree with root \ascode{G}, the proof would be of the form \ascode{(0011, 3, [B,A,D], [1011])}.
 
 \begin{figure}
 \centering
@@ -53,7 +53,7 @@ Consider the tree shown in Figure \ref{fig:Merkleexample}, in which every values
 
 \subsection{The Reputation Tree}\label{sec:reptree}
 
-The key-value pairs in the reputation tree are the reputations all users have in all skills, as well as the colony-wide totals. Such a key-value pair consists of the following data:
+The key-value pairs in the reputation tree are the reputations all users have in all skills, as well as the colony-wide totals. A single key-value pair consists of the following data:
 \begin{align*}
 k &=
   \begin{cases}
@@ -68,7 +68,7 @@ v &=
   \end{cases}
 \end{align*}
 
-All individual reputations are assembled into the \textbf{Reputation Tree} which is a Merkle-Patricia tree of all individual reputations in a colony, as well as the total reputation of each type held by the users in each colony. The leaves that represent these colony-wide totals are indicated by setting \ascode{user} to zero. These leaves are then put into the tree in the usual way (described in Section \ref{sec:Merkle-summary}). We term the root hash of the resulting tree the \ascode{ReputationRootHash}, $\mathcal{RH}$.
+All individual reputations are assembled into the \textbf{Reputation Tree} which is a Merkle-Patricia tree of all individual reputations in a colony, as well as the total reputation of each type held by the users in each colony. The leaves that represent these colony-wide totals are indicated by setting \ascode{user} to zero. These leaves are then inserted into the tree as described in Section \ref{sec:Merkle-summary}. We term the root hash of the resulting tree the \ascode{ReputationRootHash}, $\mathcal{RH}$.
 \begin{figure}
 \centering
 \begin{tikzpicture}
@@ -118,7 +118,7 @@ All individual reputations are assembled into the \textbf{Reputation Tree} which
 The \ascode{ReputationRootHash} is the only data we record on the blockchain associated with users' reputations. It summarises the state of the whole reputation system and whenever a user wishes to make use of their reputation, they can submit a Merkle proof from the reputation $\mathcal{R}_i$ they wish to make use of and ending at $\mathcal{RH}$.
 
 \subsection{Calculating the new root hash}
-To calculate the new root hash, the miners begin with the last reputation state, and decay all reputations held by all users in all colonies, in the order of the leaf nonces. They then take the set of reputation gains or losses that were not in the last state submitted, and are to be included in the next state. They apply the reputation updates to each user in each colony, updating or adding leaves as necessary, to end up with a new list of reputations for all users and colonies. These new reputations are then hashed and assembled into a new Merkle-Patricia tree yielding an updated \ascode{ReputationRootHash}.
+To calculate the new root hash, the miners begin with the last reputation state, and decay all reputations held by all users in all colonies, in the order of the leaf nonces. They then take the set of reputation gains or losses that were not in the last state submitted, and are to be included in the next state (the update log). They apply the reputation updates to each user in each colony, updating or adding leaves as necessary (following the process described in \ref{sec:justificationTree}), to end up with a new list of reputations for all users and colonies. These new reputations are then hashed and assembled into a new Merkle-Patricia tree yielding an updated \ascode{ReputationRootHash}.
 
 While the calculation is too large to be done on-chain due to technical and economic limitations (i.e. the block gas limit and the cost of gas, respectively), this calculation can easily be performed by a typical user's computer.
 
@@ -128,7 +128,7 @@ While the calculation is too large to be done on-chain due to technical and econ
 The final \ascode{ReputationRootHash} is submitted to the contract by the miner along with the number of leaves in the tree (\ascode{NReputationLeaves}). The miner also submits the root hash of the Justification Tree (see Section \ref{sec:justificationTree}), which will be used in the event of a dispute. These three properties uniquely identify a submission.
 %
 \subsubsection*{Who can submit a new root hash?}
-All CLNY token holders are eligible to become miners and participate in the reputation update process, but since any user can calculate the correct root hash locally, it would be possible for \emph{any} miner to submit the hash to the contract.
+All \rcths\ are eligible to become miners and participate in the reputation update process. Since any user can calculate the correct root hash locally, it should be possible for \emph{any} miner to submit the hash to the contract.
 
 It is however undesirable to have too many submissions for every update. We propose a mechanism that only allows some miners to submit results to begin with. To participate in the mining process, \rcths\ must stake some of their tokens to become `reputation miners'. A submission will only be accepted from a miner if
 \begin{equation*}\label{eq:mining-difficulty}
@@ -153,20 +153,20 @@ When a state is accepted, a number of (newly minted) \rcts\ are made available f
 
 We assume that the correct hash is one of the  submitted hashes. This is a reasonable assumption, as only one out of all the miners is required to make a correct submission, and there is an incentive for them to do so (the reward defined in Section \ref{subsec:mining-costs-and-rewards}). Thus our task is not to validate the correct hash but to invalidate the false one(s).
 
-We must prove all but one submission incorrect by having each submission prove that they calculated more correct reputation updates before getting one wrong (if any) than another submission they are being compared against. Anyone is able to respond to a challenge (and be rewarded), regardless of who submitted the original hash; this should ensure that the correct state is always defended.
+We must prove all but one submission incorrect by having each submission prove that they calculated more correct reputation updates before getting one wrong (if any) than another submission they are being compared against. Anyone is able to respond to a challenge (and be rewarded), regardless of who submitted the original hash; this should ensure that the correct state is always defended, even if some miners go offline.
 
 We consider the scenario where only two submissions are made, and one is correct. In the event of more than two submissions, this same pair-wise comparison described below is repeatedly run (in parallel, where possible) among remaining submissions until only one remains.
 
 \subsubsection{The Justification Tree}\label{sec:justificationTree}
 \newcommand{\jrh}{\ensuremath{\mathbb{JRH}}}
 
-As part of the process of submitting a proposed new root hash, a client also submits a \ascode{JustificationRootHash} (\jrh). This is the Merkle root of the `Justification Tree' -- a Merkle-Patricia tree where each leaf represents a complete reputation state. The left-most leaf of the Justification Tree is the final accepted reputation state from the last update ($\mathcal{RH}_0$) concatenated with the number of leaves ($\mathcal{L}_0$) in the reputation tree $\mathcal{RH}_0$ is the root of. The right-most leaf of the Justification Tree  is the \ascode{ReputationRootHash} they submitted ($\mathcal{RH}_n$) concatenated with the number of leaves it contains ($\mathcal{L}_n$). We denote these leaves as $\mathcal{RH}_0 \cdot \mathcal{L}_0$ and $\mathcal{RH}_n \cdot \mathcal{L}_n$.
+A client submits a \ascode{JustificationRootHash} (\jrh) as part of the process of submitting a proposed new root hash. This is the Merkle root of the `Justification Tree' -- a Merkle-Patricia tree where each leaf represents not a single reputation value, but the root hash of an entire reputation state. The left-most leaf of the Justification Tree is the final accepted reputation state from the last update ($\mathcal{RH}_0$) concatenated with the number of leaves ($\mathcal{L}_0$) in the reputation tree $\mathcal{RH}_0$ is the root of. The right-most leaf of the Justification Tree is the \ascode{ReputationRootHash} they submitted ($\mathcal{RH}_N$) concatenated with the number of leaves it contains ($\mathcal{L}_N$). We denote these leaves as $\mathcal{RH}_0 \cdot \mathcal{L}_0$ and $\mathcal{RH}_N \cdot \mathcal{L}_N$.
 
-The intermediate leaves represent the global reputation state after applying a subset of the reputation updates required. Each state represented by a leaf differs from the reputation states in neighboring leaves in at most a single reputation.\footnote{It is possible for two adjacent leaves to be identical if the reputation update the transition between them represents does not result in a change in reputation -- e.g. a reputation loss in a reputation that is already zero.} In order to do this in a consistent way, we must order all the updates in a reputation cycle. The canonical ordering for reputation updates is:
+The intermediate leaves represent the evolution of the global reputation state after applying some subset of the full sequence of reputation updates required. Each state represented by a leaf differs from the reputation states in neighboring leaves in \textit{at most} a single reputation.\footnote{It is possible for two adjacent leaves to be identical if the reputation update the transition between them represents does not result in a change in reputation -- e.g. a reputation loss in a reputation that is already zero.} In order to do this in a consistent way, we must order all the updates in a reputation cycle. The canonical ordering for reputation updates is:
 
 \begin{enumerate}
 \item All decays of existing reputations, in order of \ascode{nonce},
-\item The entries in the reputation update log, in order of appearance in the reputation update log. A single once of these entries corresponds to at least two reputation updates with an unbounded upper limit. These updates are themselves ordered:
+\item The entries in the reputation update log, in order of appearance in the reputation update log. A single one of these entries corresponds to at least two reputation updates with an unbounded upper limit (since there can be many parent and child updates). These updates are themselves ordered:
 \begin{enumerate}
   \item Colony-wide total of any impacted child reputations \label{lab:colonyWideChildren}
   \item Colony-wide total of any impacted parent reputations \label{lab:colonyWideParents}
@@ -175,10 +175,10 @@ The intermediate leaves represent the global reputation state after applying a s
   \item User-specific parent reputations\label{lab:userParents}
   \item User-specific origin reputation
 \end{enumerate}
-The origin reputation is defined to be the reputation specified in the reputation log where the reputation is to be lost or gained. Where multiple child reputations are required to be updated as part of \ref{lab:colonyWideChildren} or \ref{lab:userChildren}, they are done so in the order they appear in the \ascode{children} property of the origin skill. Where multiple parent reputations are required to be updated as part of \ref{lab:colonyWideParents} or \ref{lab:userParents}, the immediate parent is updated first, then the immediate parent of that skill, and so on until no parents remain.
+The origin reputation is defined to be the skill specified in the reputation log where the reputation is to be lost or gained. Where multiple child reputations are required to be updated as part of \ref{lab:colonyWideChildren} or \ref{lab:userChildren}, they are done so in the order they appear in the \ascode{children} property of the origin skill. Where multiple parent reputations are required to be updated as part of \ref{lab:colonyWideParents} or \ref{lab:userParents}, the immediate parent is updated first, then the immediate parent of that skill, and so on until no parents remain. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
 \end{enumerate}
 
-As a miner applies the reputation updates for a cycle in this order, they should take each intermediate \ascode{ReputationRootHash} values and build the Justification Tree by adding the intermediate \ascode{ReputationRootHash} values concantenated with \ascode{NReputationLeaves} to the tree, with key equal to the update number, starting from 0. Note that unlike the Reputation Tree, the keys should not be hashed. This will become important further on in the dispute process. The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. An example of such a tree is shown in Figure \ref{fig:justification-tree}.
+As a miner applies the reputation updates for a cycle in this order, they should take each intermediate \ascode{ReputationRootHash} values and build the Justification Tree by adding the intermediate \ascode{ReputationRootHash} values concantenated with \ascode{NReputationLeaves} to the tree, \textit{with key equal to the update number}, starting from 0. Note that unlike in the Reputation Tree, the keys should not be hashed. This will become important further on in the dispute process, as we will need to be able to identify sequentially adjacent reputation updates. The intermediate leaves of the Justification Tree represent the evolution of the reputation state, with $\mathcal{RH}_i$ corresponding to the reputation state after the first $i$ reputation updates in this cycle have been applied. An example of such a tree is shown in Figure \ref{fig:justification-tree}.
 
  %
 \begin{figure}
@@ -204,18 +204,18 @@ As a miner applies the reputation updates for a cycle in this order, they should
   edge[-] (rn);
  %
  \node at (1.25,-2.5) (r01) {}
-  edge[-] node[left] {0} (r0hash)
-  edge[-] node[right] {1} (r1hash);
+  edge[-] node[left=1mm] {0} (r0hash)
+  edge[-] node[right=1mm] {1} (r1hash);
  \node at (6.25,-2.5) (r23) {}
-  edge[-] node[left] {0} (r2hash)
-  edge[-] node[right] {1} (r3hash);
+  edge[-] node[left=1mm] {0} (r2hash)
+  edge[-] node[right=1mm] {1} (r3hash);
  \node at (10,-2.5) (rnn) {}
   edge[-] (rnhash)
   edge[dashed] (9,-4);
  %
  \node at (3.75,-1) (r14) {}
-  edge[-] node[left] {0} (r01)
-  edge[-] node[right] {1} (r23);
+  edge[-] node[left=2.5mm] {0} (r01)
+  edge[-] node[right=2.5mm] {1} (r23);
  %
  \node[draw, fill=gray!5] at (6.5,0) (root) {\texttt{Justification Root Hash}  (\jrh)};
  \node[below = 1mm of root] (dummy) {\phantom{a}}
@@ -237,12 +237,12 @@ If a dispute occurs, the first step is for each submission to verify the Justifi
 For a justification tree to be deemed valid, it must:
 
 \begin{itemize}
-\item Have $\mathcal{H}(RH_0)$ at key 0,
-\item Have $\mathcal{H}(RH_N)$ at key $N$,
+\item Have $\mathcal{H}(RH_0 \cdot \mathcal{L}_0)$ at key 0,
+\item Have $\mathcal{H}(RH_N \cdot \mathcal{L}_N)$ at key $N$,
 \item Have a plausible structure.
 \end{itemize}
 
-The first two items are relatively straightforward to prove via Merkle proof. The last requirement requires slightly more explanation. A Justification Tree with two leaves could meet the first two requirements, but we would be able to tell this tree wasn't plausible as a Justification Tree because the Merkle proofs supplied to prove the first two requirements would not be of the expected length.\footnote{We know that every reputation cycle will at least have log entries for rewarding those who submitted the previous reputation state successfully.} This length is calculable because we know how many leaves are meant to be in the tree and what keys they are expected to be at (every key between 0 and $N$). We are also able to determine the branchmasks that these proofs should have (the binary representations of $2^{\lceil\log_2 (N+1) \rceil} - 1$, and $N$ respectively), which further constrains the shape of plausible tree.
+The first two items are relatively straightforward to prove via Merkle proof. The last requirement requires slightly more explanation. A Justification Tree with two leaves could meet the first two requirements, but we would be able to tell this tree wasn't plausible as a Justification Tree because the Merkle proofs supplied to prove the first two requirements would not be of the expected length.\footnote{We know that every reputation cycle will at least have log entries for rewarding those who submitted the previous reputation state successfully.} This length is calculable because we know how many leaves are meant to be in the tree and what keys they are expected to be at (every key between 0 and $N$). We are also able to determine the branchmasks that these proofs should have (the binary representations of $2^{\lceil\log_2 (N+1) \rceil} - 1$, and $N$ respectively), which further constrains the shape of a plausible tree.
 
 Unfortunately, based on these two proofs, we are unable to guarantee the Justification Tree contains a leaf at every key from 0 to $N$. This is because we do not know how many leaves the siblings used in the Merkle proofs contain, and it is not feasible to request a proof for every key between $1$ and $N-1$. This is why the constraint is limited to being `plausible'. With the approach we have taken, however, we are at least able to guarantee that key $N$ is the last in the Justification Tree, that key $0$ is the first (though this is a trivial consequence of it existing), and there are at least some number of other keys in the tree.\footnote{This number is $\lceil\log_2 (N+1) \rceil + \#_{1}(N) - 2$, where $\#_{1}(N)$ is the binary logarithm of the $N$th integer in Gould's sequence. To derive this expression, consider how many siblings each proof requires; each sibling corresponds to at least one other key. In our case, $\#_{1}(N)$ provides the number of set bits in the branchmask of the proof for key $N$ i.e. how many siblings that the Merkle proof of key $N$ has. The $-2$ accounts for the key-value pairs stored at 0 and $N$.}
 
@@ -251,9 +251,7 @@ Since any two differing submitted states agree on the first leaf $\mathcal{RH}_0
 \noindent First, however, we must establish where the two submissions begin to differ.
 
 \subsubsection*{2. Searching for the discrepancy}
-The contract requires both parties to submit repeated Merkle proofs to locate $\mathcal{RH}_{i+1}$, the first disagreement hash.
-
-We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree.
+The contract requires both parties to submit repeated Merkle proofs to locate $\mathcal{RH}_{i+1}$, the first disagreement hash. We shall call the two parties $A$ and $B$ and we shall indicate which party made a submission by a superscript of $A$ or $B$. Furthermore we introduce the simplifying notation of $\overline{h}$ to mean `sibling of $h$' in the Merkle tree.
 
 Along with their justification root hashes $\jrh^A$ and $\jrh^B$ both parties have already submitted proofs for the left-most leaf. Ignoring the branchmasks for simplicity, these proofs have the form:
 \[
@@ -280,9 +278,7 @@ picking an index $j$ from within the range the first discrepancy in known to lie
 
 The process as before of comparing hashes and retaining the roots of either the left-side subtree or the right-side subtree is repeated. With each iteration, the range of possible values for the index of the first discrepancy is reduced by (on average) a factor of two and the length of the required Merkle proofs is reduced by at least one.
 
-There are two ways this process can terminate. The first way the process terminates is when one party does not respond to a challenge in adequate time, either because they could not or chose not to. In this case the party not responding is deemed to be incorrect.
-
-The other way the process terminates, is when it has reached the bottom of the tree and determined $i$.
+There are two ways this process can terminate. The first way the process terminates is when one party does not respond to a challenge in adequate time, either because they could not or chose not to. In this case the party not responding is deemed to be incorrect. The other way the process terminates is when it has reached the bottom of the tree and determined $i$, the disputed reputation update.
 
 \subsubsection*{3. Confirming $i$ }
 
@@ -293,7 +289,7 @@ Once the contract has found the index $i$ such that $\mathcal{RH}^A_{i}=\mathcal
 In most cases, only one of the two submissions will be able to perform the transaction corresponding to this step. There are several types of calculation and checks that might need to take place, depending on which transition the two submissions first disagree on, and the values of \ascode{ReputationRootHash} and \ascode{NReputationLeaves} they placed in their Justification Trees. All of the following must be performed on chain to verify the calculation under dispute.
 
 \begin{itemize}
-\item \textbf{Check the key} As part of the Merkle proofs submitted (see the next step), the \ascode{key} of the reputation under dispute is submitted. This is a concatenation of the colony address the reputation is in, the skill the reputation is in, and the address holding the reputation (which is possibly the zero address if the total reputation in the colony is under dispute). Based on the value of $i$, which has already been established during the binary search, and the known canonical ordering of reputation updates, the contract is able to check these values. In the case where the update under dispute is due to a log entry, the index of the log entry under dispute is supplied by the user and verified on-chain, to avoid iteration over the unbounded log.
+\item \textbf{Check the key} As part of the Merkle proofs submitted (see the next step), the \ascode{key} of the reputation under dispute is submitted. This is a concatenation of the colony address the reputation is in, the skill the reputation is in, and the address holding the reputation (which is possibly the zero address if the total reputation in the colony is under dispute). Based on the value of $i$, which has already been established during the binary search, and the known canonical ordering of reputation updates, the contract is able to check these values. In the case where the update under dispute is due to a log entry (as opposed to normal decay), the index of the log entry under dispute is supplied by the user and verified on-chain, to avoid iteration over the unbounded log.
 \item \textbf{Check the claimed before and after values} The values of the reputation at \ascode{key} in $\mathcal{RH}_{i}$ and $\mathcal{RH}_{i+1}$ for the submission in question are proved via Merkle proof. If it is claimed an existing reputation is being updated, then the proofs' siblings and branchmask are required to be the same to guarantee no other reputations have been changed. If a new reputation is claimed to be being added (indicated by $\mathcal{L}_{i+1} - \mathcal{L}_i = 1$), the proof for the reputation in $\mathcal{RH}_i$ is not required as the reputation should not be in the tree, but an additional check will be performed later to confirm this.
 \item \textbf{Perform the calculation} This has two elements. The first is to check that the \ascode{nonce} for the reputation has not changed in the leaf if an existing leaf is being updated. If a new leaf is being added, the value of the \ascode{nonce} is checked to be one larger than the \ascode{nonce} of another leaf in $\mathcal{RH}_{i}$ that they have provided. The second is to check that the value of the reputation is correct. It can be a decay, or an update due to an entry in the log, the potential consequences of which are described in section \ref{sec:calculating-reputation-updates}.
 \item \textbf{Additional checks} Depending on the type of update being disputed, additional checks may be required
@@ -304,17 +300,15 @@ In most cases, only one of the two submissions will be able to perform the trans
 \end{enumerate}
 \end{itemize}
 
-It is possible that both submissions will successfully submit the transaction that validates their submissions as described here. This can happen when a new leaf is being added, and the submissions have disagreed over the \ascode{nonce} the reputation should be given. Whichever has successfully awarded the highest \ascode{nonce} is deemed the correct submission.
-
-If at neither party responds to a particular stage in this process in time, both are eliminated from consideration.
+It is possible that both submissions will successfully submit the transaction that validates their submissions as described here. This can happen when a new leaf is being added, and the submissions have disagreed over the \ascode{nonce} the reputation should be given. Whichever has successfully awarded the highest \ascode{nonce} is deemed the correct submission. If neither party responds to a particular stage in this process in time, both are eliminated from consideration.
 
 If the \miningcycleduration-hour mining cycle window has not elapsed by the time only one submission remains, the next window only opens when the current window has elapsed. If the \miningcycleduration-hour window has elapsed by the time the dispute process has finished, the next submission window opens immediately.
 
 \subsection{Calculating reputation updates}\label{sec:calculating-reputation-updates}
 % TODO: I think this needs to be moved to before 'Dealing with false submissions'.
-%
+
 \subsubsection{Keeping track of reputation changes}
-%
+
 Fundamentally, there are two types of reputation update that occur:
 \begin{itemize}
  \item Decay of existing reputation.
@@ -325,12 +319,7 @@ When a user earns reputation in a skill or domain, they also earn reputation in 
 
 In Section \ref{subsec:on-chain-representation-of-skills}, we asserted we store \ascode{n\_parents} and \ascode{n\_children} for all skills and domains. It is only by having access to the number of parents and children for each reputation and the reputation update log recording how many reputations have been updated already in this update cycle (via \ascode{n\_updates}) that the resolution protocol is able to perform the binary search of the justification trees submitted by the disagreeing users. At the start of the challenge protocol, the contract can look up the last entry in the update table for the cycle under consideration, and work out how many updates have occurred in this cycle based on the number of updates prior and the number of parent and child reputations. After verifying that both submitted justification trees contain this exact number of leaves it can proceed to the binary search.
 
-When the discrepant state transition is found, the users supply the index of the event in the on-chain log that corresponds to that reputation update.  This means that the contract does not have to iterate over the whole list expensively, but the contract can simply check the correct reputation update is being considered, and then confirm that the calculation made corresponds to the correct reputation update. To do this, we assert that children are always updated in order, then parents, and then the reputation in question itself. In addition, all colony-wide totals of reputation are always updated in this order before any user-specific reputation.
-
 If the discrepant transition is a decay transition they must also supply a Merkle proof that the starting value assumed for the user corresponds to the value that user had at the end of the last update cycle. A decay transition is identified by the Merkle path corresponding to an index in the justification tree smaller than the number of leaves in the reputation tree at the end of the last successful update.
-
-Recording the number of leaves in the reputation tree is required % to allow the binary search to occur, as well as
-to accommodate the decay calculations that must be done at the start of each update. Before any new reputation is earned or lost in an update cycle, all existing reputations owned by users decay (see Section \ref{sec:repdecay}). There is a decay calculation for every leaf in the previously accepted reputation tree. We do the decay calculations first to give users the benefit of the doubt during reputation updates so they do not lose reputation they have only just earned to premature decay.
 
 \subsubsection{Earning reputation for the first time}\label{sec:earning-rep-for-first-time}
 When a user earns reputation in a new skill, at least one new leaf is added to the tree --- if they have not earned reputation before in some of the parents, then they will also cause further new leaves to be added. Additional new leaves will be added if they are the first user in a colony to earn those particular skills, making the total reputation for that skill in the colony non-zero. During a dispute, when the user proves that they have included the update in the tree, it is not possible to check (efficiently) on-chain that they should not have added it to an existing leaf instead. However, because during the resolution process we are always comparing two submissions against each other, one of two things will be true:\footnote{Assuming that one of the two submissions is correct.}
