@@ -1,44 +1,9 @@
 \section{Structure and Hierarchy Within a Colony}\label{sec:colony-structure}
-Colonies exist to enable collaboration between their members, and direct collective efforts towards some common goal(s). Facilitating effective division of labour is therefore, one of the most important functions of the Colony protocol.
-
-Work is divided into discrete `tasks', which can then be organised into `domains'.
-
-\subsection{Tasks}\label{sec:tasks}
-
-The smallest structural unit in a colony is the `task'. A task represents a unit of work requiring no further subdivision or delegation. A task has three roles associated with it:
-\begin{itemize}
-\item A manager --- someone responsible for defining and coordinating the delivery of the task.
-\item A worker --- someone responsible for executing the task.
-\item An evaluator --- someone responsible for assessing whether the work has been completed satisfactorily.
-\end{itemize}
-
-These roles are assigned to addresses. While it is anticipated that roles within tasks will likely be assigned to individuals, there is nothing to prevent these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
-
-The manager (usually the creator of the task) is responsible for selecting the evaluator and worker and setting additional metadata for the task:
-
-\begin{itemize}
-\item A due date.
-\item Bounties for each of the manager, the worker and the evaluator.
-\item A specification, or brief: to be used by the worker to guide the work, and by the evaluator for assessing the satisfactory completion of the task.
-\end{itemize}
-
-In order to create a task, the manager must possess sufficient reputation and must stake a number of the colony's own tokens proportional to the amount of reputation within the domain. This stake is used to discourage spam, and provide a mechanism whereby the manager can be punished for bad behaviour.
-
-Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). A funding proposal can be made by anyone, but the manager is the natural person to do so. Payouts do not have to all be in the same currency, and a task's payout can be made up of an arbitrary number of currencies.
-
-If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals may be reassigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in. The manager's stake is still only returned after a timeout period in order to ensure they can be punished if necessary.
-
-Assigning either the worker or the evaluator requires the mutual agreement of the manager and the assignee. Once assigned, changes which involve either the worker or evaluator (such as changing the task brief or due date, cancelling the task, or changing assignments or payouts) require mutual consent, or can be triggered via the dispute process.
-
-After the task has been assigned, the worker has until the due date to make a `final submission', which includes some evidence that the work has been completed.
-
-Once the due date has passed or the worker has made their submission, the evaluator may rate the work. Regardless of whether the rating is positive or not, the task enters a state in which \textbf{objections} to the final state of the task can be made and \textbf{disputes} can be initiated (see Section \ref{sec:objections-and-disputes}). Once three days have elapsed, no more objections or disputes can be raised. Once all pending disputes related to the task are resolved, the parties involved get punished or rewarded based on the final state of the task.
-
-If the evaluator's rating for the work is changed as a result of a dispute, they get a reduced payout based on the discrepancy between their original score and the score that their peers determined to be more appropriate. If an objection has determined the manager or evaluator should be punished, they lose their stake, otherwise the stake is able to be reclaimed. The worker is paid based on the final score awarded to their work, taking into account the result of any disputes.
+Colonies exist to enable collaboration between their members, and direct collective efforts towards some common goal(s). Facilitating effective division of labour, management of incentives, and allocation of resources are therefore some of the most important functions of the Colony protocol.
 
 \subsection{Domains}\label{sec:domains}
 
-Of course, without structure, a large colony could quickly become difficult to navigate due to the sheer number of tasks —-- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain sub-domains and tasks. This simple modularity enables great flexibility as to how an organisation may be structured. A toy example is shown in in Figure \ref{fig:domainhierarchysample}.
+Without structure, a large colony could quickly become difficult to navigate due to the sheer number of participants and interactions taking place --- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain subdomains, funding, and expenditures. This simple modularity enables great flexibility as to how an organisation may be structured. A toy example is shown in in Figure \ref{fig:domainhierarchysample}.
 
 \begin{figure}[h]
     \centering
@@ -55,15 +20,67 @@ Of course, without structure, a large colony could quickly become difficult to n
     (development.-120) edge[->, bend left=45, in=-120] (frontend.north)
     (development.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north);
  \end{tikzpicture}
- \caption{Parts of a possible domain hierarchy for a colony developing a web service.}
+ \caption{Parts of a domain hierarchy for a colony developing a web service.}
  \label{fig:domainhierarchysample}
 
 \end{figure}
 
-This compartmentalisation of activity provides a tangible benefit to the colony as a whole by making reputation \textit{contextual}. When objections are raised, they are raised at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be targeted for their opinion, and that when a dispute occurs, the whole colony is not required to vote in the dispute. Rather, only members with the relevant experience can provide their opinion.
+Among other things, this compartmentalisation of activity provides an essential benefit to the colony as a whole by making reputation \textit{contextual}. When arbitration occurs, it occurs at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be included for their opinion, and that when arbitration occurs, the whole colony is not required to participate in the dispute. Rather, only members with the relevant experience are asked for their opinion.
 
-It is ultimately up to individual colonies to decide how they wish to use domains --- some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar tasks together, or even multiple tasks that other colonies would consider a single task. We aim to provide a general framework that colonies may use however they see fit, and to only be prescriptive where necessary.
+It is ultimately up to individual colonies to decide how they wish to use domains --- some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar expenditures together, or even multiple expenditures that other colonies would consider a single expenditure. We aim to provide a general framework that colonies may use however they see fit, and to only be prescriptive where necessary.
 
-In order to create a domain, the creating user must have sufficient reputation in the domain that will become a parent, and must stake a small amount of colony tokens. These thresholds will be larger than for task creation, as the creation of a domain is more significant than the creation of a task. The token stake for creating a domain will be able to be claimed by the creator once a task has been successfully paid out inside the domain --- this indicates the domain is legitimate.
+\subsection{Roles \& Permissions}\label{sec:roles}
 
-In the event of a dispute being raised over the creation of the domain, if the domain is determined to be spurious, the stake is lost and the creator loses reputation.
+Access control in a colony is organized around the concept of \textbf{roles} and \textbf{permissions}. There are six different roles (roughly in order of decreasing influence): Recovery, Root, Arbitration, Architecture, Funding, and Arbitration. Each role provides a bundle of related functionality, giving role-holders \textit{permission} to call certain authenticated functions.
+
+With the exception of the Recovery and Root roles, all roles are domain-specific (much like permissions in a Unix file system are directory-specific), with the rule that roles held in a parent domain are inherited in all child domains. Put another way, holding a role in a domain gives you that role in the entire \textit{subtree} rooted in that domain.
+
+Roles are held by Ethereum addresses. This means that roles can be given to human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly compose various decision-making mechanisms is a key concept in the Colony protocol.
+
+Broadly, roles are designed as a `separation of powers': roles must work together to carry out the functioning of a colony. For example, the administration role can create an expenditure, but only the funding role can actually provide the resources. Complex extensions may require multiple roles in order to function properly (such as `tasks', which requires both the arbitration and administration roles.
+
+\subsubsection{Recovery}
+
+The recovery role gives addresses access to the colony's emergency `recovery' functionality, which allows for arbitrary state-changes to the colony's data. Recovery mode is described in more detail in Section \ref{sec:escape-hatches}.
+
+\subsubsection{Root}
+
+The root role gives addresses access to high-level administrative functions in the colony, such as setting colony-wide parameters, upgrading the colony, and minting new internal tokens. The root role also gives addresses the ability to assign roles throughout the colony.
+
+\subsubsection{Arbitration}
+
+The arbitration role give addresses the ability to make domain-specific state changes, meant as a means of resolving disputes. This role also gives permission to emit reputation penalties.
+
+\subsubsection{Architecture}
+
+The architecture role gives addresses the ability to create new domains in a colony, as well as assign roles in those new domains. Unlike the root role, architecture role holders cannot edit roles in the domain in which they hold the role, only in subdomains.
+
+\subsubsection{Funding}
+
+The funding role gives addresses the ability to move tokens between domains, and to fund expenditures. Financial management in a colony is described in more detail in Section \ref{sec:finance}.
+
+\subsubsection{Administration}
+
+The administration role gives addresses the ability to create and manage expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}.
+
+\subsection{Expenditures}\label{sec:expenditures}
+
+The basic incentive unit of a colony is the `expenditure'. An expenditure represents an allocation of resources \textit{out of} a colony, and thus accepts no further subdivison or delegation. An expenditure has several properties:
+
+\begin{itemize}
+\item An owner (the account which created the expenditure)
+\item A status (active, cancelled, or finalized)
+\item One or more recipients
+\item Payouts for each recipient, denominated in one or more tokens
+\item Optionally, a per-recipient skill
+\item Optionally, a per-recipient payout modifier
+\item Optionally, a per-recipient claim delay
+\end{itemize}
+
+The owner is responsible for setting the properties of the expenditure. The recipients are simply Ethereum addresses. While it is anticipated that recipients will likely be individuals, there is nothing to prevent these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. We would expect some further developed version of the Colony Network to be able provide this functionality to users.}
+
+Once the expenditure is finalized, all properties become immutable and payouts can be claimed (and reputation earned). Prior to finalization, the owner has the ability to cancel the expenditure entirely. Any funds that have already been assigned to the expenditure via funding proposals may be reassigned to the domain (introduced in Section \ref{sec:domains}) that the expenditure was created in.
+
+Defining the payouts for each recipient, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). Payouts do not have to all be in the same token, and an expenditure's payouts can be made up of an arbitrary number of tokens.
+
+The expenditure is meant to be an abstract unit, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the payout modifier and claim delay can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient. A claim delay can be set to allow for dispute processes to elapse before funds can exit the colony.
