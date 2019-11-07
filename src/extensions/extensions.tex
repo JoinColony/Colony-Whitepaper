@@ -1,3 +1,316 @@
-\section{Extensions: Allowing More Complex Behavior}\label{sec:extensions}
+\section{Extending Functionality}\label{sec:extensions}
 
-WIP
+The vision of Colony is the creation of decentralized, permissionless organizations, in which decisions are driven by reputation, not administrative access. Yet, at the level of the core Colony contracts, access is mediated by roles and permissions, not reputation.
+
+The decision to expose roles as the interface to Colony functionality is doubly motivated. First, it makes it possible to launch a Colony which is admin-controlled (appropriate for small teams with a lot of existing trust) and to migrate to a more decentralized, permissionless style of operating as the organization matures. Second, the roles-based approach makes it possible to experiment with a wide variety of mechanisms without needing to continually deploy new Colony contracts. Much like the distinction between \textbf{kernel space} and \textbf{user space} in the design of operating systems, roles can be thought of as providing the \textbf{system calls} needed to allow end-user applications (extensions) the ability to securely manipulate the underlying resources of the system. Just as this model has proven very successful in enabling a wide variety of software applications to safely share computing resources, so do we think that the colony-and-extensions model will be successful here.
+
+This section will discuss in-depth how a variety of key permissionless functionality will be implemented and made available for colonies to use, and to demonstrate the flexibility enabled by the roles system.
+
+\subsection{Tasks}\label{sec:tasks}
+
+\subsubsection{Functionality}
+
+Unlike an expenditure, which represents an abstract transfer of resources, the `task' represents a more concrete exchange of labor for value, and a unit of work requiring no further subdivision or delegation. A task has three roles associated with it:
+
+\begin{itemize}
+\item Manager --- responsible for defining and coordinating the delivery of the task
+\item Worker --- responsible for executing the task
+\item Evaluator --- responsible for assessing whether the work has been completed satisfactorily
+\end{itemize}
+
+The manager (initially the creator of the task) is responsible for selecting the evaluator and worker and setting additional metadata for the task:
+
+\begin{itemize}
+\item A due date
+\item Payouts for each of the manager, worker and evaluator
+\item A specification, or brief: to be used by the worker to guide the work, and by the evaluator for assessing the satisfactory completion of the task
+\end{itemize}
+
+In order to create a task, the manager must hold the administration role. Future variations of the `tasks' extension may instead impose minimum reputation requirements and/or staking, making task creation permissionless.
+
+Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). Payouts do not have to all be in the same currency, and a task's payout can be made up of an arbitrary number of currencies. If a payout for the task is denominated in the colony's token, the recipient will also earn reputation when the task is completed as long as their work was well received.
+
+If no worker has been assigned to a task, the manager has the ability to cancel the task entirely. Any funds that have already been assigned to the task via funding proposals may be reassigned to the domain (introduced in Section \ref{sec:domains}) that the task was created in.
+
+Assigning either the worker or the evaluator requires the mutual agreement of the manager and the assignee. Once assigned, changes which involve either the worker or evaluator (such as changing the task brief or due date, cancelling the task, or changing assignments or payouts) require mutual consent, or can be triggered via the dispute process.
+
+After the task has been assigned, the worker has until the due date to make a `final submission', which includes some evidence that the work has been completed.
+
+Once the due date has passed or the worker has made their submission, the evaluator may rate the work. Regardless of whether the rating is positive or not, the task enters a state in which \textbf{objections} to the final state of the task can be made and \textbf{disputes} can be initiated (see Section \ref{sec:objections-and-disputes}). Once the dispute period has elapsed, payouts are eligible to be claimed. \\
+
+As mentioned, the performance of the user who has completed the work is established after the work is submitted. At this point, the evaluator grades the work submitted by the worker, and the worker rates the manager's ability to coordinate delivery of the task\footnote{These scores should be submitted using a pre-commit and reveal scheme to ensure secrecy during the rating process and avoid retaliatory grading in the event that the manager and evaluator are the same person, which we expect to be a reasonably common occurrence. In the event of a user not committing or revealing within a reasonable time, their rating of their counterpart is assumed to be the highest possible and they receive a mild reputation penalty. } on a scale of one to three points. In the case of the evaluator, a rating of 1 point counts as them rejecting the work and a score of 2-3 points counts as accepting the work. The rating received defines the reputation change the user will experience:
+
+\begin{itemize}
+ \item[]1 point:\phantom{s} User was unable to complete the task. Reputation penalty equal to 1x payout.
+ \item[]2 points: User completed the task acceptably. Reputation gain equal to 1x payout.
+ \item[]3 points: User completed the task superbly. Reputation gain equal to 1.5x payout.
+\end{itemize}
+
+The worker receives reputation both in the domain (and parent domains) and the skill(s) of the task, while and manager receives only in the domains, not in the skill(s) as they have not actually done the task. While it is likely some knowledge is required to coordinate delivery of the task, this is not always the case; we believe that skill reputation should exclusively demonstrate ability to perform tasks.
+
+Upon completion of a task, the evaluator also earns domain reputation based on their internal token payout (with an implicit rating of "2"). There is no explicit rating of the evaluator, but as with all other payouts an objection can be raised before a payout is claimable; the outcome of the objection may be a reduction of payout or an explicit reputation penalty.
+
+\subsubsection{Implementation}
+
+Tasks are built on expenditures, and implementing tasks as an extension contract makes use of the \textbf{arbitration} and \textbf{administration} roles -- the latter to manipulate the expenditure and the former to implement consequences of the rate-and-reveal flow.
+
+When the task is finalized, the underlying expenditure's \texttt{claimDelay}s are set to allow for disputes to occur. Based on the rating recipients receive, their \texttt{payoutModifier}s are set to give a reputation boost (for an excellent review) or reduce the payout they can claim (for an unsatisfactory review). Also in the case of an unsatisfactory review, a reputation penalty is emitted.
+
+\subsection{Funding queues}\label{sec:funding-queues}
+
+Section \ref{sec:roles} describes the \textbf{funding} role, which is allowed to transfer funds in between \textbf{funding pots}. This permission is very powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One of these mechanisms is the \textbf{funding queue}, containing of a series of \textbf{funding proposals}, each with the following attributes:
+
+ \begin{itemize}
+  \item \ascode{\textbf{Creator}}	--	The person that created the proposal.
+  \item \ascode{\textbf{From}}	--	Funding pot funds are coming from.
+  \item \ascode{\textbf{To}}	--	Pot funds are going to (may be the rewards pot).
+  \item \ascode{\textbf{TokenType}}	--	The token contract address (0x0 for Ether).
+  \item \ascode{\textbf{CurrentState}}	--	The state of the proposal (i.e. inactive, active, completed, cancelled).
+  \item \ascode{\textbf{TotalPaid}}	--	How much has been transferred along this funding proposal so far.
+  \item \ascode{\textbf{TotalRequested}}	--	The maximum amount to transfer after which this funding proposal is considered `completed'.
+  \item \ascode{\textbf{LastUpdated}}	--	The time when the funding proposal was last updated.
+  \item \ascode{\textbf{Rate}}	--	Rate of funding.
+  \item \ascode{PunishCreator} -- Whether the creator should be punished upon completion.
+ \end{itemize}
+
+We distinguish between two types of funding proposals: Basic Funding Proposals (BFP) intended for normal use, and Priority Funding Proposals (PFP) intended to be used when atypical circumstances present themselves. The basic funding proposal may start funding the target straight away, whereas a priority funding proposal must be explicitly voted on before it starts directing funds. Furthermore, for a basic funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a priority funding proposal has no such restrictions.
+
+Priority funding proposals should be used when funds need to be directed somewhere that is not a direct descendant of the source, when the funding rate needs to be very high (including immediate payment), or when the funding rate should be otherwise controlled (e.g. in the case of paying a salary).
+
+For either funding proposal, the assignment to funding pots associated with domains or tasks is purely a bookkeeping mechanism. From the perspective of the blockchain, Ether and tokens are held by the colony contract until they are paid out when a task is completed.
+
+\subsubsection{Creating a funding proposal}
+Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots. They must stake an equivalent fraction of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour.
+
+\subsubsection{From, To and TokenType}
+The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}.
+
+The \ascode{TokenType} may be any ERC20 token whitelisted for use in the network, Ether, CLNY or the Colony's own Token. The \ascode{From} field must be a funding pot associated with a domain or a task in the colony, while the \ascode{To} field must be either a funding pot or the special rewards pot. If the funds are to move `downstream' from a domain to one of its children, a basic funding proposal is often sufficient.
+
+\subsubsection{CurrentState}
+The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to channel funds. A basic funding proposal begins in active state while a priority one begins inactive (i.e. it must be activated by a vote). A funding proposal is completed when its \ascode{TotalPaid} reaches \ascode{TotalRequested}. Any other state changes must be made through the dispute mechanism (see Section \ref{sec:objections-and-disputes}).
+
+\subsubsection{TotalPaid and TotalRequested}
+The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount.
+
+\subsubsection{Rate and LastUpdated}
+When a funding proposal is eligible to accrue funds (see Section \ref{subsec:funding-queue}) it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal --- i.e. the user manually requests an update. When pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid} and the current time is recorded as \ascode{LastUpdated}.
+
+\ascode{TotalPaid} is only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occurred.
+
+\subsubsection{The funding queue}\label{subsec:funding-queue}
+Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the priority funding proposals, followed by the basic funding proposals. PFPs are ordered by the total reputation in their domain\footnote{The domain of a PFP is the domain that voted on it becoming active --- this will be the last common ancestor of the source and target pot domains unless an escalation has occurred.} --- while basic funding proposals are ordered by the reputation `backing' them.  The details of this procedure are outlined below.
+
+\subsubsection{Basic funding proposals}\label{subsubsec:BFPs}
+A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's funding pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}, or through the dispute mechanism. In either case, the stake is only able to be reclaimed if \ascode{PunishCreator} has not been set to true via a dispute by the end of a timeout period.
+
+\subsubsection{Ordering of BFPs}
+Basic funding proposals are ordered in the \emph{Funding Queue}. Only one of them can receive funds at any one time. The proposals are ordered by the amount of reputation backing the proposal.
+
+When created, a basic funding proposal gets placed at the bottom of the queue. Users can give a proposal `backing' weighted by their reputation in the source domain\footnote{The source domain of a BFP is the domain of the funding pot that the funding proposal is \ascode{From}.} at the time of backing\footnote{A user's reputation may change, but the backing weight is recorded at the time of backing and does not change without further user action.}. There are no costs to backing a proposal (other than gas costs) and the users obtain no direct benefits; it does not represent them putting their earned reputation at risk, nor any tokens --- it merely helps the proposal achieve funding in a more timely fashion.
+
+The more reputation backs a proposal, the higher up the queue it is placed. Every transaction that adds backing to a proposal (or otherwise updates the backing level) inserts the proposal in the correct place in the queue. Only the funding proposal at the top of the queue accrues funds.
+
+\subsubsection{The rate of funding for BFPs}
+The more reputation backs a proposal, the faster it is funded. The rate scales linearly, and at the limit, if 100\% of the reputation in the source domain backs a basic funding proposal, then that funding proposal will be funded at a rate of 50\% of the domain's holdings (of the \ascode{TokenType}) per week. The goal is a steady and predictable allocation of resources directed collectively by the domain's (reputation weighted) priorities.
+
+When a user backs a proposal, both the user and their reputation at the time are recorded. Consequently the user is able to update their backing at a later date. However, we note that such an update is not automatic and even if a user loses reputation due to bad behaviour, their backing level remains unchanged. To rectify this, we will allow users to update another user's backing to reflect their updated reputation scores, but we don't expect this functionality to be used often. We would only anticipate it being used if a user lost a lot of reputation due to some very bad behaviour, and other users wanted to prevent a bad funding proposal backed by the same user from being completed before it could be cancelled by other means (i.e. via dispute, described in Section \ref{sec:objections-and-disputes}).
+
+We emphasised that a user could back a proposal with their reputation at the time of backing because the reputation backing a proposal will not change when that user's reputation does so. If by a quirk in this system, the reputation recorded as backing a funding proposal ends up higher than 100\% of the total of that reputation in the colony, then the funding occurs no quicker than it would at 100\%.
+
+\subsubsection{Completing a BFP}
+If an update finds that a proposal is fully funded (i.e. \ascode{TotalPaid} = \ascode{TotalRequested}), it is removed from this queue to allow the next-most-popular funding proposal to accrue funds. Explicitly, the following steps need to happen:
+\begin{itemize}
+ \item[\textbf{1.}] The time at which the funding proposal was fully funded is calculated.% (and is recorded as \ascode{LastUpdated})
+ \item[\textbf{2.}] \ascode{TotalPaid} is set to \ascode{TotalRequested}.
+ \item[\textbf{3.}] The BFP is removed from the queue.
+ \item[\textbf{4.}] The next BFP in the queue is promoted to the top of the queue, and its \ascode{LastUpdated} time is set as the time calculated in \textbf{1.}
+\end{itemize}
+
+Once the the BFP has been fully funded, for a period of three days anyone can make a proposal that \ascode{PunishCreator} should be set to `true', and the creator lose their stake. This proposal takes the form of an Objection (Section \ref{sec:objections-and-disputes}). If no such proposal is made, or the proposal fails to pass, then the creator can reclaim their stake. Once the fate of the stake is decided, and the creator either reclaims the stake or loses it and a matching amount of reputation, the BFP is set to the \ascode{completed} state.
+
+\subsubsection{Priority funding proposals}
+A priority funding proposal (\textbf{PFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. PFPs begin in the \ascode{inactive} state and can only become \ascode{active} via an explicit vote. The vote is based on reputation in the domain that is the most recent common ancestor of the two pots that money is being transferred between.
+
+We imagine PFPs will be used to:
+\begin{itemize}
+ \item reclaim funds from child domains.
+ \item reclaim funds from cancelled tasks.
+ \item fund tasks across domains.
+ \item set aside funds designated as a person's salary.
+ \item make large, one-off payments.
+ \end{itemize}
+
+\subsubsection{PFPs and the funding queue}
+
+Active Priority Funding Proposals take priority over Basic Funding Proposals and so they are placed at the top of the funding queue. They are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus PFPs that are higher in the domain hierarchy come before those lower down.
+
+As with BFPs, any user can `ping' an active PFP at the top of the queue to cause the contract to update the funds available to the recipient pot. \ascode{TotalPaid}, \ascode{LastUpdated} and \ascode{CurrentState} are updated as required.
+
+\subsubsection{The 24h waiting period for PFP updates}
+Priority Funding Proposals take precedence over Basic Funding Proposals. To avoid the situation in which long running PFPs block the BFP process entirely, a limit is placed on how often and PFP can be updated (`pinged'). We say a PFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its \ascode{LastUpdated} time is at least 24 hours old.
+
+The result of this rule is that fast payments are still possible --- in such a case the PFP's \ascode{rate} is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate PFPs that do not block the entire BFP process.
+
+\subsubsection{When is a funding proposal eligible to receive funding?}
+A Basic Funding Proposal may receive funds when pinged if it is active and at the top of the BFP funding queue and when the \ascode{LastUpdated} time of the PFPs are less than 24 hours old.
+
+A Priority Funding Proposal may receive funds when pinged if it is active and all PFP ahead of it in the funding queue have been updated less than 24 hours ago.\footnote{In order to avoid hitting the gas limit due to unbounded loops, it will be necessary to maintain two orderings for the PFPs, one by priority and one by \ascode{LastUpdated}. }
+
+\subsubsection{Editing funding proposals}
+The creator of a funding proposal may edit the \code{TotalRequested} property of a funding proposal at any time, but doing so resets the reputational support that the proposal has in the funding queue to zero. The intention here is for changes to funding to be potentially quick to achieve with the agreement of others in the colony if the requirements for the recipient pot change (e.g. the scope of a domain increases).
+
+\subsubsection{Cancelling funding proposals}
+The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to \ascode{cancelled}. This is analogous to the creator of a task being able to cancel the task if it has not yet been assigned a worker (see Section \ref{sec:tasks}). Beyond this it must be possible for a colony to cancel a funding proposal without the creator's involvement. This is done through the objection mechanism described in Section \ref{sec:objections-and-disputes}.
+
+When a task is cancelled, funding proposals that have that task's funding pot as their target (\ascode{To}) also enter the \ascode{Cancelled} state when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it will require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
+
+\subsection{Objections and Disputes}\label{sec:objections-and-disputes}
+
+The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. These are trust problems, which have traditionally been solved by management hierarchies. But colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable.
+
+The solution to collective decision making is usually voting, but Colony is designed for day to day operation of an organisation. Voting on every decision is wholly impractical.
+
+The emphasis should be on `getting stuff done' and not about `applying for permission'. Therefore, Colony is designed to be permissive. Task creation does not require explicit approval (Section \ref{sec:tasks}), nor do basic funding proposals (Section \ref{sec:finance}) or any number of administrative actions throughout the Colony system.
+
+The \textbf{Dispute System} provides a self regulating mechanism to provide a balanced set of incentives for users to keep their colony running harmoniously. It is there to resolve disagreements and to punish bad behaviour and fraud. The dispute mechanism allows colony members to signal disapproval and potentially \textbf{force a vote} on decisions and actions that would otherwise have proceeded unimpeded.
+
+\textbf*{What are objections?}
+When a member of a colony feels that something is amiss, they can \emph{raise an objection}. By doing so, they are fundamentally proposing that a variable, or more than one variable, in the contract should be changed to another value. For this reason we call supporters of the objection the `change' side and opponents the `keep' side.
+
+The user raising the objection must also put up a stake of colony tokens to back it up (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \emph{dispute}.
+
+\textbf*{What are disputes?}
+We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting.
+
+\subsubsection{Raising objections}\label{subsec:raising-objections}
+
+The user raising an objection submits the following data:
+\begin{itemize}
+ \item the data that should be changed
+ \item the reputation(s) that should vote on this issue (a maximum of one from each of the domain and skill hierarchies)
+ \item proof that these reputations should be allowed to make the change in question.
+\end{itemize}
+
+The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern \emph{escalation}.
+
+\begin{center}
+ \textbf{In Colony you cannot escalate a decision to higher management, you can only escalate to bigger groups of your peers.}
+\end{center}
+
+For example, suppose that the objection concerns a task in the domain `development of our website'. The objector could choose to have all `development' reputation vote on it --- we say the decision was `escalated to the development domain'. In this example, the third point would be a proof that the domain `development of our website' was indeed a subdomain of `development'. The highest domain any decision can be escalated to is that of the entire colony, where all domain reputation is entitled to vote.
+
+Whenever an escalation occurs, we need to ensure that the reputation we are escalating to is a direct parent of the reputation associated with the variable being changed. This is possible to do efficiently because of metadata that is placed on the reputations (for domains) when they are created, which includes pointers to at least the direct parent.\footnote{Each reputation type includes the \ascode{parents} array, containing pointers to its `$n^{th}$ parents' for all $n$ that are powers of $2$ (see Section \ref{subsec:on-chain-representation-of-skills}).} When a user creates an objection, instead of directly specifying the domain they are escalating to, they provide the steps needed to get there from the domain associated with the variable that is to be changed. This ensures that the domain they escalate is a direct parent of that associated with the variable.
+
+\subsubsection{Costs and rewards}\label{sec:costs-of-disputes}
+\textbf{Cost of raising an objection}
+To create an objection, a user must possess enough reputation and must also stake some number of the colony's tokens. The reputation they need to be able to make the objection depends on the level they are escalating to; the `higher up' the decision goes, the higher the reputation requirement. To be able to create an objection, the user must have 0.1\% of the reputation queried and then must stake 0.1\% of the corresponding fraction of tokens. Thus, if an objection appeals to 13\% of total colony reputation, then objecting requires 0.013\% (0.1\% of 13\%) of reputation and the required stake is 0.013\% of all colony tokens.
+
+If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the tokens required, which requires them to have a correspondingly smaller amount of reputation.\footnote{This minimum amount required to even propose a change prevents users from spamming objections --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the objection will not be `live' until other users stake tokens, and take it over the 0.1\% threshold. The  amount of tokens required to be staked for a particular objection is recorded at the time when it is created. Users can only stake tokens in proportion to the reputation they have. For example, if they wanted to stake 40\% of the tokens required, they must have at least 40\% of the reputation that would be required to create the objection outright.
+
+\textbf{Cost of defending against a raised objection}
+Once enough tokens have been staked against an objection it becomes active and, barring any further user actions for three days, the suggested change will take place when the objection is `pinged' by a user. However, if there are users who oppose the suggested `change', they may stake tokens in support of the `keep' side. If the keep side receives sufficient support, a dispute is raised.
+
+If the `change' side does not garner enough support in three days, the objection fails and is rejected. If, three days after the `change' side had enough tokens staked and the `keep' side does not, then it is assumed that the change is acceptable and it occurs when `pinged'.
+
+\textbf{Voting on disputes}
+If both sides stake the required number of tokens within their three days time limit, then the proposal goes to a vote. The weight of a user's vote is the sum of their reputations in the skills chosen by the user who originally raised the objection.
+
+The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved.
+
+Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak256(secret, option\_id)}, where \ascode{option\_id} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{secret, option\_id} and the contract calculates \ascode{keccak256(secret, option\_id)} to verify it is what they originally submitted.
+
+As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. We suggest a (hash) of the consequence field of the poll signed with their private key. This is easily reproducible by a client at a later date with no local storage required.
+
+10\% of the staked tokens are set aside to pay voters when they vote; if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest\cite{KeynesianBeauty}. Any tokens that would have been awarded to users who abstained from voting, or are not revealed in the reveal window, are sent to the root domain funding pot once the poll closes.
+
+Once a vote has been in the reveal phase for 48 hours, a transaction may be made to finalise the vote. Any subsequent reveals of votes do not contribute to the decision being made, but serve only to unlock the user's tokens if it was a token-weighted or hybrid vote (see below). We define quorum to be more than 10\% of the reputation eligible to vote has done so. If quorum is not reached, no changes are made and all participants get their remaining staked tokens returned.\footnote{Some of the staked tokens on the change side will have been used to compensate voters.}
+
+\textbf{Consequences of the vote}
+If quorum has been reached in a dispute vote, and the `change' side won, then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable (see Section \ref{sec:repeated-disputes}). If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted.
+
+At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens back and they lose the  complementary percentage of the reputation that was required to stake. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
+
+\begin{itemize}
+ %\item The number of people that voted in a decision
+ \item The fraction of the reputation in the colony that voted.
+ \item How close the vote ultimately was.
+\end{itemize}
+
+At the end of a vote, if the vote was very close, then the losing side receives nearly 90\% of their stake back. If the vote is lopsided enough that the winning side's vote weight ($w$) reaches a landslide threshold ($L$) of the total vote weight, then they receive 0\% of their staked tokens back. $L$ varies based on the fraction of total reputation in the colony that voted ($R$):
+
+\begin{equation}
+L = 1 - \frac{R}{3}.
+\end{equation}
+
+So for a small vote with little reputation in the colony being allowed to vote, the decision has to be close to unanimous for the losing side to be punished harshly. For a vote of the whole colony, the landslide threshold $L$ reduces to 67\% of the votes --- i.e. the reputation of the colony overall was split 2-to-1 on the decision.
+
+Between these extremes of a landslide loss and a very slim loss, the loss of tokens and reputation suffered by the losing side beyond the 0.1 minimum ($\Delta$) varies linearly:
+
+\begin{equation}
+ \Delta = 0.9 \times \min \left\lbrace \frac{w-0.5}{L-0.5}, 1 \right\rbrace
+\end{equation}
+
+\noindent and so the total loss ($0.1 + \Delta$) varies between $0.1$ and $1$.
+
+\textbf*{What happens to the tokens lost?}
+Any tokens lost beyond the initial 10\% are split between the colony and those who staked on the winning side, proportional to the amount they staked. Half of the reputation lost beyond the initial 10\% is given to those who staked on the winning side, and half is destroyed (the colony as a whole having reputation has no meaning, unlike the idea of the colony as a whole owning tokens).
+
+The motivation here is efficiency --- it aims to discourage spurious objections and disputes. A close vote is a sign that the decision was not a simple one and forcing a vote may have been wise. Therefore, the instigators of the dispute should not be harshly punished. On the other hand, if a vote ends in a landslide, it is a sign that the losing side was going up against a general consensus. We encourage communication within the colony. Members should be aware of the opinions of their peers whenever possible before disputes are invoked.
+
+\textbf{Repeated disputes}\label{sec:repeated-disputes}
+In order to reduce the number of repeated objections and disputes over the same variable, the fraction of total reputation in the colony that voted for the winning side is recorded after every vote. This is the threshold that must be exceeded in any future vote in order to change the variable again. We reiterate that this value is updated after every vote on the variable, even if the decision was to maintain the current value of the variable.
+
+To ensure that the variable can always be changed if necessary, this threshold for changing the variable is ignored if the dispute was raised to the root domain of the colony.
+
+\subsubsection{Types of vote}
+Depending on the context and potential consequences of the vote, Colony supports three types of voting. The type of vote a particular action merits is predetermined based on the action, and is not a choice of the instigator.
+
+\textbf{Reputation weighted voting}
+Most votes in a colony will be due to disputes related to tasks. In these cases, the weights of the users' votes is proportional to the reputation that each user has in the domain and skill that the vote is taking place in. When such a vote starts, the current reputation state is stored alongside the vote. This allows the current reputation state to be `frozen' for the context of the vote, and prevents unwanted behaviours that might otherwise be encouraged (for example, delaying submission of a task until closer to voting so that the reputation earned has not decayed as much).
+
+When revealing their vote, the user also supplies a Merkle proof of their relevant reputation contained within the reputation state that was saved at the start of the vote. The total vote for the option they demonstrated they voted for is then incremented appropriately.
+
+\textbf{Token weighted voting}
+Unlike with reputation, we do not have the ability to `freeze' the token distribution when a vote starts. While this is effectively possible with something like the MiniMe token \cite{minime}, we envision token-weighted votes will still be regular enough within a Colony that we do not wish to burden users with the gas costs of deploying a new contract every time.
+
+When conducting a token weighted vote, steps must be taken to ensure that tokens cannot be used to vote multiple times. In the case of `The DAO', once a user had voted their tokens were locked until the vote completed. This introduced peculiar incentives to delay voting until as late as possible to avoid locking tokens unnecessarily.  Our locking scheme avoids such skewed incentives.
+
+Instead, once a vote enters the reveal phase, any user who has voted on that vote will find themselves unable to see tokens sent to them, or be able to send tokens themselves --- their token balance has become locked. To unlock their token balance, users only have to reveal the vote they cast for any polls that have entered the reveal phase --- something they can do at any time. Once their tokens are unlocked, any tokens they have notionally received since their tokens became locked are added to their balance.
+
+It is possible to achieve this locking in constant gas by storing all submitted secrets for votes in a sorted linked list indexed by \ascode{close\_time}. If the first key in this linked list is earlier than \ascode{now} when a user sends or would receive funds, then they find their tokens locked. Revealing a vote causes the key to be deleted (if the user has no other votes submitted for polls that closed at the same time). This will unlock the tokens so long as the next key in the list is a timestamp in the future. A more detailed description of our implementation can be found on the Colony blog \cite{ColonyVoting}.
+
+Insertion into this structure can also be done in constant gas if the client supplies the correct insertion location, which can be checked efficiently on-chain, rather than searching for the correct location to insert new items.
+
+\textbf{Hybrid voting}
+A hybrid vote would allow both reputation holders and token holders to vote on a decision. We envision such a vote being used when the action being voted on would potentially have a sizeable impact on both reputation holders and token holders. This would include altering the supply of the colony tokens beyond the parameters already agreed (see Section \ref{sec:colony-token-management}) or when deciding whether to execute an arbitrary transaction (see Section \ref{sec:arbitrary-transaction}).
+
+In order for a proposal to successfully pass through a hybrid vote, both the reputation holders and the token holders must have reached quorum, and a majority of both reputation and token holders who vote must agree that the change should be enacted.
+
+
+\subsection{Salaried positions}\label{sec:salary}
+
+The work-for-payment model in the colony network is based around tasks, and on the surface this implies colony-worker relationships that are purely transactional. However the system is flexible enough to accommodate a wider range of employment models. One such example is a \emph{salaried position}.
+
+A salaried position could be realised by creating a special domain representing the position to be filled. The domain could be issued the salary through a priority funding proposal. The employee would be the only person with reputation within that domain and would be able to withdraw funds by creating and self-assigning placeholder tasks that are funded from the domain's funding pot. A good user interface could hide these implementation details from the users and render salaried positions differently from regular domains.
+
+\subsection{Awarding reputation for work not captured by tasks}
+
+All reputation decays over time, as described in Section \ref{sec:reputation}. This prevents an eternal `reputation aristocracy' and allows reputation to be meaningful even after major changes in the colony token's value.
+
+Reputation is awarded when a user receives payment of colony tokens --- most commonly as payout from a task, but sometimes from dispute resolution and, in the case of the \rc, from the reputation mining process. We can use the task payout mechanism to award users extra reputation provided there is consensus to do so.
+
+Consider the scenario in which a founder, or an important early contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate was sub-optimally high for the particular colony.\footnote{Finding an optimal decay rate for reputation in the network will depend on empirical data collected from early colonies.} Or perhaps the founder was doing a lot of intangible work to get the colony off the ground in the first place and so was never compensated properly through the task system. To get around the limitations of the reputation system and to re-integrate the founder (and make them eligible to receive their rewards), the colony can create a special task that is solely designed to award reputation they are due. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
+
+The important point is that any limitations imposed by the system can be weakened if there is consensus to do so. The system should not stand in the way of consensus, it should just provide conflict resolution mechanisms for those times in which there is dissent.
+
+\subsection{Objections by non-members}
+
+Having reputation is a prerequisite for creating an objection and triggering the dispute process. Therefore, if an outsider is hired by a colony to perform a task, they will not, on their own, be able to object to the evaluation of their work. However, a good colony frontend may allow them to create the template for an objection, effectively calling for members of the colony to support it and submit the objection to the colony network on-chain on their behalf.
+
+This is analogous to a member staking only 10\% of the required amount and waiting for further support from their peers (Section \ref{sec:costs-of-disputes}), with the difference being that without any third party support, this `objection' would never be processed on-chain.
+
+\subsection{Proposing an arbitrary transaction by the \ascode{Colony} contract}\label{sec:arbitrary-transaction}
+Of course, it is possible that a colony will want to engage in some behaviour that we haven't foreseen, that could be implemented in a contract outside the control of the Colony Network. To that end, we wish to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens without requiring the network to explicitly support them. As they are powerful, such transactions should be rare occurrences requiring high support thresholds.
+
+Formally, proposing that a colony make an arbitrary transaction on the blockchain is no different from an objection; however the proposal is to change the value of a special variable from zero to the value of the transaction data of the proposed transaction. Such a proposal requires the entire colony to be able to vote (both token holders and reputation holders), as it concerns actions taken `by the contract as a whole'. In the event the proposal is successful, the special variable is set. Another subsequent transaction --- able to be made by anyone --- is able to call a function that executes the transaction in the special variable, and resets it to zero if successful.

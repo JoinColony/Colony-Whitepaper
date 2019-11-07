@@ -84,3 +84,21 @@ Once the expenditure is finalized, all properties become immutable and payouts c
 Defining the payouts for each recipient, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). Payouts do not have to all be in the same token, and an expenditure's payouts can be made up of an arbitrary number of tokens.
 
 The expenditure is meant to be an abstract unit, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the payout modifier and claim delay can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient. A claim delay can be set to allow for dispute processes to elapse before funds can exit the colony.
+
+Once the tokens have been paid out, they are under the control of the user --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.
+
+\subsection{Finances}\label{sec:finance}
+
+All tokens and currencies are administered by the colony contract; it is responsible for all the bookkeeping and allocations.
+
+\textbf{Each domain and each expenditure in a colony has an associated \emph{funding pot}.} A funding pot can be thought of as acting like a wallet specific to a particular domain or task. To each funding pot, the colony contract may associate any number of unassigned tokens it holds. Depending on context, the funds in a funding pot may be referred to as the bounty, the budget, the salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
+
+This section deals with the mechanisms by which a colony \emph{allocates} financial resources to domains and tasks. The norm is for resources to be allocated from the general to the particular, and that all allocations with sufficient reputational `backing' may proceed without a vote. As long as there is no disagreement, everything will run smoothly and automatically.
+
+For how revenue earned by a colony is handled see Section \ref{sec:revenue}.
+
+Every colony has its own ERC20-compatible token. These tokens are under the control of the colony contract and may be used to pay for work done in the colony. Tokens only leave the control of the colony upon being paid out for completed tasks.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the Arbitrary Transaction feature described in Section \ref{sec:arbitrary-transaction}. }
+
+To pay out tasks, in addition to local tokens, a colony may also use Ether, CLNY and other ERC20 tokens that have been explicitly whitelisted by the Colony Network.
+
+\subsection{Managing stakes}\label{sec:stakes}
