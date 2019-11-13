@@ -1,5 +1,5 @@
+\section{Reputation Mining}\label{sec:reputationmining}
 
-\section{Calculating Reputation: Miners and Merkle Proofs}\label{sec:reputationmining}
 The reputation system is a core component of any decentralised colony. By carefully balancing the rewards and penalties we aim to keep every users' incentives aligned with the colony and the colony network. Since reputation can only be \emph{earned} and not transferred between accounts, the system fosters a more meritocratic form of decision making than pure token-weighted voting can hope to achieve. The continuous decay of reputation ensures that the influence conveyed by reputation is recently earned and up-to-date. As such, it prevents a reputation aristocracy and allows for a fluid passing of control from one set of contributors to another over time.
 
 
@@ -402,6 +402,6 @@ The reward earned by each miner on the list is given by
 \end{equation}
 i.e. the mining reward $M$ is divided among the miners according to their relative weighting.
 
-
 \subsection{Emergency shutdown}\label{sec:big-red-button}
+
 Section \ref{sec:escape-hatches} described a transaction from a whitelisted address can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be made. Similarly, the reputation mining process will also have an emergency stop-and-repair mechanism (to begin with). This will allow the whitelisted addresses to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved (which will likely involve a contract upgrade). The colonies will be able to continue operations as usual using the reputations of the last valid state, which will be temporarily frozen and not decay.

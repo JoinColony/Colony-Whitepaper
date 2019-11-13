@@ -1,11 +1,12 @@
-% \clearpage
-\section{Gas-Efficient Reputation Penalty in Dispute Resolution}\label{appendix:rep-transfer}
+\section{Appendices}
+
+\subsection{Gas-Efficient Reputation Penalty in Dispute Resolution} \label{appendix:rep-transfer}
 
 Once a dispute has been raised and settled one way or the other, the users on the losing side will lose reputation and those on the winning side will gain it. If there is then a disagreement during the reputation mining mechanism, we must be able to calculate on-chain, in a gas-efficient way, a specific reputational consequence of the dispute being settled. A dispute may affect the reputations of many users, but all of these reputation changes are represented by only a single entry in the `reputation update log', so it is necessary to expand upon the process used to resolve this.
 
 Given that users are able stake small amounts on each objection, an arbitrarily large number of users could theoretically be involved. Gas limits dictate that we must therefore not have any (on-chain) loops in this implementation.
 
-\subsection{Staking}
+\subsubsection{Staking}
 
 As noted in Section \ref{sec:costs-of-disputes}, an objection requires 0.1\% of the reputation queried and 0.1\% of the corresponding fraction of tokens to be staked' to be considered valid, but that just 10\% of this amount is sufficient in order to create such a proposal. The exact numerical values of how much reputation and how many tokens are needed, is set at the time the proposal is first created. We proceed with a detailed example.
 
@@ -68,7 +69,7 @@ Stake & Match From & Match To & Remainder & Tx \# From & Tx \# To\\ \hline
 
 When staking, the user supplies the `Match From' and `Match To' arguments. These can be checked to be correct on-chain in constant gas by using the values of $\Sigma^+$ and $\Sigma^-$ recorded alongside previous stakes, and the remainder from the previous match. Then, when a miner is asked to prove a particular transaction has been included, they can point to the row in this log that contains that transaction without the contract having to iterate over an arbitrarily long list. The user's client is required to do this iteration locally to find the row, but this does not require any gas expenditure.
 
-\subsection{Exact matching}\label{sec:exactMatching}
+\subsubsection{Exact matching}\label{sec:exactMatching}
 
 For the `reputation update log' to work correctly, we must know exactly how many reputation updates we have to consider. In the above example, it was $4\times(3+3p+2c)$, which could be calculated and recorded easily in the update log. However, consider an example where the staked amounts were
 
@@ -138,3 +139,46 @@ These dummy insertions occur whenever the remainder is 0 --- i.e. when the new s
 % \end{table}
 %
 % So for example, in Table \ref{appa:modifiedexamplelog}, the stake of -150 is matching against the stake at index 1 in the `positive stake' list which is stake number 1 i.e. the stake from user A. The stake of 300 is matching against the stake at index 1 in the `negative stake' list, which is stake number 2 i.e. the (remainder of the) stake from user B.
+
+\subsection{Reputation Decay Calculation Details}\label{appendix:rep-decay}
+
+Reputation in any skill decays by a factor of two every \repdecayduration\ days. At each update (i.e. after every \miningcycleduration\ hours), the new decayed value ($u_{\rm new}$) is calculated by
+
+$$u_{\rm new} = u_{\rm old} \times \exp\left(-\frac{\ln 2}{\decayfactor}\right) = u_{\rm old} \times \exp\left(-k\right).$$
+
+This calculation is applied separately to each user's skill, as well as the number that represents the total of all of those skills in the colony. Due to rounding error with the integer representation on the blockchain, these numbers will drift away from each other. However, we can show the accumulated error will be negligible. The amount of reputation that will be incorrectly missing after the first iteration will be, on average. $0.5N$ reputation wei, where $N$ is the number of users that have this skill.\footnote{This ignores the incorrectly lost reputation from rounding error introduced when decaying the colony-wide sum of the relevant reputation, but as there is only one total and many more users, ignoring it does not change our conclusions. We also note that there is an implicit assumption here that all users have the same amount of reputation; this is a worst-case assumption, as if it is not true then once some users have lost all their reputation the reputation incorrectly lost on each cycle will drop below $0.5N$.} The 0.5 is the average fractional part lost during each calculation.
+
+After the second iteration, the amount of reputation that is incorrectly missing is
+
+$$0.5N\exp\left(-k\right) + 0.5N.$$
+
+The second term here is the incorrectly lost reputation from this second set of calculations. The factor of $\exp\left(-k\right)$ has been introduced to the term representing the incorrectly lost reputation from the first set of calculations because some of that incorrectly lost reputation would have correctly decayed away by this point, and so it shouldn't be considered incorrectly lost.
+
+It is apparent that this is a geometric series, and after $b$ cycles of reputation update have passed, the amount of reputation incorrectly missing ($R_{\rm m}$) is
+$$R_{\rm m} = \frac{N}{2} \left(\frac{1-\exp\left(-bk\right)}{1-\exp\left(-k\right)}\right)$$
+
+\noindent where we have used the standard result for the sum of a geometric series. If we started with $R_0$ reputation, then the ratio of the incorrectly missing reputation to the total the colony believes exists is
+
+$$\frac{R_{\rm m}}{R_0\exp\left(-bk\right)}.$$
+
+This ratio becomes 1 when
+$$ b = \frac{1}{k}\ln\left(\frac{2R_{\rm 0}}{N}\left(1-\exp\left(-k\right)\right) +1   \right)$$
+
+\noindent which, for conservative values of $R_0 = 200\times10^{18}$ and $N=1000000$ occurs after 38011 iterations, or over \timetofail\ years for a \miningcycleduration\ hour mining cycle. At this point, even though the colony believes some amount of reputation exists, no users have it, and no users can make decisions related to this type of reputation.
+
+This is the end-of-life for an inactive colony; if no activity takes place in it for \timetofail\ years that is worthy of earning reputation, then the colony will be irrecoverable --- no-one will be able to create tasks to earn further reputation. This seems like a reasonable failure mode for an inactive colony, and it would take longer to reach for smaller colonies (with fewer rounding errors).
+
+We now consider the case of an active colony. If the colony is active and creates $A$ new reputation at every update cycle, how does the ratio between the figure taken to be the total reputation and the incorrectly missing reputation change over time?
+
+$R_{\rm m}$ remains the same in this situation, but the total reputation the colony believes exists increases by $A$ each cycle. After $b$ iterations, we can show that the total reputation the colony believes exists is
+
+$$R_{\rm 0}\exp\left(-bk\right) + A\frac{1-\exp\left(-bk\right)}{1-\exp\left(-k\right)}.$$
+
+As $b$ tends to infinity --- which represents the regime of a colony in a steady state --- the ratio between this and $R_{\rm m}$ tends to
+$$\frac{N}{2A}$$
+
+\noindent i.e. for the discrepancy to be small between what the colony thinks the total reputation inside it is and the sum of all users' reputations, the reputation earned in each cycle should, on average, be much larger than the number of users. Given that reputation will be expressed in terms of numbers on the order of $10^{18}$, this seems assured.
+
+For calculating the exponential decay, we will use the first-order Taylor expansion of the exponential decay i.e. we approximate $\exp\left(-k\right)$ as $1-k$. Given that $k$ is small, this will be a good approximation --- the second order term is on the order of $10^{-7}$. This error will cause all reputations to decay slightly faster than an exponential, but otherwise will have no effect.
+
+When calculating the decay, in order to accommodate the fact that we are multiplying by a value close to one and only integers are available in Solidity, we will multiply the user's reputation by $K(1-k)$ (calculated off-chain), for some large value of $K$, and then divide by the same large factor $K$.
