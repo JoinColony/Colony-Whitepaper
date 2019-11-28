@@ -59,7 +59,7 @@ Section \ref{sec:roles} describes the \textbf{funding} role, which is allowed to
  \begin{itemize}
   \item \ascode{Creator} -- The person that created the proposal.
   \item \ascode{From} -- Funding pot funds are coming from.
-  \item \ascode{To} -- Pot funds are going to (may be the rewards pot).
+  \item \ascode{To} -- Pot funds are going to.
   \item \ascode{TokenType} -- The token contract address (0x0 for Ether).
   \item \ascode{CurrentState} -- The state of the proposal (i.e. inactive, active, completed, cancelled).
   \item \ascode{TotalPaid} -- How much has been transferred along this funding proposal so far.
@@ -120,7 +120,7 @@ If an update finds that a proposal is fully funded (i.e. \ascode{TotalPaid} = \a
  \item[\textbf{4.}] The next BFP in the queue is promoted to the top of the queue, and its \ascode{LastUpdated} time is set as the time calculated in \textbf{1.}
 \end{itemize}
 
-Three days after the BFP has been fully funded, the BFP is set to the the \ascode{completed} state and the creator's stake is released. Until that time, the stake can be slashed as the result of arbitration.
+Three days after the BFP has been fully funded, the BFP is set to the \ascode{completed} state and the creator's stake is released. Until that time, the stake can be slashed as the result of arbitration.
 
 
 \subsubsection{Priority funding proposals}
@@ -146,7 +146,7 @@ Priority Funding Proposals take precedence over Basic Funding Proposals. To avoi
 
 The result of this rule is that fast payments are still possible --- in such a case the PFP's \ascode{rate} is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate PFPs that do not block the entire BFP process.
 
-\subsubsection{When is a funding proposal eligible to receive funding?}
+\subsubsection{When is a basic funding proposal eligible to receive funding?}
 A Basic Funding Proposal may receive funds when pinged if it is active and at the top of the BFP funding queue and when the \ascode{LastUpdated} time of the PFPs are less than 24 hours old. A Priority Funding Proposal may receive funds when pinged if it is active and all PFP ahead of it in the funding queue have been updated less than 24 hours ago.\footnote{In order to avoid hitting the gas limit due to unbounded loops, it will be necessary to maintain two orderings for the PFPs, one by priority and one by \ascode{LastUpdated}. }
 
 \subsubsection{Editing funding proposals}
@@ -165,7 +165,7 @@ Depending on the usage, the extension would need the \textbf{funding} and potent
 
 The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. Often, these many decisions are structured via management hierarchies. But permissionless colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable.
 
-In low-hierarchy organizations, the mechanism of collective-decision making is usually voting, but Colony is designed for day-to-day operation of an organisation. In a colony, voting on every decision is wholly impractical.
+In most DAO frameworks, the mechanism of collective-decision making is usually voting, but Colony is designed for day-to-day operation of an organisation. In a colony, voting on every decision is wholly impractical.
 
 The emphasis should be on `getting stuff done' and not about `applying for permission'. Therefore, Colony is designed to be permissive. Task creation does not require explicit approval (Section \ref{sec:tasks}), nor do basic funding proposals (Section \ref{sec:funding-queues}) or any number of administrative actions throughout a colony. \\
 
@@ -173,7 +173,7 @@ The \textbf{Dispute System} provides a self-regulating mechanism which, via a ba
 
 When a member of a colony feels that something is amiss, they can raise an \textbf{objection}. By doing so, they are fundamentally proposing that either a) a variable, or more than one variable, in the colony should be changed to another value, or b) a user, or more than one user, should receive a reputation penalty. For this reason we call supporters of the objection the `change' side and opponents the `keep' side.
 
-The user raising the objection must also put up a stake of colony tokens (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \textbf{dispute}.
+The user raising the objection must also put up a stake of the colony's internal token (see Section \ref{sec:costs-of-disputes}). In essence, they are challenging the rest of the colony to disagree with them. In the spirit of avoiding unnecessary voting, the objection will pass automatically \emph{unless} someone else stakes on the `keep' side and thereby elevates the objection to a \textbf{dispute}.
 
 We say that a dispute has been raised whenever an objection has found enough support on both the `change' side as well as the `keep' side. Once raised, disputes must be resolved by voting.
 
@@ -220,7 +220,7 @@ Voting takes place using a commit-and-reveal-scheme. To make a vote, the user su
 
 As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. While there are many reasonable schemes for generating secure secrets, we suggest a (hash) of the consequence field of the poll signed with their private key, as it is easily reproducible by a client at a later date with no local storage required.
 
-10\% of the staked tokens are set aside to pay voters when they vote: if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest \cite{KeynesianBeauty}, by which voters might feel compelled to be on the `right side' of the dispute, even if they personally agreed with the losing side. Any tokens that would have been awarded to users who abstained from voting, or are not revealed in the reveal window, are sent to the root domain funding pot once the poll closes.
+10\% of the staked tokens are set aside to pay voters when they vote: if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest \cite{KeynesianBeauty}, in which due to receiving a reward for being “correct”, voters are incentivised to vote for what they believe most other people will vote for, rather than what they independently believe. Any tokens that would have been awarded to users who abstained from voting, or are not revealed in the reveal window, are sent to the root domain funding pot once the poll closes.
 
 Once a vote has been in the reveal phase for 48 hours, a transaction may be made to finalise the vote. Any subsequent reveals of votes do not contribute to the decision being made, but serve only to unlock the user's tokens if it was a token-weighted or hybrid vote (see below).
 
@@ -307,9 +307,9 @@ When the extension is deployed, the \ascode{TokenSupplyCeiling} and the \ascode{
 
 \subsubsection*{Changing the TokenIssuanceRate}
 
-The \ascode{TokenSupplyCeiling} represents the total number of tokens that the token holders have granted to the colony in order to conduct business: to fund domains and expenditures, and to incentivize workers and contributors. This is especially important during the early life of a colony when it has little-to-no revenue in other tokens to fall back on.
+The \ascode{TokenSupplyCeiling} represents the total number of tokens that the token holders have granted to the colony in order to conduct business: to fund domains and expenditures, and to incentivize workers and contributors.
 
-The \ascode{TokenIssuanceRate} controls how rapidly the colony receives the new tokens. If the rate is `too high', tokens will accumulate in the funding pot of the root domain (or other funding pots lower in the hierarchy); usually this is not a big problem. If the rate is too low, this signals that the colony has a healthy amount of activity and that the issuance rate has become a bottleneck. In such situations it may be desirable to increase the rate of issuance without necessarily increasing the maximum supply.
+The \ascode{TokenIssuanceRate} controls how rapidly the colony receives the new tokens. If the rate is `too high', tokens will accumulate in the funding pot of the root domain (or other funding pots lower in the hierarchy). If the rate is too low, this signals that the colony has a healthy amount of activity and that the issuance rate has become a bottleneck. In such situations it may be desirable to increase the rate of issuance without necessarily increasing the maximum supply.
 
 Increasing and decreasing the \ascode{TokenIssuanceRate} by up to 10\% can be done by the reputation holders alone and this action can be taken no more than once every 4 weeks. Larger changes to the issuance rate should additionally require the agreement of existing token holders.
 

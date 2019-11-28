@@ -7,7 +7,7 @@ The essential structure of the colony revolves around domains and the roles that
 
 \subsubsection{Domains}
 
-Without structure, a large colony could quickly become difficult to navigate due to the sheer number of participants and interactions taking place --- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain subdomains, funding, and expenditures. This simple modularity enables great flexibility as to how an organisation may be structured. A toy example is shown in in Figure \ref{fig:domainhierarchysample}.
+Like any organization, without structure, a large colony would quickly become difficult to navigate due to the sheer number of participants and interactions taking place --- domains solve this problem. A domain is like a folder in a shared filesystem, except instead of containing files and folders, it can contain subdomains, funding, and expenditures. This simple modularity enables great flexibility as to how an organisation may be structured. Domains could be used to represent teams, departments, projects, tribes, circles, and so forth. A toy example is shown in in Figure \ref{fig:domainhierarchysample}.
 
 \begin{figure}[h]
     \centering
@@ -29,9 +29,9 @@ Without structure, a large colony could quickly become difficult to navigate due
 
 \end{figure}
 
-Among other things, this compartmentalisation of activity provides an essential benefit to the colony as a whole by making reputation \textit{contextual}. When arbitration occurs, it occurs at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be included for their opinion, and that when arbitration occurs, the whole colony is not required to participate in the dispute.
+It is ultimately up to individual colonies to decide how they wish to use domains—some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar expenditures together, or even multiple expenditures that other colonies would consider a single expenditure. Some might use domains to represent long-lived organizational departments, while others might use them more ephemerally, to represent projects with start and end dates. We aim to provide a general framework that colonies may use however they see fit, and to be prescriptive only where necessary.
 
-It is ultimately up to individual colonies to decide how they wish to use domains --- some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar expenditures together, or even multiple expenditures that other colonies would consider a single expenditure. Some might use domains to represent long-lived organizational departments, while others might use them more ephemerally, to represent projects with start and end dates. We aim to provide a general framework that colonies may use however they see fit, and to be prescriptive only where necessary.
+Among other things, this compartmentalisation of activity provides an essential benefit to the colony as a whole by making reputation \textit{contextual}. When arbitration occurs, it occurs at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be included for their opinion, and that when arbitration occurs, the whole colony is not required to participate in the dispute.
 
 \subsubsection{Roles}
 
@@ -47,7 +47,9 @@ With the exception of the Recovery and Root roles, all roles are domain-specific
 
 These arguments can be evaluated on-chain in constant time to determine whether the address is authorized to call the privileged function.
 
-Roles are held by Ethereum addresses. This means that roles can be given to human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
+Roles are held by Ethereum addresses. This means that roles may be held by human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
+
+It is worth noting that the list of addresses that have the permission in question have the full permission; no additional restrictions exist at the protocol level. In some cases, these are extremely powerful capabilities (such as emitting arbitrary reputation penalties) and require absolute confidence in whomever or whatever controls it. We anticipate therefore that in many cases, extension contracts will be used to offer varying degree of moderation to the underlying permissions.
 
 \subsubsection*{Recovery}
 
@@ -77,7 +79,7 @@ Broadly, roles are designed as a `separation of powers': different roles must wo
 
 The intention is that, since the roles represent semantic bundles of functionality, it will be possible to develop \textit{specialized} mechanisms for mediating access to the underlying functionality (i.e. specialized funding mechanisms and specialized dispute-resolution mechanisms, as opposed to a general-purpose `voting' mechanism meant to handle all possible decisions).
 
-Colony's long-term vision is of \textit{permissionless organizations}; however, early colonies may find that a larger emphasis on human moderators to be useful. Over time, we hope that colonies will devolve more and more decision-making away from human moderators to extensions which implement permissionless functionality. We will refer to colonies which make substantial use of these extensions as \textit{permissionless colonies}.
+Colony's long-term vision is of \textit{trustless organizations}; organizations in which members can safely collaborate and manage shared resources, without needing to know or trust each other. However, early colonies may find that a larger emphasis on human moderators to be useful. Over time, we hope that colonies will devolve more and more decision-making away from human moderators to extensions which implement trustless functionality. We will refer to colonies which make substantial use of these extensions as \textit{trustless colonies}.
 
 \subsection{Funding and expenditures}\label{sec:expenditures}\label{sec:finance}
 
@@ -85,13 +87,13 @@ All tokens and currencies are administered by the colony contract; it is respons
 
 \subsubsection{Funding pots}
 
-Each domain and each expenditure in a colony has an associated \emph{funding pot}. A funding pot can be thought of as a wallet specific to a particular domain or expenditure. To each funding pot, the colony contract may associate any number of Ether or ERC20-compatible tokens it holds. Depending on context, the funds in a funding pot may be referred to as the payout, bounty, budget, salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
+Each domain and each expenditure in a colony has an associated \emph{funding pot}. A funding pot can be thought of as a wallet specific to a particular domain or expenditure, and are used to move funds around \textit{within} a colony. To each funding pot, the colony contract may associate any number of Ether or ERC20-compatible tokens it holds. Depending on context, the funds in a funding pot may be referred to as the payout, bounty, budget, salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
 
 Only addresses holding the \textbf{funding} role may move tokens; the rule is that they may move tokens between any two pots in the subtree rooted in the domain in which they hold the role. It is the expectation that the funding role will in many cases be assigned to an \textit{extension contract} implementing a specialized decision-making mechanism, such as the \textit{funding queue} described in Section \ref{sec:funding-queues}.
 
 \subsubsection{Expenditures}
 
-The basic incentive unit of a colony is the `expenditure'. An expenditure represents an allocation of resources \textit{out of} a colony, and thus accepts no further subdivison or delegation. An expenditure has several properties:
+The basic payment primitive of a colony is the `expenditure'. Expenditures are used to transfer funds out of a colony to any Ethereum address. An expenditure has several properties:
 
 \begin{itemize}
 \item An \texttt{owner} (the address which created the expenditure).
@@ -103,19 +105,19 @@ The basic incentive unit of a colony is the `expenditure'. An expenditure repres
 \item Optionally, a per-recipient \texttt{claimDelay}.
 \end{itemize}
 
-The owner is responsible for setting the properties of the expenditure. The recipients are simply Ethereum addresses. While it is anticipated that recipients will be individuals, there is nothing to prevent these addresses being contracts under the control of multiple people.\footnote{With the protocol described in this version of the document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. In these cases, it might be better to develop an extension contract which would determine the per-user allocation in advance and configure the expenditure accordingly.}
+The owner is responsible for setting the properties of the expenditure. The recipients are simply Ethereum addresses. While it is anticipated that recipients will be individuals, there is nothing to prevent these addresses being contracts under the control of multiple people.\footnote{With the protocol as described in this document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. In these cases, it might be better to develop an extension contract which would determine the per-user allocation in advance and configure the expenditure accordingly.}
 
-Once the expenditure is finalized, all properties become immutable (but subject to arbitration) and payouts can be claimed (and reputation earned). Prior to finalization, the owner has the ability to cancel the expenditure entirely. Any funds that have already been assigned to the expenditure via funding proposals can be reassigned to the domain that the expenditure was created in.
+Once the expenditure is finalized, all properties become locked (but subject to arbitration) and payouts can be claimed (and reputation awarded). Prior to finalization, the owner has the ability to cancel the expenditure entirely. Any funds that have already been assigned to the expenditure can be reassigned to the domain that the expenditure was created in.
 
 Defining the payouts for each recipient, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony. Payouts do not have to all be in the same token, and an expenditure's payouts can be made up of an arbitrary number of tokens.
 
-The expenditure is meant to be an abstract unit, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any dispute processes to complete before funds can exit the colony. \\
+The expenditure is meant to be an abstract primitive, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any dispute processes to complete before funds can exit the colony. \\
 
-Once the tokens have been paid out, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
+Once the tokens have been received by an address, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
 
 \subsection{Internal tokens}\label{sec:colony-tokens}
 
-Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver. What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section. In addition, colonies may `bring their own token' and designate an existing token (such as Ether or DAI) as reputation-bearing. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
+Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver. What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section. In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
 
 In cases where a colony creates a new token, that colony is in control of the supply of the token. Specifically, \textbf{root} role holders can mint tokens at-will. In some cases, this may look like a founder managing the token supply unilaterally, while in other cases colonies may manage the minting process via an extension contract (see Section \ref{sec:colony-token-management} for an example).
 
@@ -149,19 +151,19 @@ This contract underlies the \rct\ (see Section \ref{sec:clny}) and is the defaul
 
 \subsection{Revenue and rewards}\label{sec:revenue}
 
-A colony may sell goods and services in exchange for Ether or any ERC20-compatible tokens. Whenever a colony receives such payments, we say that the colony has earned \emph{revenue}. Revenue is distinct from a colony's working capital: the latter is the sum of all tokens held by the colony in various domains (see Section \ref{sec:finance}), while the former is implicitly defined as the colony's token holdings not yet accounted for in any of the existing pots.
+A colony may sell goods and services in exchange for Ether or any ERC20-compatible tokens, and this revenue may be sent to the colony's address. Whenever a colony receives such payments, we say that the colony has earned \emph{revenue}. Revenue is distinct from a colony's working capital: the latter is the sum of all tokens held by the colony in various domains (see Section \ref{sec:finance}), while the former is implicitly defined as the colony's token holdings not yet accounted for in any of the existing pots.
 
-There is an expectation that some fraction of any Ether or other valuable tokens earned by the colony are paid out to their members. `Members', in this context, means accounts holding both tokens and reputation in the colony. Whenever a colony distributes a portion of revenue to its members, we say that the colony is paying out \emph{rewards}. It is expected that most of the revenue will \emph{not} go towards rewards, but towards replenishing the working capital.
+There is an expectation that some fraction of any Ether or other tokens received by the colony are paid out to their members. `Members', in this context, means accounts holding both tokens and reputation in the colony. Whenever a colony distributes a portion of revenue to its members, we say that the colony is paying out \emph{rewards}.
 
 \subsubsection{Processing revenue}
 
 Revenue accumulates as the colony receives transfers of tokens. In order to be processed, any user can make a special \texttt{claimColonyFunds} transaction, indicating for which token they wish to process accumulated revenue.
 
-The transaction then calculates the amount of token-denominated revenue that has accumulated since the last such transaction, and transfers some (small) percentage to the colony rewards pot. The remainder is then made available to the colony as working capital. The percentage split is configurable by the \textbf{root} role via the \texttt{setRewardInverse} function.
+The transaction then calculates the amount of token-denominated revenue that has accumulated since the last such transaction, and transfers some proportion to the colony's rewards pot. The remainder is then made available to the colony as working capital. The percentage split is configurable by the \textbf{root} role via the \texttt{setRewardInverse} function.
 
 \subsubsection{Claiming rewards from the rewards pot}\label{sec:claimrewards}
 
-Rewards accumulate in the rewards pot. To trigger an actual payout to users (i.e. to make rewards claimable) a \textbf{root} user makes a special \texttt{startNextRewardPayout} transaction (no more than once every \rewardclaimduration\ days), initiating a process by which all members may claim a payout based on the reward pot's holdings.
+Rewards accumulate in the rewards pot. To trigger a payout to users (i.e. to make rewards claimable) a \textbf{root} user makes a special \texttt{startNextRewardPayout} transaction (no more than once every \rewardclaimduration\ days), initiating a process by which all members may claim a payout based on the reward pot's holdings.
 
 This reward payout transaction includes the specific currency that should be paid, and only one currency is handled at a time. Once the process begins, all users' tokens are locked until they claim their payout. Locking is necessary because the token balance of each account factors into the rewards formula of equation \eqref{eq:reward-claim}. Locking is done by incrementing the token's \texttt{totalLockCount}.
 
@@ -183,15 +185,15 @@ After some sufficiently long period of time (\rewardclaimduration\ days), all un
 
 \subsection{The reputation system}\label{sec:reputation}
 
-Reputation is a number associated with each user which attempts to represent objectively the value of that user's recent contributions to the colony. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit.
+Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit.
 
-Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a permissionless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or malfeasance; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
+Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a trustless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or misbehaviour; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 
 \subsubsection{Types of reputation}
 
 \subsubsection*{Reputation by domain}\label{sec:rep-by-domain}
 
-The hierarchical structure of a colony was described in Section \ref{sec:domains}. Reputation is earned in this hierarchy, and a user has a reputation in all domains that exist --- even if that reputation is zero. When a user earns or loses reputation in a domain, the reputation in all parent domains changes by the same amount. In the case of a user losing reputation, they also lose reputation in all child domains, but in this case the child domains lose the same \textit{fraction} of reputation that was lost in the original domain. If a reputation update would result in a user's reputation being less than zero, their reputation is set to zero instead. \\
+The hierarchical domain structure of a colony was described in Section \ref{sec:domains}. Reputation is earned in this hierarchy, and a user has a reputation in all domains that exist --- even if that reputation is zero. When a user earns or loses reputation in a domain, the reputation in all parent domains changes by the same amount. In the case of a user losing reputation, they also lose reputation in all child domains, but in this case the child domains lose the same \textit{fraction} of reputation that was lost in the original domain. If a reputation update would result in a user's reputation being less than zero, their reputation is set to zero instead. \\
 
 An example makes this clearer. Suppose a colony has a `development' domain which contains a `backend' domain and a `frontend' domain, as in Figure \ref{fig:domainhierarchysample} on page \pageref{fig:domainhierarchysample}. Any time a member of the colony earns reputation for work completed in the backend domain, it will increase their backend reputation, their development reputation and their reputation in the all-encompassing root domain of the colony. Reputation earned in the development domain will only increase the development and root domain reputation scores of the user.
 
@@ -199,7 +201,7 @@ Later, the user behaves badly in the `development' domain, and they lose 100 rep
 
 \subsubsection*{Reputation by skill}\label{sec:rep-by-skill}
 
-We envision domains to mostly be used as an organisational hierarchy within a colony. However, this would not necessarily capture the \emph{type} of work that a user completed to earn their reputation. If the domain were a project, with tasks involving both design and development work, reputation earned by completing tasks related to these skills would not be distinguishable. To have a more granular account of the work a user completes to earn their reputation, a skill cloud is also maintained.
+We anticipate domains to mostly be used as an organisational hierarchy within a colony. However, this would not necessarily capture the \emph{type} of work that a user completed to earn their reputation. If the domain were a project, with tasks involving both design and development work, reputation earned by completing tasks related to these skills would not be distinguishable. To have a more granular account of the work a user completes to earn their reputation, a skill cloud is also maintained.
 
 This global cloud of skill tags is available to all colonies, and is curated and maintained by the \rc. When a task is created, as well as being placed in a particular domain in the colony, it is also tagged with one or more skills from the skills cloud. When the worker earns reputation for successfully completing the task, they will earn reputation in all skills the task was tagged with, with the reputation divided uniformly amongst the skills. This is in addition to the reputation earned in the relevant domains. Conversely, if they are to lose reputation because their work is found inadequate, they will lose equivalent reputation in all associated skills.
 
@@ -211,7 +213,7 @@ A user's total reputation in a colony is their reputation in the root domain. Th
 
 \subsubsection{Earning and losing reputation}\label{sec:earning-losing-rep}
 
-There are three ways to earn reputation in a colony.\footnote{The \rc\ is a special case where reputation may also be earned by reputation mining (see Section \ref{sec:reputationmining}).} The first (and by far the most common) is through receiving a payout via an expenditure. The second is through the arbitration process. The third way to earn reputation is upon the creation of a colony and the associated bootstrapping process.
+There are three ways to receive reputation in a colony.\footnote{The \rc\ is a special case where reputation may also be earned by reputation mining (see Section \ref{sec:reputationmining}).} The first (and by far the most common) is through receiving a payout via an expenditure. The second is through the arbitration process. The third is upon the creation of a colony and the associated bootstrapping process.
 
 Reputation losses broadly occur as the result of arbitration, and extension contracts (see Section \ref{sec:extensions}) makes it possible to implement mechanisms which involve reputation penalties (such as tasks and disputes). In addition, all reputation earned by users is subject to a continual decay over time.
 
@@ -263,7 +265,7 @@ Each skill that reputation can be earned in is assigned a \ascode{skillId} that 
   \end{cases}
 \end{equation*}
 
-Upon creation, \ascode{nChildren} is 0 and \ascode{children[]} is empty. These two attributes in all parents are updated with the \ascode{skillId} of the new child skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Back-of-the-envelope calculations suggest this corresponds to a depth of around 80, which we don't believe our users will be limited by.}
+Upon creation, \ascode{nChildren} is 0 and \ascode{children[]} is empty. These two attributes in all parents are updated with the \ascode{skillId} of the new child skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Our calculations suggest this corresponds to a depth of around 80, which we believe  is likely to be sufficient for the majority of use cases.}
 
 Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol (see Section \ref{sec:reputationmining}) and the procedures for escalating disputes (see Section \ref{sec:objections-and-disputes}). They are stored under the control of the \ascode{ColonyNetwork} contract.
 
@@ -286,7 +288,7 @@ This log exists to define an ordering of all reputation updates in a reputation 
 
 \subsection{Managing stakes}\label{sec:stakes}
 
-Staking is a key concept in permissionless systems, as a way to ensure that participants have `skin in the game' and can be incentivized towards good behavior. As Colony wishes to enable an ecosystem of extensions implementing various cryptoeconomic mechanisms (see Section \ref{sec:extensions}), a shared system for managing stakes improves usability and security by saving users from needing to send and retrieve tokens to and from many different contracts. \textbf{In colonies, all stakes are denominated in that colony's internal token.}
+Staking is a key concept in permissionless systems, as a way to ensure that participants have `skin in the game' and can be incentivized towards good behavior. As Colony wishes to enable an ecosystem of extensions implementing various cryptoeconomic mechanisms (see Section \ref{sec:extensions}), a shared system for managing stakes improves usability and security by saving users from needing to send and retrieve tokens to and from many different contracts. In colonies, all stakes are denominated in that colony's internal token.
 
 \subsubsection{Storing Tokens}
 
