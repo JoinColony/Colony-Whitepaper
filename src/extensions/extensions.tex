@@ -54,7 +54,11 @@ When the task is finalized, the underlying expenditure's \texttt{claimDelay}s ar
 
 \subsection{Funding queues}\label{sec:funding-queues}
 
-Section \ref{sec:roles} describes the \textbf{funding} role, which is allowed to transfer funds in between \textbf{funding pots}. This permission is very powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One of these mechanisms is the \textbf{funding queue}, containing of a series of \textbf{funding proposals}, each with the following attributes:
+Section \ref{sec:roles} describes the \textbf{funding} role, which is allowed to transfer funds in between \textbf{funding pots}. This permission is very powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One of these mechanisms is the \textbf{funding queue}, which leverages time as a driving factor to enable \textit{collaborative}, \textit{asynchronous}, and \textit{permissionless} decision-making, without voting.
+
+They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly.
+
+A funding queue contains of a series of \textbf{funding proposals}, each with the following attributes:
 
  \begin{itemize}
   \item \ascode{Creator} -- The person that created the proposal.
@@ -89,7 +93,7 @@ The total number of funds that a funding proposal wishes to reallocate is called
 \subsubsection{Rate and LastUpdated}
 When a funding proposal is eligible to accrue funds, it does so at a specific \ascode{Rate}. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal --- i.e. the user manually requests a pro-rated distribution of funds. When pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid}, the funds are transferred, and the current time is recorded as \ascode{LastUpdated}.
 
-\ascode{TotalPaid} is only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occurred.
+\ascode{TotalPaid} is only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occurred. It is very possible, however, for a front-end abstraction to display the `current' level of funding updated in real-time, hiding the pro-rating from users.
 
 \subsubsection{The funding queue}\label{subsec:funding-queue}
 Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the priority funding proposals, followed by the basic funding proposals. PFPs are ordered by the total reputation in their domain\footnote{The domain of a PFP is the domain that voted on it becoming active --- this will be the last common ancestor of the source and target pot domains unless an escalation has occurred.} --- while basic funding proposals are ordered by the reputation `backing' them.  The details of this procedure are outlined below.
@@ -186,11 +190,7 @@ The user raising an objection submits the following data:
  \item Proof that these reputations should be allowed to make the change in question.
 \end{itemize}
 
-The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern \emph{escalation}.
-
-\begin{center}
- \textbf{In Colony you cannot escalate a decision to higher management, you can only escalate to bigger groups of your peers.}
-\end{center}
+The first item identifies the subject of the objection, and what the initiator believes the state should be.\footnote{The exact structure of this is dependent on the method used to implement contract upgradability. The function that uses it is likely to require being coded with inline assembly in the contracts, and require significant effort in the client to make it intuitive to generate and verify.} The second and third points concern escalation. The basic rule in Colony is: \textit{you cannot escalate a decision to higher management, you can only escalate to larger sets of reputation.}
 
 For example, suppose that the objection concerns a task in the `frontend' domain. The objector could choose to have all `development' reputation vote on it --- we say the decision was `escalated to the development domain'. In this example, the third point would be a proof that the domain `frontend' was indeed a subdomain of `development'. The highest domain any decision can be escalated to is that of the entire colony, where all domain reputation is entitled to vote.
 
@@ -216,9 +216,9 @@ If both sides stake the required number of tokens within their three days time l
 
 The duration of the poll is determined by the amount of reputation eligible to vote in the poll as a fraction of reputation in the colony. If a larger fraction is eligible, the longer the poll is open for. The minimum duration is two days and the maximum is seven. This is a trade-off between allowing disagreements between small groups to be resolved quickly, but to also allow adequate debate to occur when more people are involved.
 
-Voting takes place using a commit-and-reveal-scheme. To make a vote, the user submits a hash that is \ascode{keccak256(secret, optionId)}, where \ascode{optionId} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{(secret, optionId)} and the contract calculates \ascode{keccak256(secret, optionId)} to verify it is what they originally submitted. \\
+Voting takes place using a commit-and-reveal-scheme. This scheme is desirable because votes are kept secret during the voting period, preventing users from being influenced by what they perceive to be the majority opinion.\footnote{Even better than commit-and-reveal voting would be receipt-free voting in which votes are \textit{never} revealed, as this would disincentivise vote-buying. Unfortunately the technology to make this possible is still under development.} To make a vote, the user submits a hash that is \ascode{keccak256(secret, optionId)}, where \ascode{optionId} indicates the option that the user is voting for. Once voting has closed, the poll enters the reveal phase, where a user can submit \ascode{(secret, optionId)} and the contract calculates \ascode{keccak256(secret, optionId)} to verify it is what they originally submitted.
 
-As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. While there are many reasonable schemes for generating secure secrets, we suggest a (hash) of the consequence field of the poll signed with their private key, as it is easily reproducible by a client at a later date with no local storage required.
+As the secret is revealed it cannot be sensitive. It must also change with each vote so that observers cannot establish what people are voting for after they have revealed their first vote. While there are many reasonable schemes for generating secure secrets, we suggest a (hash) of the consequence field of the poll signed with their private key, as it is easily reproducible by a client at a later date with no local storage required. \\
 
 10\% of the staked tokens are set aside to pay voters when they vote: if a voter has 1\% of the reputation allowed to vote on a decision, they receive 1\% of this pot that is set aside. They receive this payout when they reveal their vote, regardless of the direction they voted in or the eventual result of the decision. This payout regardless of opinion is to avoid us falling victim to the Keynesian beauty contest \cite{KeynesianBeauty}, in which due to receiving a reward for being “correct”, voters are incentivised to vote for what they believe most other people will vote for, rather than what they independently believe. Any tokens that would have been awarded to users who abstained from voting, or are not revealed in the reveal window, are sent to the root domain funding pot once the poll closes.
 
@@ -226,7 +226,7 @@ Once a vote has been in the reveal phase for 48 hours, a transaction may be made
 
 \subsubsection*{Consequences of the vote}
 
-If quorum has been reached in a dispute vote, and the `change' side won, then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable. If the `keep' side won, then the variable is not changed. In either case, alongside the variable that may or may not have been changed, the fraction of total reputation in the colony that voted for the winning side is noted.
+If the `change' side wins the vote then the variable in question is changed, but only if the reputation that voted for this outcome is more than previous votes on the same variable. If the `keep' side wins, then the variable is not changed. In either case, the fraction of total reputation in the colony that voted for the winning side is noted.
 
 At the conclusion of the poll, losing stakers receive 0-90\% of their staked tokens back and they lose the  complementary percentage of the reputation that was required to stake. The exact amount of tokens they receive back (and therefore reputation they lose) is based on:
 
@@ -313,13 +313,23 @@ The \ascode{TokenIssuanceRate} controls how rapidly the colony receives the new 
 
 Increasing and decreasing the \ascode{TokenIssuanceRate} by up to 10\% can be done by the reputation holders alone and this action can be taken no more than once every 4 weeks. Larger changes to the issuance rate should additionally require the agreement of existing token holders.
 
-\subsubsection{Salaried Positions}\label{sec:salary}
+\subsubsection{Compensation Modalities}\label{sec:salary}
 
-The work-for-payment model in the colony network is ultimately based on some variation of tasks, which imply colony-worker relationships that are mostly transactional. Using extensions, however, it is possible to support more long-term relationships, such as a \emph{salaried position}.
+Using expenditures, it is possible to implement many types of compensation modalities. In addition to the `task' (see Section \ref{sec:tasks}), we can conceive of a number of additional modalities of compensation.
+
+\subsubsection*{Salaries}
+
+Tasks imply imply colony-worker relationships are mostly transactional. In many cases, it is desirable to represent more long-term relationships via a \emph{salary}.
 
 A salary can be as simple as a \texttt{recipient}, \texttt{amount}, and \texttt{period}, and \texttt{lastClaimed}. At any point, the recipient can ping the salaries contract, at which point the contract will create an expenditure made out to the recipient, with funding equivalent to the pro-rated amount since the last salary payout. If the recipient is willing to pay the gas costs, they could conceivably claim (a fraction of) their salary daily, or choose to claim weekly, monthly, or at whatever cadence suits them. It would be the responsibility of the colony to ensure that adequate funding is available in the domain out of which salaries are to be paid.
 
-The salaries extension would need the \textbf{funding} and \textbf{administration} permissions to manipulate tokens and expenditures on behalf of the recipients.
+This extension would need the \textbf{funding} and \textbf{administration} permissions to manipulate tokens and expenditures on behalf of the recipients.
+
+\subsubsection*{Recurring or Automatic Tasks}
+
+While for certain kinds of work, tasks are unique and must be individually scoped out and subjectively evalauted. However, we can imagine situations where work can be done by many people and/or evaluated automatically by computer (such as rewarding users for participating in a referral program). In these cases, a variation of the task which contains logic for evaluating the work, and allows anyone to submit the work, would be appropriate.
+
+This extension would need the \textbf{funding} and \textbf{administration} permissions to manipulate tokens and expenditures on behalf of the recipients.
 
 \subsubsection{Awarding reputation for work not captured by tasks}
 
@@ -328,6 +338,8 @@ All reputation decays over time, as described in Section \ref{sec:reputation}. T
 Reputation is awarded when a user receives payment of a colony's internal token --- most commonly as payout from an expenditure, but sometimes from dispute resolution and, in the case of the \rc, from the reputation mining process. We can use the expenditure mechanism to award users extra reputation when there is consensus to do so.
 
 Consider the scenario in which a founder, or an important early contributor to a colony has almost no reputation left by the time the colony starts earning revenue; perhaps the development of the product took a long time or perhaps the reputation decay rate was sub-optimally high for the particular colony.\footnote{Finding an optimal decay rate for reputation in the network will depend on empirical data collected from early colonies. It is also possible that in the future reputation decay rates can be configured per-colony.} Or perhaps the founder was doing a lot of intangible work to get the colony off the ground in the first place and so was never compensated properly on-chain. To get around the limitations of the reputation system and to re-integrate the founder (and make them eligible to receive their rewards), the colony can create an expenditure that is solely designed to award the reputation they are due. To qualify for the payout of tokens (and thereby the reputation), the user in question would have to give the same number of tokens back to the colony. Again, a good frontend abstraction could make such reputation awards easy and intuitive.
+
+Another important scenario concerns absences due to maternity/paternity or illness -- the reputation system should not implicitly discriminate against these users. While `pausing' reputation decay is not a viable option, various mechanisms of giving reputation `for free' can be used to ensure that these users retain their reputation during periods of unavoidable absence.
 
 The important point is that any limitations imposed by the system can be weakened if there is consensus to do so. The system should not stand in the way of consensus, it should just provide conflict resolution mechanisms for those times in which there is dissent.
 

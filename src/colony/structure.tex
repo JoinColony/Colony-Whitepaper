@@ -111,26 +111,28 @@ Once the expenditure is finalized, all properties become locked (but subject to 
 
 Defining the payouts for each recipient, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony. Payouts do not have to all be in the same token, and an expenditure's payouts can be made up of an arbitrary number of tokens.
 
-The expenditure is meant to be an abstract primitive, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any dispute processes to complete before funds can exit the colony. \\
+The expenditure is meant to be an abstract primitive which can support many types of workflows, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any dispute processes to complete before funds can exit the colony. \\
 
 Once the tokens have been received by an address, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
 
 \subsection{Internal tokens}\label{sec:colony-tokens}
 
-Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver. What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section. In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
+Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver (and thus distribute control within the colony). What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section. In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
 
 In cases where a colony creates a new token, that colony is in control of the supply of the token. Specifically, \textbf{root} role holders can mint tokens at-will. In some cases, this may look like a founder managing the token supply unilaterally, while in other cases colonies may manage the minting process via an extension contract (see Section \ref{sec:colony-token-management} for an example).
+
+A common question is why only internal tokens (as opposed to all tokens) are reputation-bearing. The reason for having a single token be reputation-bearing is that it avoids tricky exchange-rate problems in which there are incentives to receive more of a less valuable token to earn more reputation.
 
 \subsubsection{Token use-cases}
 
 \subsubsection*{Tokens as early rewards}
 
 One of the chief benefits of a colony having its own token is that it can offer rewards for work before it has any revenue or external funding to draw on.
-A new colony may offer token payouts for tasks that people may accept in the hope that the reputation earned by these token payments (and the future revenue earned by the colony) will eventually lead to financial rewards. By allowing `spending' before fund-raising, the financial burden during the start-up phase of a new colony is eased. Once a colony is profitable, payment in tokens may be the exception rather than the norm.
+A new colony may offer token payouts for expenditures with the hope that the reputation earned by these token payments (and the future revenue earned by the colony) will eventually lead to financial rewards. By allowing `spending' before fund-raising, the financial burden during the start-up phase of a new colony is eased. Once a colony is profitable, payment in tokens may be the exception rather than the norm.
 
 \subsubsection*{Tokens representing hours worked}
 
-We could imagine a colony in which all tasks are paid in Ether, but include a number of the colony's own tokens as well, equal to the expected number of hours worked on a task. The members of the colony would be responsible for assigning `correct' token and Ether payouts to tasks. This extra responsibility would also ensure users doing the same amount of work received the same reputation gain, rather than the reputation gain being dependent on the rates they charged.
+We could imagine a colony in which all expenditures are paid in Ether, but include a number of the colony's own tokens as well, equal to the expected number of hours worked. The members of the colony would be responsible for assigning `correct' token and Ether payouts to expenditures. This extra responsibility would also ensure users doing the same amount of work received the same reputation gain, rather than the reputation gain being dependent on the rates they charged.
 
 \subsubsection*{Tokens as performance-based bonuses}
 
@@ -147,7 +149,7 @@ Colony has developed a customized \ascode{Token} contract, with some additional 
 
 In addition, Colony's \ascode{Token} contract introduces the idea of `locking' --- tokens being non-transferrable until a one-way boolean flag is flipped. This is useful for colonies which want more control over how and when their tokens can be liquidated and exchanged.
 
-This contract underlies the \rct\ (see Section \ref{sec:clny}) and is the default token contract for new colonies, although colonies are free to use any ERC20-compatible token.
+This contract underlies the \rct\ (see Section \ref{sec:clny}) and is the default token contract for new colonies, although colonies are free to choose any ERC20-compatible token.
 
 \subsection{Revenue and rewards}\label{sec:revenue}
 
@@ -165,11 +167,11 @@ The transaction then calculates the amount of token-denominated revenue that has
 
 Rewards accumulate in the rewards pot. To trigger a payout to users (i.e. to make rewards claimable) a \textbf{root} user makes a special \texttt{startNextRewardPayout} transaction (no more than once every \rewardclaimduration\ days), initiating a process by which all members may claim a payout based on the reward pot's holdings.
 
-This reward payout transaction includes the specific currency that should be paid, and only one currency is handled at a time. Once the process begins, all users' tokens are locked until they claim their payout. Locking is necessary because the token balance of each account factors into the rewards formula of equation \eqref{eq:reward-claim}. Locking is done by incrementing the token's \texttt{totalLockCount}.
+This reward payout transaction includes the specific currency that should be paid (reward payouts for each token are handled separately). Once the process begins, all users' tokens are locked until they claim their payout. Locking is necessary because the token balance of each account factors into the rewards formula of equation \eqref{eq:reward-claim}. Locking is done by incrementing the token's \texttt{totalLockCount}.
 
 Our \texttt{TokenLocking} contract contains a locking mechanism ensuring that a user cannot move tokens while they have (token-weighted) votes to reveal; we use the same mechanism here to ensure that a user cannot move tokens after a payout is approved by the members of the colony but before the user has claimed their rewards. The colony has a counter for each user that is incremented whenever they claim a payout; they can also waive their claim to a payout that will increment this counter. \\
 
-\textbf{Rewards are only available to accounts that hold both tokens and reputation}, and the amount claimable by each account depends on \emph{both} token balance and reputation (see equation \eqref{eq:reward-claim} below). Therefore we need to have a similar behaviour to `lock' the reputation of the users for the payout. When a payout is activated, the current state of the reputation tree is recorded in the payout itself. Users are paid out according to their reputation in this state, rather than the most recent state, to ensure all users get an appropriate payout and to avoid exploiting the system (which might otherwise be possible via e.g. delaying reward collection until after completing a task, increasing their reputation).
+\textbf{Rewards are only available to accounts that hold both tokens and reputation}, and the amount claimable by each account depends on \emph{both} token balance and reputation (see equation \eqref{eq:reward-claim} below). Therefore we need to have a similar behaviour to `lock' the reputation of the users for the payout. When a payout is activated, the current state of the reputation tree is recorded in the payout itself. Users are paid out according to their reputation in this state, rather than the most recent state, to ensure all users get an appropriate payout and to avoid exploiting the system (which might otherwise be possible via e.g. delaying reward collection until after completing an expenditure, increasing their reputation).
 
 \subsubsection{The rewards formula}
 
@@ -201,9 +203,9 @@ Later, the user behaves badly in the `development' domain, and they lose 100 rep
 
 \subsubsection*{Reputation by skill}\label{sec:rep-by-skill}
 
-We anticipate domains to mostly be used as an organisational hierarchy within a colony. However, this would not necessarily capture the \emph{type} of work that a user completed to earn their reputation. If the domain were a project, with tasks involving both design and development work, reputation earned by completing tasks related to these skills would not be distinguishable. To have a more granular account of the work a user completes to earn their reputation, a skill cloud is also maintained.
+We anticipate domains to mostly be used as an organisational hierarchy within a colony. However, this would not necessarily capture the \emph{type} of work that a user completed to earn their reputation. If the domain were a project, with expenditures involving both design and development work, reputation earned by completing expenditures related to these skills would not be distinguishable. To have a more granular account of the work a user completes to earn their reputation, a skill cloud is also maintained.
 
-This global cloud of skill tags is available to all colonies, and is curated and maintained by the \rc. When a task is created, as well as being placed in a particular domain in the colony, it is also tagged with one or more skills from the skills cloud. When the worker earns reputation for successfully completing the task, they will earn reputation in all skills the task was tagged with, with the reputation divided uniformly amongst the skills. This is in addition to the reputation earned in the relevant domains. Conversely, if they are to lose reputation because their work is found inadequate, they will lose equivalent reputation in all associated skills.
+This global cloud of skill tags is available to all colonies, and is curated and maintained by the \rc. When an expenditure is created, as well as being placed in a particular domain in the colony, may also be tagged with one or more skills from the skills cloud. When the recipient earns reputation by claiming the payout, they will earn reputation in all skills the expenditure was tagged with, with the reputation divided uniformly amongst the skills. This is in addition to the reputation earned in the relevant domains.
 
 Even though the skills cloud is universal, specific skills reputation is unique to each colony. Earning reputation in a skill in one colony has no effect on the user's reputation in that skill in any other colonies.
 
@@ -221,7 +223,7 @@ The rest of this section outlines each of these mechanisms, with references to t
 
 \subsubsection*{Reputation change via expenditures}
 
-Whenever an expenditure recipient receives a payout denominated in the colony's internal token, the recipient also receives some amount of reputation, scaled by that recipient's \texttt{payoutScalar}. A value of 1 gives reputation equivalent to the token payout, but a multiple of up to 2x is possible. The reputation is earned in the domain (and all parent domains) of the expenditure, and divided equally among any skills associated with that recipient. Note that reputation \textit{penalties} are not possible via expenditures, but rather are made via the \textbf{arbitration} role.
+Whenever an expenditure recipient receives a payout denominated in the colony's internal token, the recipient also receives some amount of reputation, scaled by that recipient's \texttt{payoutScalar}. A value of 1 gives reputation equivalent to the token payout, but a multiple of up to 2x is possible. The reputation is earned in the domain (and all parent domains) of the expenditure, and divided equally among any skills associated with that recipient.
 
 \subsubsection*{Reputation change as a result of arbitration}\label{sec:earning-rep-in-disputes}
 
@@ -229,7 +231,7 @@ Arbitration role holders have the ability to emit arbitrary reputation penalties
 
 \subsubsection*{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 
-Since a permissionless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a permissionless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first task is successfully completed, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
+Since a permissionless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a permissionless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
 To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them in the root domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the root domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated expenditure being paid out. Users receiving reputation are presumably the colony founder and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
 
@@ -237,9 +239,9 @@ We note that the same is not required when a new domain is created in a colony. 
 
 \subsubsection*{Reputation decay}
 
-All reputation decays over time. Every \repdecayduration\ days, a user's reputation in every domain or skill decays by a factor of 2. This decay occurs every \miningcycleduration\ hours, rather than being a step change every \repdecayduration\ days to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain.
+All reputation decays over time. Every \repdecayduration\ days,\footnote{It is likely that this parameter will be configurable on a per-colony basis in the future.} a user's reputation in every domain or skill decays by a factor of 2. This decay occurs every \miningcycleduration\ hour, rather than being a step change every \repdecayduration\ days to ensure there are minimal incentives to earn reputation at any particular time. This frequent, network-wide update is the primary reason for the existence of the reputation mining protocol, which allows this near-continuous decay to be calculated off-chain without gas limits, and then realised on-chain.
 
-The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per task) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time. \\
+The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per expenditure) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time. \\
 
 One might wonder why we have chosen to \textit{decay} reputation, rather than pursue a strategy of reputation \textit{dilution} via inflation. In one sense, they are equivalent: decaying reputation that is earned at a constant rate is the same as earning reputation at increasingly inflated valuations. From an implementation perspective, however, reputation inflation has several flaws. First and most importantly, reputation can be decayed indefinitely, but only inflated up until the largest number the system can hold, at which point reputation will overflow. In Ethereum's case, it is a 256-bit integer, or roughly $10^{78}$ -- a stupendously large number. Were inflation to occur \textit{linearly} (`by fixed amounts') then the overflow would occur billions or more years in the future -- arguably a nonissue.
 
@@ -322,7 +324,7 @@ Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}
  \label{fig:stake-deobligate}
 \end{figure}
 
-While an obligation is active, any \textbf{arbitration} role holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}).
+While an obligation is active, any \textbf{arbitration} role holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}). We reiterate that this is a powerful ability and in most cases should be mediated by an appropriate extension (such as disputes described in Section \ref{sec:objections-and-disputes}).
 
 \begin{figure}[h]
     \centering
@@ -346,7 +348,7 @@ While an obligation is active, any \textbf{arbitration} role holder can \textit{
  \label{fig:stake-slash}
 \end{figure}
 
-For reasons of security, approvals are keyed by \textit{domain}, as well as by address of approvee (i.e. \texttt{approve(approvee, domain, amount)}). This is because otherwise, a malicious actor could use \textit{any} arbitration role holder in the colony to slash a stake, rather than arbitration role holders in the intended domain inheritance path. However, because \texttt{TokenLocking} does not know about the domain structure of specific colonies, the obligations in \texttt{TokenLocking} are aggregates of all colony- and domain-specific obligations.
+For reasons of security, approvals are keyed by \textit{domain}, as well as by address of approvee (i.e. \texttt{approve(approvee, domain, amount)}). Otherwise, a malicious actor could use \textit{any} arbitration role holder in the colony to slash a stake, rather than arbitration role holders in the intended domain inheritance path. However, because \texttt{TokenLocking} does not know about the domain structure of specific colonies, the obligations in \texttt{TokenLocking} are aggregates of all colony- and domain-specific obligations.
 
 Overall, this design allows arbitration to be generalized and separated from the implementation of any particular extension: extensions obligate a stake (and define the period of obligation), while during that period separate arbitration processes can slash that stake.
 
@@ -374,7 +376,7 @@ In general, the contract may enter recovery mode due to:
 
 \begin{itemize}
  \item A transaction from a whitelisted address signalling that the contract should enter recovery mode.
- \item Something that should always be true of the colony not being true --- for example, after a task payout checking that the amount of funds promised to tasks and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
+ \item Something that should always be true of the colony not being true --- for example, after an expenditure payout checking that the amount of funds promised to expenditures and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
  \item A qualitative trigger suggesting something may be amiss --- perhaps too many tokens have been paid out in a short amount of time.
 \end{itemize}
 
@@ -384,4 +386,4 @@ The first \textbf{recovery} role holder is set at colony creation and is the cre
 
 \subsection{Arbitrary transactions}\label{sec:arbitrary-transaction}
 
-Of course, it is possible that a colony will want to engage in some behaviour that we haven't foreseen, that could be implemented in a contract outside the control of the Colony Network. To that end, we wish to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens without requiring the network to explicitly support them. As they are powerful, such transactions should be rare occurrences requiring \textbf{root} authorization.
+Of course, it is possible that a colony will want to engage in some behaviour that we haven't foreseen, that could be implemented in a contract outside the control of the Colony Network (such as changing a parameter in a contract when the colony as a whole is responsible for governing that contract). To that end, we wish to have a mechanism by which a colony can create an arbitrary transaction on the blockchain to interact with contracts and tokens without requiring the network to explicitly support them. As they are powerful, such transactions should be rare occurrences requiring \textbf{root} authorization.

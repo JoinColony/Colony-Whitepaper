@@ -142,7 +142,7 @@ These dummy insertions occur whenever the remainder is 0 --- i.e. when the new s
 
 \subsection{Reputation Decay Calculation Details}\label{appendix:rep-decay}
 
-Reputation in any skill decays by a factor of two every \repdecayduration\ days. At each update (i.e. after every \miningcycleduration\ hours), the new decayed value ($u_{\rm new}$) is calculated by
+Reputation in any skill decays by a factor of two every \repdecayduration\ days. At each update (i.e. after every \miningcycleduration\ hour), the new decayed value ($u_{\rm new}$) is calculated by
 
 $$u_{\rm new} = u_{\rm old} \times \exp\left(-\frac{\ln 2}{\decayfactor}\right) = u_{\rm old} \times \exp\left(-k\right).$$
 
