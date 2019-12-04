@@ -1,9 +1,9 @@
 \section{Structure of a Colony}\label{sec:colony-structure}
 Colonies exist to enable collaboration between their members, and direct collective efforts towards common goals. Facilitating effective division of labour, management of incentives, and allocation of resources are therefore some of the most important functions of the Colony protocol.
 
-\subsection{Domains and roles}\label{sec:domains}\label{sec:roles}
+\subsection{Domains and permissions}\label{sec:domains}\label{sec:permissions}
 
-The essential structure of the colony revolves around domains and the roles that addresses may hold in them. These two concepts jointly define the structure and security of a colony and provide a flexible framework for creating colonies of many kinds.
+The essential structure of the colony revolves around domains and the permissions that accounts may have in them. These two concepts jointly define the structure and security of a colony and provide a flexible framework for creating colonies of many kinds.
 
 \subsubsection{Domains}
 
@@ -33,51 +33,51 @@ It is ultimately up to individual colonies to decide how they wish to use domain
 
 Among other things, this compartmentalisation of activity provides an essential benefit to the colony as a whole by making reputation \textit{contextual}. When arbitration occurs, it occurs at a specific level in the colony's domain hierarchy. This means that people with relevant contextual knowledge can be included for their opinion, and that when arbitration occurs, the whole colony is not required to participate in the dispute.
 
-\subsubsection{Roles}
+\subsubsection{Permissions}
 
-Access control in a colony is organized around the concepts of \textbf{roles} and their accompanying \textbf{permissions}. There are six different roles (roughly in order of influence): Recovery, Root, Arbitration, Architecture, Funding, and Arbitration. Each role provides a bundle of semantically-related functionality, giving role-holders \textit{permission} to call certain privileged functions.
+Access control in a colony is organized around the concepts of \textbf{permissions}. There are six different permissions (roughly in order of influence): recovery, root, arbitration, architecture, funding, and arbitration, each unlocking a bundle of semantically-related functionality.
 
-With the exception of the Recovery and Root roles, all roles are domain-specific (much like permissions in a Unix file system are directory-specific), with the rule that roles held in a parent domain are inherited in all child domains. Put another way, holding a role in a domain gives you that role in the entire \textit{subtree} rooted in that domain. To implement this inheritance, permissioned functions require a \textit{domain proof} of the following arguments:
+With the exception of the recovery and root permissions, all permissions are domain-specific (much like permissions in a Unix file system are directory-specific), with the rule that permissions held in a parent domain are inherited in all child domains. Put another way, have a permission in a domain gives you that permission in the entire \textit{subtree} rooted in that domain. To implement this inheritance, permissioned functions require a \textit{domain proof} of the following arguments:
 
 \begin{itemize}
-\item \texttt{permissionDomainId} - The (parent) domain in which the address holds the role.
+\item \texttt{permissionDomainId} - The (parent) domain in which the address holds the permission.
 \item \texttt{childSkillIndex} - The index of \texttt{domainId} in \texttt{permissionDomainId}'s \texttt{children} array.
 \item \texttt{domainId} - The (child) domain in which the action is being taken.
 \end{itemize}
 
 These arguments can be evaluated on-chain in constant time to determine whether the address is authorized to call the privileged function.
 
-Roles are held by Ethereum addresses. This means that roles may be held by human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
+Permissions are held by Ethereum addresses. This means that permissions may be given to human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
 
 It is worth noting that the list of addresses that have the permission in question have the full permission; no additional restrictions exist at the protocol level. In some cases, these are extremely powerful capabilities (such as emitting arbitrary reputation penalties) and require absolute confidence in whomever or whatever controls it. We anticipate therefore that in many cases, extension contracts will be used to offer varying degree of moderation to the underlying permissions.
 
 \subsubsection*{Recovery}
 
-The recovery role gives addresses access to the colony's emergency `recovery' functionality, which allows for arbitrary state-changes to the colony's data. Recovery mode is described in more detail in Section \ref{sec:escape-hatches}.
+The recovery permission gives addresses access to the colony's emergency `recovery' functionality, which allows for arbitrary state-changes to the colony's data. Recovery mode is described in more detail in Section \ref{sec:escape-hatches}.
 
 \subsubsection*{Root}
 
-The root role gives addresses access to high-level administrative functions in the colony, such as setting colony-wide parameters, upgrading the colony, and minting new internal tokens. The root role also gives addresses the ability to assign roles throughout the colony (including in the root domain).
+The root permission gives addresses access to high-level administrative functions in the colony, such as setting colony-wide parameters, upgrading the colony, and minting new internal tokens. This permission also gives addresses the ability to assign permissions throughout the colony (including in the root domain).
 
 \subsubsection*{Arbitration}
 
-The arbitration role give addresses the ability to make domain-specific state changes, meant as a means of resolving disputes. This role also gives permission to emit reputation penalties (but not reputation increases).
+The arbitration permission give addresses the ability to make domain-specific state changes, meant as a means of resolving disputes. This permission also gives permission to emit reputation penalties (but not reputation increases).
 
 \subsubsection*{Architecture}
 
-The architecture role gives addresses the ability to create new domains in a colony, as well as assign roles in those new domains. Unlike the root role, architecture role holders cannot edit roles in the domain in which they hold the role, only in subdomains.
+The architecture permission gives addresses the ability to create new domains in a colony, as well as assign permissions in those new domains. Unlike root, accounts with this permission cannot edit permissions in the domain in which they hold the permission, only in subdomains.
 
 \subsubsection*{Funding}
 
-The funding role gives addresses the ability to move tokens between funding pots. In practice, this means that this role is responsible for allocating money amongst domains and for funding expenditures. Financial management in a colony is described in more detail in Section \ref{sec:finance}.
+The funding permission gives addresses the ability to move tokens between funding pots. In practice, this means that this permission is responsible for allocating money amongst domains and for funding expenditures. Financial management in a colony is described in more detail in Section \ref{sec:finance}.
 
 \subsubsection*{Administration}
 
-The administration role gives addresses the ability to create and manage (but not fund) expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}. \\
+The administration permission gives addresses the ability to create and manage (but not fund) expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}. \\
 
-Broadly, roles are designed as a `separation of powers': different roles must work together to carry out the functioning of a colony. For example, the administration role can create an expenditure, but only the funding role can actually provide the resources, while the arbitration role resolves disputes as they arise. Complex extensions may require multiple roles in order to function properly (such as `tasks', which requires both the arbitration and administration roles.
+Broadly, permissions are designed as a `separation of powers': different permissions must work in concert to carry out the functioning of a colony. For example, administration can create an expenditure, but only funding can actually provide the resources, while arbitration resolves disputes as they arise. Complex extensions may require multiple permissions in order to function properly (such as `tasks', which requires both arbitration and administration).
 
-The intention is that, since the roles represent semantic bundles of functionality, it will be possible to develop \textit{specialized} mechanisms for mediating access to the underlying functionality (i.e. specialized funding mechanisms and specialized dispute-resolution mechanisms, as opposed to a general-purpose `voting' mechanism meant to handle all possible decisions).
+The intention is that, since permissions are grouped into semantic bundles of functionality, it will be possible to develop \textit{specialized} mechanisms for mediating access to the underlying functionality (i.e. specialized funding mechanisms and specialized dispute-resolution mechanisms, as opposed to a general-purpose `voting' mechanism meant to handle all possible decisions).
 
 Colony's long-term vision is of \textit{trustless organizations}; organizations in which members can safely collaborate and manage shared resources, without needing to know or trust each other. However, early colonies may find that a larger emphasis on human moderators to be useful. Over time, we hope that colonies will devolve more and more decision-making away from human moderators to extensions which implement trustless functionality. We will refer to colonies which make substantial use of these extensions as \textit{trustless colonies}.
 
@@ -89,7 +89,7 @@ All tokens and currencies are administered by the colony contract; it is respons
 
 Each domain and each expenditure in a colony has an associated \emph{funding pot}. A funding pot can be thought of as a wallet specific to a particular domain or expenditure, and are used to move funds around \textit{within} a colony. To each funding pot, the colony contract may associate any number of Ether or ERC20-compatible tokens it holds. Depending on context, the funds in a funding pot may be referred to as the payout, bounty, budget, salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
 
-Only addresses holding the \textbf{funding} role may move tokens; the rule is that they may move tokens between any two pots in the subtree rooted in the domain in which they hold the role. It is the expectation that the funding role will in many cases be assigned to an \textit{extension contract} implementing a specialized decision-making mechanism, such as the \textit{funding queue} described in Section \ref{sec:funding-queues}.
+Only addresses holding the \textbf{funding} permission may move tokens; the rule is that they may move tokens between any two pots in the subtree rooted in the domain in which they hold the permission. It is the expectation that this permission will in many cases be given to an \textit{extension contract} implementing a specialized decision-making mechanism, such as the \textit{funding queue} described in Section \ref{sec:funding-queues}.
 
 \subsubsection{Expenditures}
 
@@ -117,18 +117,21 @@ Once the tokens have been received by an address, they are under the control of 
 
 \subsection{Internal tokens}\label{sec:colony-tokens}
 
-Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver (and thus distribute control within the colony). What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section. In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
+Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver (and thus distribute control within the colony). What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section.
 
-In cases where a colony creates a new token, that colony is in control of the supply of the token. Specifically, \textbf{root} role holders can mint tokens at-will. In some cases, this may look like a founder managing the token supply unilaterally, while in other cases colonies may manage the minting process via an extension contract (see Section \ref{sec:colony-token-management} for an example).
+In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
+
+In cases where a colony creates a new token, that colony is in control of the supply of the token. Specifically, \textbf{root} permission holders can mint tokens at-will. In some cases, this may look like a founder managing the token supply unilaterally, while in other cases colonies may manage the minting process via an extension contract (see Section \ref{sec:colony-token-management} for an example).
 
 A common question is why only internal tokens (as opposed to all tokens) are reputation-bearing. The reason for having a single token be reputation-bearing is that it avoids tricky exchange-rate problems in which there are incentives to receive more of a less valuable token to earn more reputation.
 
 \subsubsection{Token use-cases}
 
+Ultimately, internal tokens are used to distribute reputation, and thus both ownership and decision-making power. Since users with more reputation can both exercise more influence over the activity of the colony, as well as claim a greater share of the rewards, reputation functions to align incentives among the members of colony. Here we give a few examples of different use-cases for internal tokens, demonstrating the variety of schemes colonies may adopt for distributing ownership and influence alongside cash compensation.
+
 \subsubsection*{Tokens as early rewards}
 
-One of the chief benefits of a colony having its own token is that it can offer rewards for work before it has any revenue or external funding to draw on.
-A new colony may offer token payouts for expenditures with the hope that the reputation earned by these token payments (and the future revenue earned by the colony) will eventually lead to financial rewards. By allowing `spending' before fund-raising, the financial burden during the start-up phase of a new colony is eased. Once a colony is profitable, payment in tokens may be the exception rather than the norm.
+One of the chief benefits of a colony having its own token is that it can offer rewards for work before it has any revenue or external funding to draw on. A new colony may offer token payouts for expenditures with the hope that the reputation earned by these token payments (and the future revenue earned by the colony) will eventually lead to financial rewards. By allowing `spending' before fund-raising, the financial burden during the start-up phase of a new colony is eased. Once a colony is profitable, payment in tokens may be the exception rather than the norm.
 
 \subsubsection*{Tokens representing hours worked}
 
@@ -161,7 +164,7 @@ There is an expectation that some fraction of any Ether or other tokens received
 
 Revenue accumulates as the colony receives transfers of tokens. In order to be processed, any user can make a special \texttt{claimColonyFunds} transaction, indicating for which token they wish to process accumulated revenue.
 
-The transaction then calculates the amount of token-denominated revenue that has accumulated since the last such transaction, and transfers some proportion to the colony's rewards pot. The remainder is then made available to the colony as working capital. The percentage split is configurable by the \textbf{root} role via the \texttt{setRewardInverse} function.
+The transaction then calculates the amount of token-denominated revenue that has accumulated since the last such transaction, and transfers some proportion to the colony's rewards pot. The remainder is then made available to the colony as working capital. The percentage split is configurable by the \textbf{root} permission via the \texttt{setRewardInverse} function.
 
 \subsubsection{Claiming rewards from the rewards pot}\label{sec:claimrewards}
 
@@ -187,7 +190,7 @@ After some sufficiently long period of time (\rewardclaimduration\ days), all un
 
 \subsection{The reputation system}\label{sec:reputation}
 
-Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit.
+Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit. Colony's aim is that reputation system will enable an emergent and dynamic decision-making heirarchy in which all of the right people are in the right places.
 
 Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a trustless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or misbehaviour; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 
@@ -211,7 +214,7 @@ Even though the skills cloud is universal, specific skills reputation is unique 
 
 \subsubsection*{Reputation by colony}\label{sec:rep-by-colony}
 
-A user's total reputation in a colony is their reputation in the root domain. This is the reputation they will be voting with in any decisions that require input from everyone in a permissionless colony (i.e. modifying colony-wide parameters). Reputation in a colony has no effect outside the colony. In particular, reputations held in one colony have no bearing on reputations held by the same account in another colony.
+A user's total reputation in a colony is their reputation in the root domain. This is the reputation they will be voting with in any decisions that require input from everyone in a trustless colony (i.e. modifying colony-wide parameters). Reputation in a colony has no effect outside the colony. In particular, reputations held in one colony have no bearing on reputations held by the same account in another colony.
 
 \subsubsection{Earning and losing reputation}\label{sec:earning-losing-rep}
 
@@ -227,11 +230,11 @@ Whenever an expenditure recipient receives a payout denominated in the colony's 
 
 \subsubsection*{Reputation change as a result of arbitration}\label{sec:earning-rep-in-disputes}
 
-Arbitration role holders have the ability to emit arbitrary reputation penalties (but not increases) in both domains and skills. While this might seem to be a significant power available to arbitration role holders, recall that this role will in many cases be assigned to extension contracts, which will mediate this ability via various mechanisms, such as a dispute process (see Section \ref{sec:objections-and-disputes}).
+Arbitration permission holders have the ability to emit arbitrary reputation penalties (but not increases) in both domains and skills. While this might seem to be a significant power available to arbitration permission holders, recall that this permission will in many cases be assigned to extension contracts, which will mediate this ability via various mechanisms, such as a dispute process (see Section \ref{sec:objections-and-disputes}).
 
 \subsubsection*{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 
-Since a permissionless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a permissionless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
+Since a trustless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a trustless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
 To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them in the root domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the root domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated expenditure being paid out. Users receiving reputation are presumably the colony founder and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
 
@@ -243,11 +246,7 @@ All reputation decays over time. Every \repdecayduration\ days,\footnote{It is l
 
 The decay serves multiple purposes. It ensures that reputation scores represent \emph{recent} contributions to a colony incentivising members to continually contribute to the colony. It further ensures that wild appreciations in token value (and the corresponding decrease in tokens paid per expenditure) do not permanently distort the distribution of reputation but instead serves to smooth out the effects of such fluctuations over time. \\
 
-One might wonder why we have chosen to \textit{decay} reputation, rather than pursue a strategy of reputation \textit{dilution} via inflation. In one sense, they are equivalent: decaying reputation that is earned at a constant rate is the same as earning reputation at increasingly inflated valuations. From an implementation perspective, however, reputation inflation has several flaws. First and most importantly, reputation can be decayed indefinitely, but only inflated up until the largest number the system can hold, at which point reputation will overflow. In Ethereum's case, it is a 256-bit integer, or roughly $10^{78}$ -- a stupendously large number. Were inflation to occur \textit{linearly} (`by fixed amounts') then the overflow would occur billions or more years in the future -- arguably a nonissue.
-
-However, linear inflation is insufficient, as it would lead to a `relative slowing' of the inflation rate over time. Only \textit{exponential} (`by multiples') inflation allows us to combine reputation earned yesterday with reputation earned today, and to correctly treat them as one value moving forward, while maintaining a consistent rate of change. And with exponential inflation, the time to overflow approaches rapidly. Given the current reputation half-life of \repdecayduration\ days, equivalent inflation would overflow in less than 50 years.
-
-One might argue that, were Colony to become wildly successful, several decades is ample time to develop a workaround for integer overflow. Even so, the main argument for reputation inflation is that it can be performed on-chain, and Colony reputation cannot be stored on-chain, for the reason that Colony reputation is not a single number, but many numbers. Inflation and decay aside, earning reputation entails looping over unbounded arrays (an entire domain hierarchy, for instance), and so is unsuitable for on-chain implementation. Given that reputation must be maintained off-chain, decay is the superior choice.
+One might wonder why we have chosen to \textit{decay} reputation, rather than pursue a strategy of reputation \textit{dilution} via inflation. In one sense, they are equivalent: decaying reputation that is earned at a constant rate is the same as earning reputation at increasingly inflated valuations. Mathematically, however, decay is the cleaner approach, and so the use-case for inflation is that it is more feasibly calculated on-chain. In the case of Colony, reputation cannot be calculated on chain, since reputation updates effect an unbounded number of reputation nodes (due to the unbounded size of the domain tree). Since reputation cannot be calculated on chain, we choose to decay reputation in our off-chain reputation mining process.
 
 \subsubsection{On-chain representation of skills and domains}\label{subsec:on-chain-representation-of-skills}
 
@@ -290,7 +289,7 @@ This log exists to define an ordering of all reputation updates in a reputation 
 
 \subsection{Managing stakes}\label{sec:stakes}
 
-Staking is a key concept in permissionless systems, as a way to ensure that participants have `skin in the game' and can be incentivized towards good behavior. As Colony wishes to enable an ecosystem of extensions implementing various cryptoeconomic mechanisms (see Section \ref{sec:extensions}), a shared system for managing stakes improves usability and security by saving users from needing to send and retrieve tokens to and from many different contracts. In colonies, all stakes are denominated in that colony's internal token.
+Staking is a key concept in trustless systems, as a way to ensure that participants have `skin in the game' and can be incentivized towards good behavior. As Colony wishes to enable an ecosystem of extensions implementing various cryptoeconomic mechanisms (see Section \ref{sec:extensions}), a shared system for managing stakes improves usability and security by saving users from needing to send and retrieve tokens to and from many different contracts. In colonies, all stakes are denominated in that colony's internal token.
 
 \subsubsection{Storing Tokens}
 
@@ -324,7 +323,7 @@ Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}
  \label{fig:stake-deobligate}
 \end{figure}
 
-While an obligation is active, any \textbf{arbitration} role holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}). We reiterate that this is a powerful ability and in most cases should be mediated by an appropriate extension (such as disputes described in Section \ref{sec:objections-and-disputes}).
+While an obligation is active, any \textbf{arbitration} permission holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}). We reiterate that this is a powerful ability and in most cases should be mediated by an appropriate extension (such as disputes described in Section \ref{sec:objections-and-disputes}).
 
 \begin{figure}[h]
     \centering
@@ -348,7 +347,7 @@ While an obligation is active, any \textbf{arbitration} role holder can \textit{
  \label{fig:stake-slash}
 \end{figure}
 
-For reasons of security, approvals are keyed by \textit{domain}, as well as by address of approvee (i.e. \texttt{approve(approvee, domain, amount)}). Otherwise, a malicious actor could use \textit{any} arbitration role holder in the colony to slash a stake, rather than arbitration role holders in the intended domain inheritance path. However, because \texttt{TokenLocking} does not know about the domain structure of specific colonies, the obligations in \texttt{TokenLocking} are aggregates of all colony- and domain-specific obligations.
+For reasons of security, approvals are keyed by \textit{domain}, as well as by address of approvee (i.e. \texttt{approve(approvee, domain, amount)}). Otherwise, a malicious actor could use \textit{any} arbitration permission holder in the colony to slash a stake, rather than arbitration permission holders in the intended domain inheritance path. However, because \texttt{TokenLocking} does not know about the domain structure of specific colonies, the obligations in \texttt{TokenLocking} are aggregates of all colony- and domain-specific obligations.
 
 Overall, this design allows arbitration to be generalized and separated from the implementation of any particular extension: extensions obligate a stake (and define the period of obligation), while during that period separate arbitration processes can slash that stake.
 
@@ -368,7 +367,7 @@ The choice of upgrading the underlying Colony contract will always fall to the c
 
 While we aspire to bug-free contracts, bugs are inevitable, and so the adoption of a `defensive programming' mentality will limit the impact of any vulnerabilities that may be discovered in the deployed contracts.
 
-The ultimate fallback is known as `recovery mode'. In this state, whitelisted addresses (those with the \textbf{recovery} role) are able to access special functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions to allow setting of variables, as well as being able to upgrade the contract. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a safe state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
+The ultimate fallback is known as `recovery mode'. In this state, whitelisted addresses (those with the \textbf{recovery} permission) are able to access special functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions to allow setting of variables, as well as being able to upgrade the contract. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a safe state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
 
 It is conceivable that colonies will be able to deactivate the recovery mode feature in the future, once the network and contracts have matured sufficiently. \\
 
@@ -382,7 +381,7 @@ In general, the contract may enter recovery mode due to:
 
 Any approvals from whitelisted addresses to leave recovery mode must be reset whenever a variable is edited. A whitelisted address agreeing to leave recovery mode records the timestamp at which the agreement occurred, and any change of variables also update a timestamp indicating the last edit. When attempting to leave recovery mode, only agreements made after the last edit are counted towards meeting the threshold.
 
-The first \textbf{recovery} role holder is set at colony creation and is the creator of the colony. Additional \textbf{recovery} role holders can be added by the \textbf{root} role.
+The first \textbf{recovery} permission holder is set at colony creation and is the creator of the colony. Additional \textbf{recovery} permission holders can be added by the \textbf{root} permission.
 
 \subsection{Arbitrary transactions}\label{sec:arbitrary-transaction}
 

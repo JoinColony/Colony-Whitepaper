@@ -1,10 +1,10 @@
 \section{Extending Functionality}\label{sec:extensions}
 
-The vision of Colony is the creation of decentralized, permissionless organizations, in which decisions are driven by reputation, not a subset of moderators. Yet, at the level of the core Colony contracts, access is mediated by roles and permissions, not reputation.
+The vision of Colony is the creation of decentralized, trustless organizations, in which decisions are driven by reputation, not a subset of moderators. Yet, at the level of the core Colony contracts, access is mediated by permissions, not reputation.
 
-The decision to make `roles' Colony's core access-control logic is doubly motivated. First, it makes it possible to launch a Colony which is admin-controlled (appropriate for small teams with substantial existing trust) and to transition to a more decentralized, permissionless style of operating as the organization matures. Second, the roles-based approach makes it possible to experiment with a wide variety of mechanisms without needing to continually deploy new Colony contracts. Much like the distinction between \textbf{kernel space} and \textbf{user space} in the design of operating systems, roles can be thought of as providing the \textbf{system calls} needed to give end-user applications (extensions) the ability to securely manipulate the underlying resources of the system. Just as this model has proven very successful in enabling a wide variety of software applications to safely share computing resources, so do we think that the colony-and-extensions model will be successful here.
+The decision to make `permissions' Colony's core access-control logic is doubly motivated. First, it makes it possible to launch a Colony which is admin-controlled (appropriate for small teams with substantial existing trust) and to transition to a more decentralized, trustless style of operating as the organization matures. Second, the permissions-based approach makes it possible to experiment with a wide variety of mechanisms without needing to continually deploy new Colony contracts. Much like the distinction between \textbf{kernel space} and \textbf{user space} in the design of operating systems, permissions can be thought of as providing the \textbf{system calls} needed to give end-user applications (extensions) the ability to securely manipulate the underlying resources of the system. Just as this model has proven very successful in enabling a wide variety of software applications to safely share computing resources, so do we think that the colony-and-extensions model will be successful here.
 
-This section will discuss in-depth how a variety of key permissionless functionality can be implemented and made available for colonies to use, and to demonstrate the flexibility enabled by the roles system.
+This section will discuss in-depth how a variety of key trustless functionality can be implemented and made available for colonies to use, and to demonstrate the flexibility enabled by the permissions system.
 
 \subsection{Tasks}\label{sec:tasks}
 
@@ -24,7 +24,7 @@ The manager (initially the creator of the task) is responsible for selecting the
 \item A \ascode{specificationHash}: the address of a specification on IPFS, used by the worker to guide the work, and the evaluator for assessing the satisfactory completion of the task.
 \end{itemize}
 
-In order to create a task, the manager must hold the \textbf{administration} role. Future variations of the `tasks' extension may instead impose minimum reputation requirements and/or staking, making task creation permissionless.
+In order to create a task, the manager must have the \textbf{administration} permission. Future variations of the `tasks' extension may instead impose minimum reputation requirements and/or staking, making task creation trustless.
 
 Defining what the payouts for each role should be, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony (see Section \ref{sec:finance}). Payouts do not have to all be in the same currency, and a task's payout can be made up of an arbitrary number of currencies. If a payout for the task is denominated in the colony's token, the recipient will also earn reputation when the task is completed as long as their work was well received.
 
@@ -48,15 +48,15 @@ The worker receives reputation both in the domain (and parent domains) and the s
 
 Upon completion of a task, the evaluator also earns domain reputation (with an implicit rating of "2"). There is no explicit rating of the evaluator, but as with all other payouts an objection can be raised before a payout is claimable; the outcome of the objection may be a reduction of payout or an explicit reputation penalty. \\
 
-Tasks are built on expenditures, and implementing tasks as an extension contract makes use of the \textbf{arbitration} and \textbf{administration} roles -- the latter to manipulate the expenditure and the former to implement consequences of the rate-and-reveal flow.
+Tasks are built on expenditures, and implementing tasks as an extension contract makes use of the \textbf{arbitration} and \textbf{administration} permissions -- the latter to manipulate the expenditure and the former to implement consequences of the rate-and-reveal flow.
 
 When the task is finalized, the underlying expenditure's \texttt{claimDelay}s are set to allow for disputes to occur. Based on the rating recipients receive, their \texttt{payoutModifier}s are set to give a reputation boost (for an excellent review) or reduce the payout they can claim (for an unsatisfactory review). Also in the case of an unsatisfactory review, a reputation penalty is emitted.
 
 \subsection{Funding queues}\label{sec:funding-queues}
 
-Section \ref{sec:roles} describes the \textbf{funding} role, which is allowed to transfer funds in between \textbf{funding pots}. This permission is very powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One of these mechanisms is the \textbf{funding queue}, which leverages time as a driving factor to enable \textit{collaborative}, \textit{asynchronous}, and \textit{permissionless} decision-making, without voting.
+Section \ref{sec:permissions} describes the \textbf{funding} permission, which is allowed to transfer funds in between \textbf{funding pots}. This permission is very powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One of these mechanisms is the \textbf{funding queue}, which leverages time as a driving factor to enable \textit{collaborative}, \textit{asynchronous}, and \textit{trustless} decision-making, without voting.
 
-They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly.
+They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly. \\
 
 A funding queue contains of a series of \textbf{funding proposals}, each with the following attributes:
 
@@ -77,7 +77,7 @@ We distinguish between two types of funding proposals: Basic Funding Proposals (
 Priority funding proposals should be used when funds need to be directed somewhere that is not a direct descendant of the source, when the funding rate needs to be very high (including immediate payment), or when the funding rate should be otherwise controlled (e.g. in the case of paying a salary).
 
 \subsubsection{Creating a funding proposal}
-Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots. They must stake an equivalent fraction of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour.
+Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots. They must stake an equivalent amount of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour.
 
 \subsubsection{From, To and TokenType}
 The purpose of a funding proposal is to move tokens of \ascode{TokenType} from a pot \ascode{From} to a pot \ascode{To}.
@@ -163,11 +163,11 @@ The \ascode{creator} of a funding proposal may set its \ascode{CurrentState} to 
 
 As an alternative to funding queues, colonies may instead choose to use a Budget Box\footnote{See https://colony.io/budgetbox.pdf} to allocate funding between subdomains (or to divide funds among multiple recipients of an expenditure). Compared to funding queues, in which items are funded \textit{serially}, Budget Boxes allow items to be funded \textit{in parallel}, proportionally out of some fixed budget. Budget Boxes are described in detail in \cite{BudgetBox}. \\
 
-Depending on the usage, the extension would need the \textbf{funding} and potentially \textbf{administration} roles.
+Depending on the usage, the extension would need the \textbf{funding} and potentially \textbf{administration} permissions.
 
 \subsection{Objections and disputes}\label{sec:objections-and-disputes}
 
-The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. Often, these many decisions are structured via management hierarchies. But permissionless colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable.
+The most successful organisations are those which are able to effectively and efficiently make decisions, divide labour, and deploy resources. Often, these many decisions are structured via management hierarchies. But trustless colonies are intended to be low trust, decentralised, and pseudonymous --- a hierarchy is not suitable.
 
 In most DAO frameworks, the mechanism of collective-decision making is usually voting, but Colony is designed for day-to-day operation of an organisation. In a colony, voting on every decision is wholly impractical.
 
