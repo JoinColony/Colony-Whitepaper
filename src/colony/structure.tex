@@ -40,40 +40,40 @@ Access control in a colony is organized around the concepts of \textbf{permissio
 With the exception of the recovery and root permissions, all permissions are domain-specific (much like permissions in a Unix file system are directory-specific), with the rule that permissions held in a parent domain are inherited in all child domains. Put another way, have a permission in a domain gives you that permission in the entire \textit{subtree} rooted in that domain. To implement this inheritance, permissioned functions require a \textit{domain proof} of the following arguments:
 
 \begin{itemize}
-\item \texttt{permissionDomainId} - The (parent) domain in which the address holds the permission.
+\item \texttt{permissionDomainId} - The (parent) domain in which the account holds the permission.
 \item \texttt{childSkillIndex} - The index of \texttt{domainId} in \texttt{permissionDomainId}'s \texttt{children} array.
 \item \texttt{domainId} - The (child) domain in which the action is being taken.
 \end{itemize}
 
-These arguments can be evaluated on-chain in constant time to determine whether the address is authorized to call the privileged function.
+These arguments can be evaluated on-chain in constant time to determine whether the account is authorized to call the privileged function.
 
-Permissions are held by Ethereum addresses. This means that permissions may be given to human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
+Permissions are held by Ethereum accounts. This means that permissions may be given to human administrators, or assigned to contracts which implement more complex behavior (such as voting mechanisms). These types of contracts are known as \textbf{extensions} and are discussed in-depth in Section \ref{sec:extensions}. The use of extensions to flexibly `plug-in' various decision-making mechanisms is a key concept in the Colony protocol.
 
-It is worth noting that the list of addresses that have the permission in question have the full permission; no additional restrictions exist at the protocol level. In some cases, these are extremely powerful capabilities (such as emitting arbitrary reputation penalties) and require absolute confidence in whomever or whatever controls it. We anticipate therefore that in many cases, extension contracts will be used to offer varying degree of moderation to the underlying permissions.
+It is worth noting that the list of accounts that have the permission in question have the full permission; no additional restrictions exist at the protocol level. In some cases, these are extremely powerful capabilities (such as emitting arbitrary reputation penalties) and require absolute confidence in whomever or whatever controls it. We anticipate therefore that in many cases, extension contracts will be used to offer varying degree of moderation to the underlying permissions.
 
 \subsubsection*{Recovery}
 
-The recovery permission gives addresses access to the colony's emergency `recovery' functionality, which allows for arbitrary state-changes to the colony's data. Recovery mode is described in more detail in Section \ref{sec:escape-hatches}.
+The recovery permission gives accounts access to the colony's emergency `recovery' functionality, which allows for arbitrary state-changes to the colony's data. Recovery mode is described in more detail in Section \ref{sec:escape-hatches}.
 
 \subsubsection*{Root}
 
-The root permission gives addresses access to high-level administrative functions in the colony, such as setting colony-wide parameters, upgrading the colony, and minting new internal tokens. This permission also gives addresses the ability to assign permissions throughout the colony (including in the root domain).
+The root permission gives accounts access to high-level administrative functions in the colony, such as setting colony-wide parameters, upgrading the colony, and minting new internal tokens. This permission also gives accounts the ability to assign permissions throughout the colony (including in the root domain).
 
 \subsubsection*{Arbitration}
 
-The arbitration permission give addresses the ability to make domain-specific state changes, meant as a means of resolving disputes. This permission also gives permission to emit reputation penalties (but not reputation increases).
+The arbitration permission give accounts the ability to make domain-specific state changes, meant as a means of resolving disputes. This permission also gives permission to emit reputation penalties (but not reputation increases).
 
 \subsubsection*{Architecture}
 
-The architecture permission gives addresses the ability to create new domains in a colony, as well as assign permissions in those new domains. Unlike root, accounts with this permission cannot edit permissions in the domain in which they hold the permission, only in subdomains.
+The architecture permission gives accounts the ability to create new domains in a colony, as well as assign permissions in those new domains. Unlike root, accounts with this permission cannot edit permissions in the domain in which they hold the permission, only in subdomains.
 
 \subsubsection*{Funding}
 
-The funding permission gives addresses the ability to move tokens between funding pots. In practice, this means that this permission is responsible for allocating money amongst domains and for funding expenditures. Financial management in a colony is described in more detail in Section \ref{sec:finance}.
+The funding permission gives accounts the ability to move tokens between funding pots. In practice, this means that this permission is responsible for allocating money amongst domains and for funding expenditures. Financial management in a colony is described in more detail in Section \ref{sec:finance}.
 
 \subsubsection*{Administration}
 
-The administration permission gives addresses the ability to create and manage (but not fund) expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}. \\
+The administration permission gives accounts the ability to create and manage (but not fund) expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}. \\
 
 Broadly, permissions are designed as a `separation of powers': different permissions must work in concert to carry out the functioning of a colony. For example, administration can create an expenditure, but only funding can actually provide the resources, while arbitration resolves disputes as they arise. Complex extensions may require multiple permissions in order to function properly (such as `tasks', which requires both arbitration and administration).
 
@@ -89,14 +89,14 @@ All tokens and currencies are administered by the colony contract; it is respons
 
 Each domain and each expenditure in a colony has an associated \emph{funding pot}. A funding pot can be thought of as a wallet specific to a particular domain or expenditure, and are used to move funds around \textit{within} a colony. To each funding pot, the colony contract may associate any number of Ether or ERC20-compatible tokens it holds. Depending on context, the funds in a funding pot may be referred to as the payout, bounty, budget, salary or working capital. In addition to the funding pots, there is a special \emph{rewards pot} which accumulates tokens to be distributed to members as \textit{rewards} (see Section \ref{sec:revenue}).
 
-Only addresses holding the \textbf{funding} permission may move tokens; the rule is that they may move tokens between any two pots in the subtree rooted in the domain in which they hold the permission. It is the expectation that this permission will in many cases be given to an \textit{extension contract} implementing a specialized decision-making mechanism, such as the \textit{funding queue} described in Section \ref{sec:funding-queues}.
+Only accounts holding the \textbf{funding} permission may move tokens; the rule is that they may move tokens between any two pots in the subtree rooted in the domain in which they hold the permission. It is the expectation that this permission will in many cases be given to an \textit{extension contract} implementing a specialized decision-making mechanism, such as the \textit{funding queue} described in Section \ref{sec:funding-queues}.
 
 \subsubsection{Expenditures}
 
-The basic payment primitive of a colony is the `expenditure'. Expenditures are used to transfer funds out of a colony to any Ethereum address. An expenditure has several properties:
+The basic payment primitive of a colony is the `expenditure'. Expenditures are used to transfer funds out of a colony to any Ethereum account. An expenditure has several properties:
 
 \begin{itemize}
-\item An \texttt{owner} (the address which created the expenditure).
+\item An \texttt{owner} (the account address which created the expenditure).
 \item A \texttt{status} (active, cancelled, or finalized).
 \item One or more \texttt{recipient}s.
 \item \texttt{payouts} for each recipient, denominated in one or more tokens.
@@ -105,7 +105,7 @@ The basic payment primitive of a colony is the `expenditure'. Expenditures are u
 \item Optionally, a per-recipient \texttt{claimDelay}.
 \end{itemize}
 
-The owner is responsible for setting the properties of the expenditure. The recipients are simply Ethereum addresses. While it is anticipated that recipients will be individuals, there is nothing to prevent these addresses being contracts under the control of multiple people.\footnote{With the protocol as described in this document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. In these cases, it might be better to develop an extension contract which would determine the per-user allocation in advance and configure the expenditure accordingly.}
+The owner is responsible for setting the properties of the expenditure. The recipients are simply Ethereum accounts. While it is anticipated that recipients will be individuals, there is nothing to prevent these accounts being contracts under the control of multiple people.\footnote{With the protocol as described in this document, any reputation earned would be assigned to the contract in question and not able to be moved to the appropriate users. In these cases, it might be better to develop an extension contract which would determine the per-user allocation in advance and configure the expenditure accordingly.}
 
 Once the expenditure is finalized, all properties become locked (but subject to arbitration) and payouts can be claimed (and reputation awarded). Prior to finalization, the owner has the ability to cancel the expenditure entirely. Any funds that have already been assigned to the expenditure can be reassigned to the domain that the expenditure was created in.
 
@@ -113,7 +113,7 @@ Defining the payouts for each recipient, of course, does not provide the funds -
 
 The expenditure is meant to be an abstract primitive which can support many types of workflows, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any dispute processes to complete before funds can exit the colony. \\
 
-Once the tokens have been received by an address, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
+Once the tokens have been received by an account, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
 
 \subsection{Internal tokens}\label{sec:colony-tokens}
 
@@ -192,7 +192,7 @@ After some sufficiently long period of time (\rewardclaimduration\ days), all un
 
 Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit. Colony's aim is that reputation system will enable an emergent and dynamic decision-making heirarchy in which all of the right people are in the right places.
 
-Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a trustless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between addresses, as it represents an appraisal of the address's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or misbehaviour; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
+Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a trustless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between accounts, as it represents an appraisal of the account's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or misbehaviour; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 
 \subsubsection{Types of reputation}
 
@@ -236,7 +236,7 @@ Arbitration permission holders have the ability to emit arbitrary reputation pen
 
 Since a trustless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a trustless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no objections can be raised and no disputes can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
-To prevent this, when a colony is created, the creator can choose addresses to have initial reputation assigned to them in the root domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the root domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated expenditure being paid out. Users receiving reputation are presumably the colony founder and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
+To prevent this, when a colony is created, the creator can choose accounts to have initial reputation assigned to them in the root domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the root domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated expenditure being paid out. Users receiving reputation are presumably the colony founder and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
 
 We note that the same is not required when a new domain is created in a colony. We do not wish to allow the creation of new reputation here, as this would devalue reputation already earned elsewhere in the colony. This bootstrapping issue is resolved by instead using reputation within the parent domain, when a child domain contains less than 10\% of the reputation of its parent domain. A domain below this threshold cannot have domains created under it.
 
@@ -299,7 +299,7 @@ Any slashing of stakes occurs as a result of a function call coming from the \te
 
 \subsubsection{Approvals and Obligations}
 
-Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}. Users \textit{approve} an address to then \textit{obligate} them up to the maximum amount of their approval. If an obligation is made in excess of the deposits held in the \texttt{TokenLocking} contract, the transaction will fail. Once an obligation is made, a user cannot withdraw tokens if the withdrawal would result in a balance less than their obligations. At any time, the approved extension can \textit{deobligate} the user, freeing the tokens for withdrawal (see Figure \ref{fig:stake-deobligate}). In practice, we expect that the same underlying deposit will be obligated and deobligated repeatedly without the user needing to move any additional tokens.
+Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}. Users \textit{approve} an account to then \textit{obligate} them up to the maximum amount of their approval. If an obligation is made in excess of the deposits held in the \texttt{TokenLocking} contract, the transaction will fail. Once an obligation is made, a user cannot withdraw tokens if the withdrawal would result in a balance less than their obligations. At any time, the approved extension can \textit{deobligate} the user, freeing the tokens for withdrawal (see Figure \ref{fig:stake-deobligate}). In practice, we expect that the same underlying deposit will be obligated and deobligated repeatedly without the user needing to move any additional tokens.
 
 \begin{figure}[h]
     \centering
@@ -357,7 +357,7 @@ Overall, this design allows arbitration to be generalized and separated from the
 
 We foresee the Colony Network being continuously developed. Providing an upgrade path is important to allow people to use Colony without preventing themselves from using new features as they are added to the network.
 
-We intend to allow colonies and tokens to be upgraded by using the pattern made available under the name EtherRouter \cite{EtherRouter}. This implementation uses two contracts in addition to the contract(s) providing the functionality implemented. The first additional contract is the \ascode{EtherRouter} contract, which passes on transactions --- via \ascode{delegatecall} --- to the contract that implements that function. The second additional contract is the \ascode{Resolver} contract, where the addresses of the contracts that implement the desired behaviour are defined. Whenever a transaction is received by the \ascode{EtherRouter} contract, it looks up the contract that implements that function (if any) in the \ascode{Resolver}, and then \ascode{delegatecall}s that contract.
+We intend to allow colonies and tokens to be upgraded by using the pattern made available under the name EtherRouter \cite{EtherRouter}. This implementation uses two contracts in addition to the contract(s) providing the functionality implemented. The first additional contract is the \ascode{EtherRouter} contract, which passes on transactions --- via \ascode{delegatecall} --- to the contract that implements that function. The second additional contract is the \ascode{Resolver} contract, where the accounts of the contracts that implement the desired behaviour are defined. Whenever a transaction is received by the \ascode{EtherRouter} contract, it looks up the contract that implements that function (if any) in the \ascode{Resolver}, and then \ascode{delegatecall}s that contract.
 
 In order to upgrade, new contracts are deployed with new functionality, and then contracts that the \ascode{Resolver} contract points to must be changed to point to these new contracts. In order to avoid a situation where the contract partially implements both old and new functionality,  a new instance of \ascode{Resolver} will be deployed for each upgrade, and then a single transaction can point \ascode{EtherRouter} at the new \ascode{Resolver}. From the perspective of the colony, an upgrade is then simply swapping out one address (the \ascode{Resolver}) for another.
 
@@ -367,19 +367,19 @@ The choice of upgrading the underlying Colony contract will always fall to the c
 
 While we aspire to bug-free contracts, bugs are inevitable, and so the adoption of a `defensive programming' mentality will limit the impact of any vulnerabilities that may be discovered in the deployed contracts.
 
-The ultimate fallback is known as `recovery mode'. In this state, whitelisted addresses (those with the \textbf{recovery} permission) are able to access special functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions to allow setting of variables, as well as being able to upgrade the contract. With the agreement of multiple whitelisted addresses, the contract will then be able to be taken out of recovery mode once the contract has been returned to a safe state. Removal from recovery mode requires the approval of multiple whitelisted addresses. This ensures that a single whitelisted address cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
+The ultimate fallback is known as `recovery mode'. In this state, whitelisted accounts (those with the \textbf{recovery} permission) are able to access special functions that allow the state of the contract to be directly edited --- in practise, this will correspond to access to the functions to allow setting of variables, as well as being able to upgrade the contract. With the agreement of multiple whitelisted accounts, the contract will then be able to be taken out of recovery mode once the contract has been returned to a safe state. Removal from recovery mode requires the approval of multiple whitelisted accounts. This ensures that a single whitelisted account cannot, in a single transaction, enter recovery mode, make a malicious edit, and then exit recovery mode before the other parties on the whitelist have had a chance to react.
 
 It is conceivable that colonies will be able to deactivate the recovery mode feature in the future, once the network and contracts have matured sufficiently. \\
 
 In general, the contract may enter recovery mode due to:
 
 \begin{itemize}
- \item A transaction from a whitelisted address signalling that the contract should enter recovery mode.
+ \item A transaction from a whitelisted account signalling that the contract should enter recovery mode.
  \item Something that should always be true of the colony not being true --- for example, after an expenditure payout checking that the amount of funds promised to expenditures and not yet paid out is still less than the balance of the colony. If not, then abort the transaction and put the contract into recovery mode.
  \item A qualitative trigger suggesting something may be amiss --- perhaps too many tokens have been paid out in a short amount of time.
 \end{itemize}
 
-Any approvals from whitelisted addresses to leave recovery mode must be reset whenever a variable is edited. A whitelisted address agreeing to leave recovery mode records the timestamp at which the agreement occurred, and any change of variables also update a timestamp indicating the last edit. When attempting to leave recovery mode, only agreements made after the last edit are counted towards meeting the threshold.
+Any approvals from whitelisted accounts to leave recovery mode must be reset whenever a variable is edited. A whitelisted account agreeing to leave recovery mode records the timestamp at which the agreement occurred, and any change of variables also update a timestamp indicating the last edit. When attempting to leave recovery mode, only agreements made after the last edit are counted towards meeting the threshold.
 
 The first \textbf{recovery} permission holder is set at colony creation and is the creator of the colony. Additional \textbf{recovery} permission holders can be added by the \textbf{root} permission.
 
