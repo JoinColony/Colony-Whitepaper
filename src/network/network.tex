@@ -43,13 +43,9 @@ As the network fee may be denominated in any ERC20 token, there is a need for a 
 
 We believe such a mechanism will be beneficial for the \rcths\ (whose tokens gain value by having an explicit use beyond reputation mining) and the \rc\ itself (by reducing the supply of \rcts\ and thus making any future minting more valuable). It also provides an immediate mechanism of price discovery for a colony's internal tokens, which are unlikely to be traded on third-party exchanges until much later in the lifetime of the colony. By auctioning off the collected tokens, we also prevent the \rc\ collecting a large number of different tokens that it has to manage, which would prove cumbersome and annoying.
 
-\subsection{CLNY and the Meta Colony}\label{sec:clny}
+\subsection{The \rc\ and CLNY}\label{sec:clny}
 
-\subsubsection{Creation of CLNY tokens}
-
-The \rc\ is a special colony which governs the Colony Network. Tokens in the \rc\ will be known as CLNY and will be initially generated during the Colony Network distribution period.\footnote{The mechanism of this distribution are yet to be defined.}
-
-Functionality will be added to the CLNY token contract as required, through the \code{EtherRouter} mechanism described in Section  \ref{subsec:upgradability}. The ability to add functionality is extremely powerful, and theoretically could allow the inclusion of additional functions to arbitrarily set balances or create additional tokens. This would destroy trust in CLNY, and thereby its underlying utility. For this reason, the ability to add new functionality to the CLNY token will never lie with the developers of Colony, but with a multisignature contract initially made up of members of the wider Ethereum community, and then subsequently the \rc\ itself.
+The \rc\ is a special colony which governs the Colony Network. Tokens in the \rc\ are known as CLNY and will be initially generated during the Colony Network distribution period.\footnote{The mechanism of this distribution are yet to be defined.}
 
 \subsubsection{Role of CLNY holders and the \rc}
 
