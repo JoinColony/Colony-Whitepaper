@@ -338,14 +338,25 @@ Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}
     legend style={at={(0.5,-0.15)},
       anchor=north,legend columns=-1},
     ylabel={Tokens},
-    symbolic x coords={1. Approve,2. Obligate,3. Deobligate},
+    y label style={at={(axis description cs:.06,.5)}},
+    symbolic x coords={Approve,Obligate,Deobligate},
     xtick=data,
     ]
-\addplot coordinates {(1. Approve,8) (2. Obligate,2) (3. Deobligate,2)};
-\addplot coordinates {(1. Approve,0) (2. Obligate,6) (3. Deobligate,0)};
-\addplot coordinates {(1. Approve,10) (2. Obligate,10) (3. Deobligate,10)};
+\addplot coordinates {(Approve,8) (Obligate,2) (Deobligate,2)};
+\addplot coordinates {(Approve,0) (Obligate,6) (Deobligate,0)};
+\addplot coordinates {(Approve,10) (Obligate,10) (Deobligate,10)};
 \legend{Approval,Obligation,Deposit}
 \end{axis}
+% Add the arrows
+\node[] at (2.25,2) (x) {$\Rightarrow$};
+\node[] at (4.75,2) (y) {$\Rightarrow$};
+% Approve
+\node[] at (.55,4.4) (x) {$\uparrow$};
+% Obligate
+\node[] at (3,2) (x) {$\downarrow$};
+\node[] at (3.43,3.62) (x) {$\uparrow$};
+% Deobligate
+\node[] at (5.87,1.15) (x) {$\downarrow$};
 \end{tikzpicture}
  \caption{Example stake lifecycle with deobligation}
  \label{fig:stake-deobligate}
@@ -362,14 +373,26 @@ While an obligation is active, any \textbf{arbitration} permission holder can \t
     legend style={at={(0.5,-0.15)},
       anchor=north,legend columns=-1},
     ylabel={Tokens},
-    symbolic x coords={1. Approve,2. Obligate,3. Slash},
+    y label style={at={(axis description cs:.06,.5)}},
+    symbolic x coords={Approve,Obligate,Slash},
     xtick=data,
     ]
-\addplot coordinates {(1. Approve,8) (2. Obligate,2) (3. Slash,2)};
-\addplot coordinates {(1. Approve,0) (2. Obligate,6) (3. Slash,0)};
-\addplot coordinates {(1. Approve,10) (2. Obligate,10) (3. Slash,4)};
+\addplot coordinates {(Approve,8) (Obligate,2) (Slash,2)};
+\addplot coordinates {(Approve,0) (Obligate,6) (Slash,0)};
+\addplot coordinates {(Approve,10) (Obligate,10) (Slash,4)};
 \legend{Approval,Obligation,Deposit}
 \end{axis}
+% Add the arrows
+\node[] at (2.25,2) (x) {$\Rightarrow$};
+\node[] at (4.75,2) (y) {$\Rightarrow$};
+% Approve
+\node[] at (.55,4.4) (x) {$\uparrow$};
+% Obligate
+\node[] at (3,2) (x) {$\downarrow$};
+\node[] at (3.43,3.62) (x) {$\uparrow$};
+% Slash
+\node[] at (5.87,1.15) (x) {$\downarrow$};
+\node[] at (6.29,2.75) (x) {$\downarrow$};
 \end{tikzpicture}
  \caption{Example stake lifecycle with slashing}
  \label{fig:stake-slash}
