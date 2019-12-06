@@ -12,21 +12,25 @@ Like any organization, without structure, a large colony would quickly become di
 \begin{figure}[h]
     \centering
  \begin{tikzpicture}
-   \node[ellipse,draw, dashed] at (0,0) (tld) {Root Domain};
-   \node[ellipse,draw, dashed] at (-3,-2) (design) {Design};
-   \node[ellipse,draw, dashed] at (0,-2) (development) {Development};
-   \node[ellipse,draw, dashed] at (3,-2) (product) {Product};
-   \node[ellipse,draw, dashed] at (-1.5,-4) (frontend) {Frontend};
-   \node[ellipse,draw, dashed] at (1.5,-4) (backend) {Backend}
-    (tld.-120) edge[->, bend left=45, in=-120] (design.north)
-    (tld.-90) edge[->, out=-60, in=120] (development.north)
-    (tld.-60) edge[->, bend left=45, out=-60, in=120] (product.north)
-    (development.-120) edge[->, bend left=45, in=-120] (frontend.north)
-    (development.-60)  edge[->, bend left=45, out=-60, in=120] (backend.north);
+   \node[shape=ellipse, draw] at (0,0) (tld) {Root};
+
+   \node[shape=ellipse, draw] at (-3,-2) (design) {Design}
+    (tld) edge[-] (design);
+
+   \node[shape=ellipse, draw] at (0,-2) (development) {Development}
+    (tld) edge[-] (development);
+
+   \node[shape=ellipse, draw] at (3,-2) (product) {Product}
+    (tld) edge[-] (product);
+
+   \node[shape=ellipse, draw] at (-1.5,-4) (frontend) {Frontend}
+    (development) edge[-] (frontend);
+
+   \node[shape=ellipse, draw] at (1.5,-4) (backend) {Backend}
+    (development)  edge[-] (backend);
  \end{tikzpicture}
  \caption{Parts of a domain hierarchy for a colony developing a web service.}
  \label{fig:domainhierarchysample}
-
 \end{figure}
 
 It is ultimately up to individual colonies to decide how they wish to use domains—some might only use them for coarse categorisations, whereas others may use them to precisely group only the most similar expenditures together, or even multiple expenditures that other colonies would consider a single expenditure. Some might use domains to represent long-lived organizational departments, while others might use them more ephemerally, to represent projects with start and end dates. We aim to provide a general framework that colonies may use however they see fit, and to be prescriptive only where necessary.
@@ -200,7 +204,31 @@ Colony aims to be broadly meritocratic. Consequently, the majority of decisions 
 
 The hierarchical domain structure of a colony was described in Section \ref{sec:domains}. Reputation is earned in this hierarchy, and a user has a reputation in all domains that exist --- even if that reputation is zero. When a user earns or loses reputation in a domain, the reputation in all parent domains changes by the same amount. In the case of a user losing reputation, they also lose reputation in all child domains, but in this case the child domains lose the same \textit{fraction} of reputation that was lost in the original domain. If a reputation update would result in a user's reputation being less than zero, their reputation is set to zero instead. \\
 
-An example makes this clearer. Suppose a colony has a `development' domain which contains a `backend' domain and a `frontend' domain, as in Figure \ref{fig:domainhierarchysample} on page \pageref{fig:domainhierarchysample}. Any time a member of the colony earns reputation for work completed in the backend domain, it will increase their backend reputation, their development reputation and their reputation in the all-encompassing root domain of the colony. Reputation earned in the development domain will only increase the development and root domain reputation scores of the user.
+\begin{figure}[h]
+    \centering
+ \begin{tikzpicture}
+   \node[shape=ellipse, draw] at (0,0) (tld) {Root: 50 + (10+45+30)};
+
+   \node[shape=ellipse, draw] at (-3,-1.5) (design) {Design: 10}
+    (tld) edge[-] node[left=4mm] {10} (design);
+
+   \node[shape=ellipse, draw] at (0,-2.5) (development) {Development: 20 + (15+10)}
+    (tld) edge[-] node[left] {45}  (development);
+
+   \node[shape=ellipse, draw] at (3,-1.5) (product) {Product: 30}
+    (tld) edge[-] node[right=4mm] {30}  (product);
+
+   \node[shape=ellipse, draw] at (-2,-4) (frontend) {Frontend: 15}
+    (development) edge[-] node[left=2mm] {15}  (frontend);
+
+   \node[shape=ellipse, draw] at (2,-4) (backend) {Backend: 10}
+    (development)  edge[-] node[right=2mm] {10}  (backend);
+ \end{tikzpicture}
+ \caption{Reputation flowing up a domain hierarchy.}
+ \label{fig:reputationhierarchysample}
+\end{figure}
+
+An example makes this clearer. Suppose a colony has a `development' domain which contains a `backend' domain and a `frontend' domain, as in Figure \ref{fig:reputationhierarchysample}. Any time a member of the colony earns reputation for work completed in the backend domain, it will increase their backend reputation, their development reputation and their reputation in the all-encompassing root domain of the colony. Reputation earned in the development domain will only increase the development and root domain reputation scores of the user.
 
 Later, the user behaves badly in the `development' domain, and they lose 100 reputation out of the 2000 they have in that domain. They also lose 100 reputation in the parent domains, and 5\% $\left(\frac{100}{2000}\right)$ of their reputation in each of the child domains of the `development' domain (which in this example, includes both frontend and backend domains).
 
