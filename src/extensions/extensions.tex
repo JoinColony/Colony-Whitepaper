@@ -266,6 +266,8 @@ When revealing their vote, the user also supplies a Merkle proof of their releva
 
 \subsubsection*{Token-weighted voting}
 
+While Colony encourages the use of reputation as the primary sibyl-resistance mechanism, there are situations where tokens are more appropriate. Specifically, if reputation is a stand-in for `labour', and tokens are a stand-in for `capital', then token-weighted votings are appropriate whenever a decision must be made by capital, rather than by labour. Whenever a decision would be made by `investors' or `shareholders' in a conventional firm, a token-weighted vote may be appropriate. \\
+
 Unlike with reputation, we do not have the ability to `freeze' the token distribution when a vote starts. While this is effectively possible with something like the MiniMe token \cite{minime}, we envision token-weighted votes will still be regular enough within a Colony that we do not wish to burden users with the gas costs of deploying a new contract every time.
 
 When conducting a token weighted vote, steps must be taken to ensure that tokens cannot be used to vote multiple times. In the case of `The DAO', once a user had voted their tokens were locked until the vote completed. This introduced peculiar incentives to delay voting until as late as possible to avoid locking tokens unnecessarily.  Our locking scheme avoids such skewed incentives by locking tokens only during the reveal period.
