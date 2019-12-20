@@ -56,7 +56,9 @@ When the task is finalized, the underlying expenditure's \texttt{claimDelay}s ar
 
 Section \ref{sec:permissions} describes the funding permission, which is used to transfer funds in between \textbf{funding pots}. This permission is powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One such mechanism is the \textbf{funding queue}, which leverages time as a driving factor to enable \textit{collaborative}, \textit{asynchronous}, and \textit{trustless} decision-making, \textit{without} voting.
 
-They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly. \\
+They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly.
+
+Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots, and stake an equivalent amount of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. \\
 
 A funding queue contains of a series of \textbf{funding proposals}, each with the following attributes:
 
@@ -72,30 +74,29 @@ A funding queue contains of a series of \textbf{funding proposals}, each with th
   \item \ascode{Rate} -- Rate of funding, a function of the backing reputation.
  \end{itemize}
 
-We distinguish between two types of funding proposals: \textbf{Basic Funding Proposals (BFP)} intended for normal use, and \textbf{Priority Funding Proposals (PFP)} intended to be used when a basic proposal is inadequate, or for unusual circumstances. The basic funding proposal may start funding the target straight away, whereas a priority funding proposal must be explicitly voted on before it starts directing funds. Furthermore, for a basic funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a priority funding proposal has no such restrictions. Priority funding proposals should be used when funds need to be directed somewhere that is not a direct descendant of the source, when the funding rate needs to be very high (including immediate payment), or when the funding rate should be otherwise controlled (e.g. in the case of paying a salary).
+We distinguish between two types of funding proposals: \textbf{Basic Funding Proposals (BFP)} intended for normal use, and \textbf{Priority Funding Proposals (PFP)} intended to be used when a basic proposal is inadequate, or for unusual circumstances. The basic funding proposal may start funding the target straight away, whereas a priority funding proposal must be explicitly voted on before it starts directing funds. Furthermore, for a basic funding proposal the target pot must be a direct descendant of the source in the hierarchy whereas a priority funding proposal has no such restrictions. Priority funding proposals should be used when funds need to be directed somewhere that is not a direct descendant of the source, when the funding rate needs to be very high (including immediate payment), or when multiple funding proposals must occur in parallel (e.g. in the case of paying of salaries).
 
 \subsubsection{Attributes in detail}
 
-\subsubsection*{From, To and TokenType}
+\subsubsection*{\ascode{From}, \ascode{To} and \ascode{TokenType}}
 The purpose of a funding proposal is to move tokens of \ascode{TokenType} from pot \ascode{From} to pot \ascode{To}. The \ascode{TokenType} may be Ether or any ERC20-compatible token. The \ascode{From} field must be a funding pot associated with a domain or an expenditure in the colony, while the \ascode{To} field may be any funding pot (including the special rewards pot, see Section \ref{sec:revenue}). If the funds are to move `downstream' from a domain to one of its children, a basic funding proposal is often sufficient.
 
-\subsubsection*{CurrentState}
+\subsubsection*{\ascode{CurrentState}}
 The state of a funding proposal is either \ascode{inactive}, \ascode{active}, \ascode{completed} or \ascode{cancelled}. Only an active funding proposal is in line to channel funds. A basic funding proposal begins in active state while a priority one begins inactive (i.e. it must be activated by a vote). A funding proposal is active until it is either completed (when its \ascode{TotalPaid} reaches \ascode{TotalRequested}) or cancelled.
 
-\subsubsection*{TotalPaid and TotalRequested}
+The \ascode{creator} of a funding proposal may cancel it (setting \ascode{CurrentState} to \ascode{cancelled}) at any time. This is analogous to the creator of a task being able to cancel the task if it has not yet been assigned a worker (see Section \ref{sec:tasks}). Note that if an expenditure is cancelled, funding proposals that have that expenditure's funding pot as their target (\ascode{To}) are automatically cancelled when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it may require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
+
+\subsubsection*{\ascode{TotalPaid} and \ascode{TotalRequested}}
 The total number of funds that a funding proposal wishes to reallocate is called its \ascode{TotalRequested} amount. Due to the mechanism by which funding proposals accrue funds over time, it is common that a funding proposal will have received a part but not all of its \ascode{TotalRequested} amount. The total number of tokens accrued to date are stored in its \ascode{TotalPaid} amount.
 
-\subsubsection*{Rate and LastUpdated}
-When a funding proposal is eligible to accrue funds, it does so at a specific \ascode{Rate}, representing tokens per second. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal --- i.e. the user manually requests a pro-rated distribution of funds.\footnote{This does not preclude a front-end interface displaying the `current' level of funding, updated in real-time.} When pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid}, the funds are transferred, and the current time is recorded as \ascode{LastUpdated}.
+The \ascode{creator} of a funding proposal may edit the \code{TotalRequested} property of a funding proposal at any time, but doing so resets the reputational support that the proposal has in the funding queue to zero. The intention here is for changes to funding to be potentially quick to achieve with the agreement of others in the colony if the requirements for the recipient pot change (e.g. the scope of a domain increases).
+
+\subsubsection*{\ascode{Rate} and \ascode{LastUpdated}}
+When a funding proposal is eligible to accrue funds, it does so at a specific \ascode{Rate}, denominated in `tokens per second'. Since nothing happens on the blockchain without user interaction, the funding system uses a form of lazy evaluation. To claim funds that the proposal is due, a user may `ping' the proposal --- i.e. the user manually requests a pro-rated distribution of funds.\footnote{This does not preclude a front-end interface displaying the `current' level of funding, updated in real-time.} When pinged, the time since \ascode{LastUpdated} is multiplied by the \ascode{Rate} to determine how many tokens the proposal would have accrued in the interim if funding flow were continuous. This amount is added to \ascode{TotalPaid}, the funds are transferred, and the current time is recorded as \ascode{LastUpdated}.
 
 \ascode{TotalPaid} is only ever increased up to \ascode{TotalRequested} and when this happens as a result of a pinging transaction, the \ascode{LastUpdated} value is set to the earliest time at which this could have occurred.
 
-\subsubsection{The funding queue}\label{subsec:funding-queue}
-Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots, and stake an equivalent amount of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour.
-
-Active Funding Proposals that share the same \ascode{From} pot are ordered in a queue. At the top of the queue are the priority funding proposals, followed by the basic funding proposals. PFPs are ordered by the total reputation in their domain\footnote{The domain of a PFP is the domain that voted on it becoming active --- this will be the last common ancestor of the source and target pot domains unless an escalation has occurred.} --- while basic funding proposals are ordered by the reputation `backing' them.  The details of this procedure are outlined below.
-
-\subsubsection{Basic funding proposals}\label{subsubsec:BFPs}
+\subsubsection{Basic funding proposals}
 A basic funding proposal (\textbf{BFP}) is a funding proposal from some domain's funding pot to one of its children's. It starts out in the \ascode{active} state and is thus immediately eligible for funding. It may be cancelled at any time by the \ascode{Creator}.
 
 \subsubsection*{Ordering of BFPs}
@@ -133,22 +134,7 @@ A priority funding proposal (\textbf{PFP}) is a funding proposal that can reques
  \item make large, one-off payments.
  \end{itemize}
 
-\subsubsection*{PFPs and the funding queue}
-Active Priority Funding Proposals take priority over Basic Funding Proposals and so they are placed at the top of the funding queue. They are ordered by the total reputation of the domain that voted to activate it and, in case there is a tie, by the actual amount of reputation that voted to activate. Thus PFPs that are higher in the domain hierarchy come before those lower down.
-
-As with BFPs, any user can `ping' an active PFP at the top of the queue to cause the contract to update the funds available to the recipient pot. \ascode{TotalPaid}, \ascode{LastUpdated} and \ascode{CurrentState} are updated as required -- with a special rule that a PFP can only be pinged once every 24 hours.
-
-\subsubsection*{The 24h waiting period for PFP updates}
-Priority Funding Proposals take precedence over Basic Funding Proposals -- they must be pinged first. To avoid the situation in which long running PFPs block the BFP process entirely, a limit is placed on how often and PFP can be updated (`pinged'). We say a PFP can only be pinged when it is first activated\footnote{In this initial update the time elapsed since last update is taken to be 24 hours.} and when its \ascode{LastUpdated} time is at least 24 hours old. During the 24-hour period following the ping, the queue behaves as if the PFP `did not exist', allowing other proposals to receive funding. The result of this rule is that fast payments are still possible --- in such a case the PFP's \ascode{rate} is set very high and the proposal is fully funded at the initial ping, while also allowing long-term lower-rate PFPs that do not block the entire BFP process.
-
-\subsubsection*{When is a basic funding proposal eligible to receive funding?}
-A Basic Funding Proposal may receive funds when pinged if it is active and at the top of the BFP funding queue and when the \ascode{LastUpdated} time of the PFPs are less than 24 hours old. A Priority Funding Proposal may receive funds when pinged if it is active and all PFP ahead of it in the funding queue have been updated less than 24 hours ago.\footnote{In order to avoid hitting the gas limit due to unbounded loops, it will be necessary to maintain two orderings for the PFPs, one by priority and one by \ascode{LastUpdated}. }
-
-\subsubsection{Managing funding proposals}
-
-The \ascode{creator} of a funding proposal may edit the \code{TotalRequested} property of a funding proposal at any time, but doing so resets the reputational support that the proposal has in the funding queue to zero. The intention here is for changes to funding to be potentially quick to achieve with the agreement of others in the colony if the requirements for the recipient pot change (e.g. the scope of a domain increases).
-
-The \ascode{creator} of a funding proposal may cancel it (setting \ascode{CurrentState} to \ascode{cancelled}) at any time. This is analogous to the creator of a task being able to cancel the task if it has not yet been assigned a worker (see Section \ref{sec:tasks}). When an expenditure is cancelled, funding proposals that have that expenditure's funding pot as their target (\ascode{To}) are automatically cancelled when they are next pinged, and no funds are reallocated. However, the funds that had already been transferred are not automatically returned; it may require a PFP to return the funds `upstream'.\footnote{It is conceivable that such return-funds-from-cancelled-tasks PFPs have lower hurdles of activation.}
+Unlike Basic Funding Proposals, Priority Funding Proposals are not ordered in a queue --- all active PFPs are eligible to receive funding at any time. Note that, since the amount of funds transferred is ultimately a function of the funds available, too many large PFPs can interfere with each other (and the leading BFP) by substantially reducing the amount of funds available in the funding pot.
 
 \subsection{Budget box}\label{sec:budget-box}
 
