@@ -65,7 +65,7 @@ The root permission gives accounts access to high-level administrative functions
 
 \subsubsection*{Arbitration}
 
-The arbitration permission give accounts the ability to make domain-specific state changes, meant as a means of resolving appeals. This permission also gives permission to emit reputation penalties (but not reputation increases).
+The arbitration permission gives accounts the ability to make domain-specific state changes, meant as a means of resolving appeals. This permission also enables accounts to emit reputation penalties (but not reputation increases).
 
 \subsubsection*{Architecture}
 
@@ -83,7 +83,7 @@ Broadly, permissions are designed as a `separation of powers': different permiss
 
 The intention is that, since permissions are grouped into semantic bundles of functionality, it will be possible to develop \textit{specialized} mechanisms for mediating access to the underlying functionality (i.e. specialized funding mechanisms and specialized dispute-resolution mechanisms, as opposed to a general-purpose `voting' mechanism meant to handle all possible decisions).
 
-Colony's long-term vision is of \textit{trustless organizations}; organizations in which members can safely collaborate and manage shared resources, without needing to know or trust each other. However, early colonies may find that a larger emphasis on human moderators to be useful. Over time, we hope that colonies will devolve more and more decision-making away from human moderators to extensions which implement trustless functionality. We will refer to colonies which make substantial use of these extensions as \textit{trustless colonies}.
+Colony's long-term vision is of \textit{trustless organizations}; organizations in which members can safely collaborate and manage shared resources, without needing to know or trust each other. Early colonies may find that a larger emphasis on human moderators to be useful, while more mature colonies may find reasons to devolve increasingly more decision-making to extensions implementing trustless functionality. We will refer to colonies which make substantial use of these extensions as \textit{trustless colonies}.
 
 \subsection{Funding and expenditures}\label{sec:expenditures}\label{sec:finance}
 
@@ -123,11 +123,11 @@ Once the tokens have been received by an account, they are under the control of 
 
 Every colony has its own ERC20-compatible `internal token'. These are the tokens that, when earned as an expenditure payout, also generate reputation for the receiver (and thus distribute control within the colony). What these tokens represent apart from this is up to the colony to decide. For example, they may have financial value, or they may be purely symbolic; some possible scenarios are outlined in this section.
 
-In addition, colonies may `bring their own token' and designate an existing utility token (such as ANT or GEN) as reputation-bearing. They may alternatively choose a currency token (such as Ether or DAI) as their internal token. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
+In addition, colonies may `bring their own token' and designate an existing ERC20-compatible token as reputation-bearing. While this may be advantageous in some contexts, it’s worth noting that this weakens the incentive alignment underpinning the game theoretic security of trustless colonies, in that the value of the token is divorced from the performance of the colony. Note that the internal token cannot be changed once a colony has been created, so \textit{choose wisely}.
 
 In cases where a colony creates a new token, that colony is in control of the supply of the token. Specifically, \textbf{root} permission holders can mint tokens at-will. In some cases, this may look like a founder managing the token supply unilaterally, while in other cases colonies may manage the minting process via an extension contract (see Section \ref{sec:colony-token-management} for an example).
 
-A common question is why only internal tokens (as opposed to all tokens) are reputation-bearing. The reason for having a single token be reputation-bearing is that it avoids tricky exchange-rate problems in which there are incentives to receive more of a less valuable token to earn more reputation.
+A common question is why only internal tokens (as opposed to all tokens) are reputation-bearing. The reason for having a single token be reputation-bearing is that it avoids tricky exchange-rate problems, such as incentives to receive more of a less valuable token to earn more reputation.
 
 \subsubsection{Token use-cases}
 
@@ -194,7 +194,7 @@ After some sufficiently long period of time (\rewardclaimduration\ days), all un
 
 \subsection{The reputation system}\label{sec:reputation}
 
-Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit. Colony's aim is that reputation system will enable an emergent and dynamic decision-making heirarchy in which all of the right people are in the right places.
+Reputation is a number associated with each user which attempts to capture the value of that user's contributions to the colony over time. Reputation is used to weight a user's influence in decisions related to the expertise they have demonstrated, and to determine amounts owed to a colony's members when rewards are disbursed. Because reputation is awarded to users by either direct or indirect peer assessment of their actions, we argue that influence and rewards can be seen as being (roughly) distributed by merit. Colony's aim is that the reputation system will enable an emergent and dynamic decision-making hierarchy in which all of the right people are in the right places.
 
 Colony aims to be broadly meritocratic. Consequently, the majority of decisions in a trustless colony are weighted by the relevant reputation. Unlike tokens, reputation cannot be transferred between accounts, as it represents an appraisal of the account's activities by their peers. Reputation must therefore be earned by direct action within the colony. Reputation that is earned will eventually be lost through inactivity, error, or misbehaviour; a description of how reputation is gained and lost is given in Section \ref{sec:earning-losing-rep}.
 

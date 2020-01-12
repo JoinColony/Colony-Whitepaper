@@ -56,7 +56,7 @@ When the task is finalized, the underlying expenditure's \texttt{claimDelay}s ar
 
 Section \ref{sec:permissions} describes the funding permission, which is used to transfer funds in between \textbf{funding pots}. This permission is powerful --- for daily operations, it is better to mediate the allocation of funds via a more specialized mechanism. One such mechanism is the \textbf{funding queue}, which leverages time as a driving factor to enable \textit{collaborative}, \textit{asynchronous}, and \textit{trustless} decision-making, \textit{without} voting.
 
-They essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly.
+The essential idea behind the funding queue is that tokens are \textit{continuously} allocated over time, rather than all at once in a pass/fail fashion, with user inputs controlling the \textit{speed} and \textit{direction} of the allocation. As an analogy, one can think of water running down a mountain, where the shape of the mountain determines the direction and speed of the flow. With funding queues, users determine this shape. Whereas with voting-based systems, unpopular proposals fail entirely, with a funding queue, unpopular proposals simply take a very long time to be fulfilled, while popular proposals are fulfilled quickly.
 
 Any member of the colony may create a funding proposal. The proposer must have 0.1\% of the reputation of the domain that is the most recent common ancestor of the source and target pots, and stake an equivalent amount of the colony's tokens. This stake is used to help discourage spamming of funding proposals and provide a mechanism whereby the creator can be punished for bad behaviour. \\
 
@@ -121,7 +121,7 @@ If an update finds that a proposal is fully funded (i.e. \ascode{TotalPaid} = \a
  \item[\textbf{4.}] The next BFP in the queue is promoted to the top of the queue, and its \ascode{LastUpdated} time is set as the time calculated in \textbf{1.}
 \end{itemize}
 
-Three days after the BFP has been full funded (and thus \texttt{complete}) the creator's stake is released. Until that time, the stake can be slashed as the result of arbitration.
+Three days after the BFP has been fully funded (and thus \texttt{complete}) the creator's stake is released. Until that time, the stake can be slashed by the arbitration permission.
 
 \subsubsection{Priority funding proposals}
 A priority funding proposal (\textbf{PFP}) is a funding proposal that can request funds to be reallocated from any pot to any other at any rate. PFPs begin in the \ascode{inactive} state and can only become \ascode{active} via an explicit vote. The vote is based on reputation in the domain that is the most recent common ancestor of the two pots that money is being transferred between. We imagine PFPs will be used to:
@@ -178,7 +178,7 @@ Whenever an escalation occurs, we need to ensure that the reputation we are esca
 
 \subsubsection*{Cost of making an appeal}
 
-To make an appeal, a user must possess enough reputation and must also stake some number of the colony's tokens. The reputation they need in order to be able to make the appeal depends on the domain they are escalating to; the `higher up' the decision goes, the higher the reputation requirement (and potential loss). To be able to create an appeal, the user must have 0.1\% of the reputation in the domain and must stake 0.1\% of the corresponding fraction of tokens. Thus, if appealing to 13\% of total colony reputation, then the appeal requires 0.013\% (0.1\% of 13\%) of reputation and the required stake is 0.013\% of all colony tokens.
+To make an appeal, a user must possess enough reputation and must also stake some number of the colony's tokens. The reputation they need to be able to make the appeal depends on the domain they are escalating to; the `higher up' the decision goes, the higher the reputation requirement (and potential loss). To be able to create an appeal, the user must have 0.1\% of the reputation in the domain and must stake 0.1\% of the corresponding fraction of tokens. Thus, if appealing to 13\% of total colony reputation, then the appeal requires 0.013\% (0.1\% of 13\%) of reputation and the required stake is 0.013\% of all colony tokens.
 
 If the initial user does not have the required number of tokens or reputation, they can still create such a proposal by staking as little as 10\% of the tokens required, which requires them to have a correspondingly smaller amount of reputation.\footnote{This basic minimum required to propose a change prevents users from spamming appeals --- even those that won’t ever be voted on --- to large numbers of people, which would impede the smooth running of the colony.} In this case the appeal will not be `live' until other users stake tokens, and take it over the 0.1\% threshold. The  amount of tokens required to be staked for a particular appeal is recorded at the time when it is created. Users can only stake tokens in proportion to the reputation they have. For example, if they wanted to stake 40\% of the tokens required, they must have at least 40\% of the reputation that would be required to create the appeal outright.
 
@@ -301,7 +301,7 @@ Using expenditures, it is possible to implement many types of compensation modal
 
 \subsubsection*{Salaries}
 
-Tasks imply imply colony-worker relationships are mostly transactional. In many cases, it is desirable to represent more long-term relationships via a \emph{salary}.
+Tasks imply colony-worker relationships are mostly transactional. In many cases, it is desirable to represent more long-term relationships via a \emph{salary}.
 
 A salary can be as simple as a \texttt{recipient}, \texttt{amount}, and \texttt{period}, and \texttt{lastClaimed}. At any point, the recipient can ping the salaries contract, at which point the contract will create an expenditure made out to the recipient, with funding equivalent to the pro-rated amount since the last salary payout. If the recipient is willing to pay the gas costs, they could conceivably claim (a fraction of) their salary daily, or choose to claim weekly, monthly, or at whatever cadence suits them. It would be the responsibility of the colony to ensure that adequate funding is available in the domain out of which salaries are to be paid.
 
@@ -309,7 +309,7 @@ This extension would need the \textbf{funding} and \textbf{administration} permi
 
 \subsubsection*{Recurring or Automatic Tasks}
 
-While for certain kinds of work, tasks are unique and must be individually scoped out and subjectively evalauted. However, we can imagine situations where work can be done by many people and/or evaluated automatically by computer (such as rewarding users for participating in a referral program). In these cases, a variation of the task which contains logic for evaluating the work, and allows anyone to submit the work, would be appropriate.
+While for certain kinds of work, tasks are unique and must be individually scoped out and subjectively evaluated. However, we can imagine situations where work can be done by many people and/or evaluated automatically by computer (such as rewarding users for participating in a referral program). In these cases, a variation of the task which contains logic for evaluating the work, and allows anyone to submit the work, would be appropriate.
 
 This extension would need the \textbf{funding} and \textbf{administration} permissions to manipulate tokens and expenditures on behalf of the recipients.
 
