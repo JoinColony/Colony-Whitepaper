@@ -65,7 +65,7 @@ The root permission gives accounts access to high-level administrative functions
 
 \subsubsection*{Arbitration}
 
-The arbitration permission gives accounts the ability to make domain-specific state changes, meant as a means of resolving appeals. This permission also enables accounts to emit reputation penalties (but not reputation increases).
+The arbitration permission gives accounts the ability to make domain-specific state changes, meant as a means of resolving motions. This permission also enables accounts to emit reputation penalties (but not reputation increases).
 
 \subsubsection*{Architecture}
 
@@ -79,7 +79,7 @@ The funding permission gives accounts the ability to move tokens between funding
 
 The administration permission gives accounts the ability to create and manage (but not fund) expenditures, the basic incentive unit in a colony, described in Section \ref{sec:expenditures}. \\
 
-Broadly, permissions are designed as a `separation of powers': different permissions must work in concert to carry out the functioning of a colony. For example, administration can create an expenditure, but only funding can actually provide the resources, while arbitration resolves appeals as they arise. Complex extensions may require multiple permissions in order to function properly (such as `tasks', which requires both arbitration and administration).
+Broadly, permissions are designed as a `separation of powers': different permissions must work in concert to carry out the functioning of a colony. For example, administration can create an expenditure, but only funding can actually provide the resources, while arbitration resolves motions as they arise. Complex extensions may require multiple permissions in order to function properly (such as `tasks', which requires both arbitration and administration).
 
 The intention is that, since permissions are grouped into semantic bundles of functionality, it will be possible to develop \textit{specialized} mechanisms for mediating access to the underlying functionality (i.e. specialized funding mechanisms and specialized dispute-resolution mechanisms, as opposed to a general-purpose `voting' mechanism meant to handle all possible decisions).
 
@@ -115,7 +115,7 @@ Once the expenditure is finalized, all properties become locked (but subject to 
 
 Defining the payouts for each recipient, of course, does not provide the funds --- this must be done through the funding mechanisms in Colony. Payouts do not have to all be in the same token, and an expenditure's payouts can be made up of an arbitrary number of tokens.
 
-The expenditure is meant to be an abstract primitive which can support many types of workflows, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any appeals processes to complete before funds can exit the colony. \\
+The expenditure is meant to be an abstract primitive which can support many types of workflows, and so contains optional attributes to support more complex behavior (see Section \ref{sec:extensions}). For instance, the \texttt{payoutModifier} and \texttt{claimDelay} can be used to implement a rating and review system, where good or bad reviews lead to an across-the-board reputation increase (or payout decrease) for a recipient, while the \texttt{claimDelay} is set to allow for any relevant motions to be decided before funds can exit the colony. \\
 
 Once the tokens have been received by an account, they are under the control of the recipient --- there is no way to reclaim the funds. The funds have to cross the `Cryptographic Rubicon' somewhere in the system (by the nature of the blockchain), and it makes sense to do so here.\footnote{Currently, the only way this rule can be broken is by the Colony conspiring to abuse the `arbitrary transaction' feature described in Section \ref{sec:arbitrary-transaction}.}
 
@@ -248,7 +248,7 @@ A user's total reputation in a colony is their reputation in the root domain. Th
 
 There are three ways to receive reputation in a colony.\footnote{The \rc\ is a special case where reputation may also be earned by reputation mining (see Section \ref{sec:reputationmining}).} The first (and by far the most common) is through receiving a payout via an expenditure. The second is through the arbitration process. The third is upon the creation of a colony and the associated bootstrapping process.
 
-Reputation losses broadly occur as the result of arbitration, and extension contracts (see Section \ref{sec:extensions}) makes it possible to implement mechanisms which involve reputation penalties (such as tasks and challenges). In addition, all reputation earned by users is subject to a continual decay over time.
+Reputation losses broadly occur as the result of arbitration, and extension contracts (see Section \ref{sec:extensions}) makes it possible to implement mechanisms which involve reputation penalties (such as tasks and disputes). In addition, all reputation earned by users is subject to a continual decay over time.
 
 The rest of this section outlines each of these mechanisms, with references to the more detailed descriptions given elsewhere where appropriate.
 
@@ -256,13 +256,13 @@ The rest of this section outlines each of these mechanisms, with references to t
 
 Whenever an expenditure recipient receives a payout denominated in the colony's internal token, the recipient also receives some amount of reputation, scaled by that recipient's \texttt{payoutScalar}. A value of 1 gives reputation equivalent to the token payout, but a multiple of up to 2x is possible. The reputation is earned in the domain (and all parent domains) of the expenditure, and divided equally among any skills associated with that recipient.
 
-\subsubsection*{Reputation change as a result of arbitration}\label{sec:earning-rep-in-challenges}
+\subsubsection*{Reputation change as a result of arbitration}\label{sec:earning-rep-in-disputes}
 
-Arbitration permission holders have the ability to emit arbitrary reputation penalties (but not increases) in both domains and skills. While this might seem to be a significant power available to arbitration permission holders, recall that this permission will in many cases be assigned to extension contracts, which will mediate this ability via various mechanisms, such as an appeals process (see Section \ref{sec:appeals-and-challenges}).
+Arbitration permission holders have the ability to emit arbitrary reputation penalties (but not increases) in both domains and skills. While this might seem to be a significant power available to arbitration permission holders, recall that this permission will in many cases be assigned to extension contracts, which will mediate this ability via various mechanisms, such as the motions system (see Section \ref{sec:motions-and-disputes}).
 
 \subsubsection*{Bootstrapping reputation}\label{sec:bootstrapping-rep}
 
-Since a trustless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a trustless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no appeals can be made and no challenges can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
+Since a trustless colony's decision making procedure rests on reputation weighted voting, we are presented with a bootstrapping problem for new colonies. When a trustless colony is new, no-one has yet completed any work in it and so nobody will have earned any reputation. Consequently, no motions can be made and no disputes can be resolved as no-one is able to vote. Then, once the first expenditure is paid out, that user has a dictatorship over decisions in the same domains or skills until another user earns similar types of reputation.
 
 To prevent this, when a colony is created, the creator can choose accounts to have initial reputation assigned to them in the root domain to allow the colony to bootstrap itself. The reputation assigned to each user will be equal to the number of tokens received, i.e. if a member receives ten tokens, they also receive ten reputation in the root domain. Given that reputation decays over time, this initial bootstrapping will not have an impact on the long-term operation of the colony. This is the only time that reputation can be created without an associated expenditure being paid out. Users receiving reputation are presumably the colony founder and their colleagues, and this starting reputation should be seen as a representation of the existing trust which exists within the team.
 
@@ -296,7 +296,7 @@ Each skill that reputation can be earned in is assigned a \ascode{skillId} that 
 
 Upon creation, \ascode{nChildren} is 0 and \ascode{children[]} is empty. These two attributes in all parents are updated with the \ascode{skillId} of the new child skill on creation.\footnote{We acknowledge that this is fundamentally gas limited, but the only consequence of this will be the inability to create new skills once the maximum depth allowed by the block size is reached. Our calculations suggest this corresponds to a depth of around 80, which we believe  is likely to be sufficient for the majority of use cases.}
 
-Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol (see Section \ref{sec:reputationmining}) and the procedures for escalating appeals (see Section \ref{sec:appeals-and-challenges}). They are stored under the control of the \ascode{ColonyNetwork} contract.
+Storing these pieces of data on-chain is required, as they are used by the reputation mining protocol (see Section \ref{sec:reputationmining}) and the procedures for appealing motions (see Section \ref{sec:motions-and-disputes}). They are stored under the control of the \ascode{ColonyNetwork} contract.
 
 \subsubsection{Reputation update log}\label{subsec:reputation-update-log}
 
@@ -311,7 +311,7 @@ Whenever an event that causes one or more users to have their reputation updated
 \item How many total updates to reputations have occurred before this one in this cycle, including decays and updates to parents and children.
 \end{itemize}
 
-If the reputation update is the result of a challenge being resolved (as outlined in Section \ref{sec:earning-rep-in-challenges}), then instead of these first three properties, there is a reference to the challenge-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see Appendix \ref{appendix:rep-transfer}.
+If the reputation update is the result of a dispute being resolved (as outlined in Section \ref{sec:earning-rep-in-disputes}), then instead of these first three properties, there is a reference to the dispute-specific record of stakes in the relevant colony. For the structure of this log, and an explanation of the way that it allows individual updates to be extracted in constant gas, see Appendix \ref{appendix:rep-transfer}.
 
 This log exists to define an ordering of all reputation updates in a reputation update cycle that is accessible on-chain. In the event of a dispute during the reputation mining protocol (described in Section \ref{sec:reputationmining}), the \ascode{ColonyNetwork} contract can use this record to establish whether an update has been included correctly.
 
@@ -362,7 +362,7 @@ Stakes are managed via a sequence of \textit{approvals} and \textit{obligations}
  \label{fig:stake-deobligate}
 \end{figure}
 
-While an obligation is active, any \textbf{arbitration} permission holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}). We reiterate that this is a powerful ability and in most cases should be mediated by an appropriate extension (such as appeals, described in Section \ref{sec:appeals-and-challenges}).
+While an obligation is active, any \textbf{arbitration} permission holder can \textit{slash} the stake up to the amount of the obligation (see Figure \ref{fig:stake-slash}). We reiterate that this is a powerful ability and in most cases should be mediated by an appropriate extension (such as motions, described in Section \ref{sec:motions-and-disputes}).
 
 \begin{figure}[h]
     \centering
