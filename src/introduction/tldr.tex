@@ -1,19 +1,14 @@
-\subsection*{Introduction}
+\subsection*{Organizations, for the Internet}
 
-Colony is the people layer of the decentralised protocol stack --— an emerging collection of technologies built on Ethereum, which provide open, permissionless protocols for developers to create sophisticated products without having to build complex backend software. Augur provides a layer for prediction, 0x for exchange, Golem for computation, and Colony for human capital.
+The Colony Network is an Ethereum-based protocol for creating and operating Internet Organizations. In a traditional organization, rules are defined in policy documents and enforced by a management hierarchy; in an Internet Organization, rules are defined in code and enforced by a blockchain mining process. \\
 
-The Colony Protocol allows developers to integrate decentralised and self regulating division of labour, decision making, and financial management into their applications.
+Automating business rule enforcement makes organizational models which previously involved high coordination costs, such as Holacracy, more feasible. More exciting still, this automation enables entirely new and previously impossible organizational forms to come into being. By reducing the trust needed for people to collaboratively manage shared funds and enforce standards of conduct, it becomes possible to coordinate the entirety of an organization’s operations via market-style interactions, rather than through the internal processes of a firm. \\
 
-Colony brings about a new `Nature of the Firm' \cite{The-Nature-of-the-Firm} by significantly reducing both the transaction costs of the market exchange mechanism for labour, and trust required for people to work together. This innovation makes pseudonymous, peer-to-peer organisations possible. Rather than centralised ownership and hierarchical management, smart contracts distribute ownership according to the value each individual contributes, and influence emerges from the bottom up through systematic peer review of contributed work.
+An Internet Organization’s operations are not \textit{necessarily} analogous to traditional company processes, such as project management, budgeting, and decision-making, although they certainly \textit{can} be, and indeed Colony’s own application (\texttt{https://colony.io/connect}) is modeled that way. We anticipate the Colony protocol will be used to build economic incentives and decision-making mechanisms for platforms whose content or value proposition is created by users \textit{without top down decision-making of any kind}. Examples may include a photo-sharing app which meritocratically divides revenue between users, a driver-run P2P ridesharing service, crowdsourced claims handling in an insurance dApp, or a merchants’ guild in a virtual world. \\
 
-This paper seeks to describe and define our best current understanding of the Colony protocol, but touches only lightly on use cases. Specifically, it discusses only on-chain actions. In many areas, subject to use case, off-chain functionality will be beneficial. This may include messaging or informal polling, but as it does not need to happen on-chain, the specifics of how this occurs are beyond the scope of this document.
+This is primarily a technical document describing the current design of the Colony protocol, focusing on on-chain actions and affordances. In many cases off-chain functionality, such as messaging or other forms of signalling, will be essential for the proper functioning of the organization. However, as that communication is not consensus-relevant, it does not need to happen on-chain, so the specifics of how it might occur are not treated here. \\
 
-The Colony protocol is intended to be flexible and extensible. As it is the most challenging manifestation to consider, this permutation is designed with low trust, decentralised environments in mind. However, subsets of the functionality in different configurations would be applicable in different circumstances, such as where greater centralisation of trust is desired.
-
-We envisage this protocol being integrated into a variety of applications. It could form the basis of a decentralised ridesharing service, claims handling in an insurance dApp, or to provide the framework by which a merchants’ guild coordinates in a virtual world.
-
-
-
+Onward!
 
 
 %\\[3cm] %space before the image
@@ -21,4 +16,3 @@ We envisage this protocol being integrated into a variety of applications. It co
 %\begin{center}
 %\includegraphics[width=0.7\linewidth]{introduction/Colonylogo.png}
 %\end{center}
-

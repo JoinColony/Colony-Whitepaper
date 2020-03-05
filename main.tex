@@ -31,7 +31,12 @@
 \title{COLONY  \\
     \large Technical White Paper\\
     \footnotesize \gitAuthorDate\ --- commit \gitAbbrevHash}
-\author{ Alex Rea\thanks{\texttt{alex@colony.io}} \and Aron Fischer\thanks{\texttt{aron@colony.io}} \and Jack du Rose\thanks{\texttt{jack@colony.io}}}
+\author{
+	Alex Rea\thanks{\texttt{alex@colony.io}} \and
+	Daniel Kronovet\thanks{\texttt{krono@colony.io}} \and
+	Aron Fischer\thanks{\texttt{aron@colony.io}} \and
+	Jack du Rose\thanks{\texttt{jack@colony.io}}
+}
 \date{}
 \def\code#1{\texttt{#1}}
 %Define the listing package
@@ -146,7 +151,7 @@ captionpos=b
 
 
 %until we agree on a name
-\newcommand{\rc}{Meta Colony}
+\newcommand{\rc}{Metacolony}
 \newcommand{\rct}{Colony Network Token}
 \newcommand{\rcts}{Colony Network Tokens}
 \newcommand{\rcth}{Colony Network Token holder}
@@ -157,7 +162,7 @@ captionpos=b
 \newcommand{\rewardclaimduration}{60} % days
 \newcommand{\miningstakeduration}{90} % days
 \newcommand{\repdecayduration}{90} % days
-\newcommand{\miningcycleduration}{24} % hours
+\newcommand{\miningcycleduration}{1} % hours
 \FPeval{decayfactor}{round((\repdecayduration * 24) / \miningcycleduration, 0)}
 \FPeval{timetofail}{round((38011 * \miningcycleduration) / (365 * 24), 0)}
 
@@ -167,6 +172,7 @@ captionpos=b
 %for diagrams of trees etc:
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning}
+\usepackage{pgfplots}
 
 \usepackage{tablefootnote}
 \begin{document}
@@ -179,28 +185,17 @@ captionpos=b
 
 \setcounter{tocdepth}{2}
 \tableofcontents
+\newpage
 
 \input{./src/introduction/introduction.tex}
 \newpage
-\input{./src/network/network.tex}
-\newpage
-\input{./src/network/tokens.tex}
-\newpage
 \input{./src/colony/structure.tex}
 \newpage
-\input{./src/colony/colonytokens.tex}
+\input{./src/extensions/extensions.tex}
 \newpage
-\input{./src/colony/reputation.tex}
+\input{./src/network/network.tex}
 \newpage
 \input{./src/network/mining.tex}
-\newpage
-\input{./src/colony/finance.tex}
-\newpage
-\input{./src/colony/disputes.tex}
-\newpage
-\input{./src/colony/revenue.tex}
-\newpage
-\input{./src/extensions/special.tex}
 \newpage
 \input{./src/conclusion/conclusion.tex}
 \bibliographystyle{./src/bibliography/custom.bst}
@@ -208,9 +203,7 @@ captionpos=b
 
 \appendix
 \newpage
-\input{./src/appendices/appendixa.tex}
-\newpage
-\input{./src/appendices/appendixb.tex}
+\input{./src/appendices/appendices.tex}
 
 
 \end{document}
