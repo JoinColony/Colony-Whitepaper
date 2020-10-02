@@ -39,7 +39,7 @@ Among other things, this compartmentalisation of activity provides an essential 
 
 \subsubsection{Permissions}
 
-Access control in a colony is organized around the concepts of \textbf{permissions}. There are six different permissions (roughly in order of influence): recovery, root, arbitration, architecture, funding, and arbitration, each unlocking a bundle of semantically-related functionality.
+Access control in a colony is organized around the concepts of \textbf{permissions}. There are six different permissions (roughly in order of influence): recovery, root, arbitration, architecture, funding, and administration, each unlocking a bundle of semantically-related functionality.
 
 With the exception of the recovery and root permissions, all permissions are domain-specific (much like permissions in a Unix file system are directory-specific), with the rule that permissions held in a parent domain are inherited in all child domains. Put another way, have a permission in a domain gives you that permission in the entire \textit{subtree} rooted in that domain. To implement this inheritance, permissioned functions require a \textit{domain proof} of the following arguments:
 
