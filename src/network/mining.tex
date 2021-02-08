@@ -143,7 +143,7 @@ When a miner stakes, the timestamp of the stake is recorded.\footnote{If a miner
 \subsubsection*{Verifying a submission}
 If only one state is submitted by the end of the submission period, then the new state is accepted, and proposals of the next state can begin to be made. This is expected to be the most common occurrence.
 
-If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the a challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challenge-response}).
+If more than one state has been submitted, then either someone has made a mistake, or there is a malicious entity trying to introduce a fraudulent reputation change. In this event, the challenge-response protocol can establish which state is incorrect (see Section \ref{sec:challenge-response}).
 
 \subsubsection*{Mining rewards}
 
@@ -404,4 +404,4 @@ i.e. the mining reward $M$ is divided among the miners according to their relati
 
 \subsection{Emergency shutdown}\label{sec:big-red-button}
 
-Section \ref{sec:escape-hatches} described a transaction from a whitelisted account can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be made. Similarly, the reputation mining process will also have an emergency stop-and-repair mechanism (to begin with). This will allow the whitelisted accountes to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved (which will likely involve a contract upgrade). The colonies will be able to continue operations as usual using the reputations of the last valid state, which will be temporarily frozen and not decay.
+Section \ref{sec:escape-hatches} described a transaction from a whitelisted account can put a colony into `recovery mode' during which the state can be edited, the effects of bugs can be corrected and upgrades can be made. Similarly, the reputation mining process will also have an emergency stop-and-repair mechanism (to begin with). This will allow the whitelisted accounts to revert the reputation root hash to a previous version and halt all updates to the reputation state until the issues have been resolved (which will likely involve a contract upgrade). The colonies will be able to continue operations as usual using the reputations of the last valid state, which will be temporarily frozen and not decay.
